@@ -73,7 +73,7 @@ const Logs = () => {
 
         // Fill in previous month's blank days
         for (let i = 0; i < firstDay; i++) {
-            daysArray.push(<div key={`empty-${i}`} className="empty-day"></div>);
+            daysArray.push(<div key={`empty-${i}`} className="flex bg-[#333] min-h-25 p-5 items-center justify-center rounded-md"></div>);
         }
 
         // Fill in the days of the current month
@@ -113,7 +113,7 @@ const Logs = () => {
             daysArray.push(
                 <div
                     key={day}
-                    className={"day"}
+                    className={"flex border border-[#333] min-h-25 p-5 items-center justify-center rounded-md"}
                     onClick={() => workoutForDay && openWorkout(workoutForDay)}
                     onMouseEnter={() => workoutForDay && setHoverDay(day)}
                     onMouseLeave={() => workoutForDay && setHoverDay(null)}
@@ -137,30 +137,30 @@ const Logs = () => {
     };
 
     return (
-        <div className="logs-container">
+        <div className="flex p-6">
             <WorkoutLogModal isOpen={isModalOpen} onClose={closeModal} workout={selectedWorkout!}/>
-            <div className="logs-content">
-                <div className="calendar-header">
-                    <button onClick={handlePreviousMonth}>{"<"}</button>
-                    <h2>
+            <div className="flex flex-col items-center justify-center w-full h-full ">
+                <div className="flex items-center justify-between w-full p-2 mb-4">
+                    <button className="bg-[#3f76c0] rounded-md cursor-pointer p-1" onClick={handlePreviousMonth}>{"<"}</button>
+                    <h2 className="text-white text-xl font-semibold">
                         {currentMonth.toLocaleString("default", {month: "long"})}{" "}
                         {currentMonth.getFullYear()}
                     </h2>
-                    <button onClick={handleNextMonth}>{">"}</button>
+                    <button className="bg-[#3f76c0] rounded-md cursor-pointer p-1" onClick={handleNextMonth}>{">"}</button>
                 </div>
 
-                <div className="calendar">
+                <div className="flex flex-col w-full h-full">
                     {/* Days of the week */}
-                    <div className="days-of-week">
+                    <div className="grid grid-cols-7 gap-1 text-center text-white w-full text-sm font-semibold mb-2">
                         {daysOfWeek.map((day) => (
-                            <div key={day} className="day-of-week">
+                            <div key={day} >
                                 {day}
                             </div>
                         ))}
                     </div>
 
                     {/* Calendar days */}
-                    <div className="days-grid">{renderCalendarDays()}</div>
+                    <div className="grid grid-cols-7 gap-1 grow-1 text-center text-white w-full h-full">{renderCalendarDays()}</div>
                 </div>
             </div>
         </div>
