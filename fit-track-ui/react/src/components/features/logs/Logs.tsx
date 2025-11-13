@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from "react";
 import {getAllWorkoutsByCustomerId} from "../../../services/client.ts";
-import "./logs.scss";
-import {Workout} from "../../../types/index.ts";
+import {Workout} from "../../../types";
 import WorkoutLogModal from "../../common/modal/workout-log-modal/WorkoutLogModal.tsx";
 
 const Logs = () => {
@@ -15,8 +14,8 @@ const Logs = () => {
         const fetchData = async () => {
             try {
                 const id = localStorage.getItem("customerId");
-                const testRes = await getAllWorkoutsByCustomerId(id);
-                setWorkoutData(testRes.data);
+                const response= await getAllWorkoutsByCustomerId(id);
+                setWorkoutData(response.data);
             } catch (error) {
                 console.error("Could not retrieve customer: ", error);
             }
