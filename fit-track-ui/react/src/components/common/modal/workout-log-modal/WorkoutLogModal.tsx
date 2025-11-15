@@ -1,4 +1,3 @@
-import "./workout-log-modal.scss";
 import {Workout} from "../../../../types";
 import ReactDOM from "react-dom";
 
@@ -12,17 +11,17 @@ export const WorkoutLogModal = ({isOpen, onClose, workout}: { isOpen: boolean, o
     if (!isOpen) return null;
 
     return ReactDOM.createPortal(
-        <div className={`workout-log-modal ${isOpen ? "open" : ""}`}>
-            <div className="modal-overlay" onClick={onClose}></div>
-            <div className="workout-log-modal-content">
-                <span className="close" onClick={onClose}>&times;</span>
-                <h2>Workout: {date?.toDateString()}</h2>
-                <div className="workout-log-data">
+        <div className={`fixed inset-0 z-[9999] flex items-center justify-center ${isOpen ? "block" : "hidden"}`}>
+            <div className="bg-black/50 absolute inset-0" onClick={onClose}></div>
+            <div className="bg-[#333] relative z-[10] w-125 h-75 content-center rounded-md flex-col p-4">
+                <span className="text-white cursor-pointer text-2xl absolute top-4 right-4" onClick={onClose}>&times;</span>
+                <h2 className="text-2xl font-bold mb-2">Workout: {date?.toDateString()}</h2>
+                <div className="text-white">
                     <p><b>Workout Type:</b> {workout.workoutType}</p>
                     <p><b>Exercises:</b> {workout.exercises}</p>
                     <p><b>Calories:</b> {workout.calories} kcal</p>
                     <p><b>Duration:</b> {Math.floor(workout.durationMinutes! / 60)}hr(s)
-                        &nbsp;{workout.durationMinutes! % 60} minutes</p>
+                        &nbsp;{workout.durationMinutes! % 60} minute(s)</p>
                     <p><b>Volume:</b> {workout.volume!.toLocaleString()} lbs</p>
                 </div>
             </div>
