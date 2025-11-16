@@ -1,0 +1,31 @@
+# H2 in-memory database configuration for tests
+spring:
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DEFAULT_NULL_ORDERING=HIGH
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # JPA/Hibernate configuration for tests
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      # Configure Hibernate to create the schema
+      hibernate:
+        default_schema: fit_tracker
+        hbm2ddl:
+          create_namespaces: true
+      # Envers configuration
+      org:
+        hibernate:
+          envers:
+            audit_table_suffix: _aud
+            revision_field_name: rev
+            revision_type_field_name: revtype
+
+  # Disable Flyway for tests (use Hibernate schema generation instead)
+  flyway:
+    enabled: false
