@@ -1,6 +1,7 @@
 package com.robinsonir.fittrack.data.service.workout;
 
 import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
+import com.robinsonir.fittrack.data.entity.exercise.ExerciseEntity;
 import com.robinsonir.fittrack.data.entity.workout.WorkoutEntity;
 import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
 import com.robinsonir.fittrack.data.repository.workout.Workout;
@@ -10,9 +11,7 @@ import com.robinsonir.fittrack.mappers.WorkoutMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class WorkoutService {
@@ -55,7 +54,7 @@ public class WorkoutService {
 
         WorkoutEntity newWorkout = new WorkoutEntity();
         newWorkout.setWorkoutType(workoutCreationRequest.workoutType());
-        newWorkout.setExercises(workoutCreationRequest.exercises());
+        newWorkout.setExercises(new HashSet<>());
         newWorkout.setCalories(workoutCreationRequest.calories());
         newWorkout.setDurationMinutes(workoutCreationRequest.durationMinutes());
         newWorkout.setVolume(workoutCreationRequest.volume());

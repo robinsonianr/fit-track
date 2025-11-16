@@ -12,6 +12,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -188,7 +189,7 @@ public class WorkoutRepositoryTest {
         workout1.setCalories(500);
         workout1.setDurationMinutes(60);
         workout1.setWorkoutDate(OffsetDateTime.now());
-        workout1.setExercises(5);
+        workout1.setExercises(new HashSet<>());
         workout1.setVolume(1000);
         workout1.setCustomer(customer);
 
@@ -197,7 +198,7 @@ public class WorkoutRepositoryTest {
         workout2.setCalories(600);
         workout2.setDurationMinutes(45);
         workout2.setWorkoutDate(OffsetDateTime.now());
-        workout2.setExercises(4);
+        workout2.setExercises(new HashSet<>());
         workout2.setVolume(800);
         workout2.setCustomer(customer);
 
