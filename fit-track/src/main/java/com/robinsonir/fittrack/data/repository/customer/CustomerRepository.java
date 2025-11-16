@@ -15,11 +15,11 @@ public interface CustomerRepository extends JpaRepository<CustomerEntity, Long>,
     @Query("select c from CustomerEntity c where c.id = ?1")
     Optional<CustomerEntity> findCustomerById(Long id);
 
-    @Query("select c.email from CustomerEntity c where c.email = ?1")
+    @Query("select c from CustomerEntity c where c.email = ?1")
     Optional<CustomerEntity> findCustomerByEmail(String email);
 
     @Query("select c from CustomerEntity c where c.email = ?1")
-    Optional<CustomerEntity> findCustomerByUsername(String email);
+    Optional<CustomerEntity> findCustomerByUsername(String username);
 
     boolean existsByEmail(String email);
 }
