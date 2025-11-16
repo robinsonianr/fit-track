@@ -16,7 +16,6 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "api/v1/customers")
 public class CustomerController {
-
     private final CustomerService customerService;
 
     private final JwtTokenUtil jwtUtil;

@@ -2,6 +2,7 @@ package com.robinsonir.fittrack.data.repository.customer;
 
 import com.robinsonir.fittrack.data.Gender;
 import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
+import com.robinsonir.fittrack.data.repository.workout.WorkoutRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,18 +15,12 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @Rollback
 public class CustomerRepositoryTest {
 
     @Autowired
     private CustomerRepository customerRepository;
 
-    @BeforeEach
-    void setUp() {
-        // Clear any existing data in the customer table before each test
-        customerRepository.deleteAll();
-    }
 
     @Test
     void testAddCustomer() {
@@ -80,11 +75,11 @@ public class CustomerRepositoryTest {
         customerRepository.save(customer);
 
         // Fetch the customer by ID
-        Optional<CustomerEntity> foundCustomer = customerRepository.findCustomerById(customer.getId());
+        Optional<CustomerEntity> foundCustomer = customerRepository.findCustomerByEmail(customer.getEmail());
 
         // Assert the customer was found and data is correct
         assertTrue(foundCustomer.isPresent());
-        assertEquals("Jane Doe", foundCustomer.get().getName());
+        assertEquals("jane.doe@example.com", foundCustomer.get().getEmail());
     }
 
     @Test

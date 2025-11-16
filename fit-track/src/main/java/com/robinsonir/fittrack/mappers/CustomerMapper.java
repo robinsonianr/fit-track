@@ -13,11 +13,9 @@ import java.util.stream.Collectors;
 @Mapper(config = FitTrackMapperConfig.class, uses = {WorkoutMapper.class})
 public interface CustomerMapper {
 
-    @Mapping(target = "workouts", source = "customerWorkouts")
     @Mapping(target = "roles", source = "authorities")
     Customer customerEntityToCustomer(CustomerEntity customerEntity);
 
-    @Mapping(target = "workouts", source = "customerWorkouts")
     @Mapping(target = "roles", source = "authorities")
     List<Customer> customerEntityListToCustomerList(List<CustomerEntity> customerEntityList);
 

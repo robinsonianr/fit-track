@@ -66,6 +66,7 @@ dependencies {
     // Tests
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.mockito:mockito-inline:5.2.0")
+    testImplementation("com.h2database:h2")
 }
 
 tasks.withType<KotlinCompile> {

@@ -35,9 +35,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CustomerServiceTest {
-    WorkoutMapper workoutMapper = new WorkoutMapperImpl();
-
-    private final CustomerMapper customerMapper = new CustomerMapperImpl(workoutMapper);
+    private final CustomerMapper customerMapper = new CustomerMapperImpl();
 
     @Mock
     private CustomerRepository customerRepository;
@@ -79,16 +77,6 @@ public class CustomerServiceTest {
         customerEntity.setPassword("password123");
         customerEntity.setAge(30);
         customerEntity.setGender(Gender.MALE);
-
-        // Create and save a workout
-        WorkoutEntity workout = new WorkoutEntity();
-        workout.setCustomer(customerEntity);
-        workout.setWorkoutType("Rowing");
-        workout.setCalories(550);
-        workout.setDurationMinutes(90);
-        workout.setWorkoutDate(OffsetDateTime.now());
-
-        customerEntity.setCustomerWorkouts(List.of(workout));
 
         when(customerRepository.findCustomerById(customerId)).thenReturn(Optional.of(customerEntity));
 
@@ -248,14 +236,6 @@ public class CustomerServiceTest {
         testCustomerEntity.setGender(Gender.MALE);
         testCustomerEntity.setProfileImageId(profileImageId);
 
-        WorkoutEntity workout = new WorkoutEntity();
-        workout.setCustomer(testCustomerEntity);
-        workout.setWorkoutType("Rowing");
-        workout.setCalories(550);
-        workout.setDurationMinutes(90);
-        workout.setWorkoutDate(OffsetDateTime.now());
-        testCustomerEntity.setCustomerWorkouts(List.of(workout));
-
         when(customerRepository.findCustomerById(customerId)).thenReturn(Optional.of(testCustomerEntity));
         when(s3Service.getObject("fitness-tracker-customers", "profile-images/1/ca4cd8f6-3487-4e79-ba0f-56e8047d5a62"))
                 .thenReturn(expectedImageData);
@@ -290,14 +270,6 @@ public class CustomerServiceTest {
         testCustomerEntity.setPassword("hashedPassword");
         testCustomerEntity.setAge(30);
         testCustomerEntity.setGender(Gender.MALE);
-
-        WorkoutEntity workout = new WorkoutEntity();
-        workout.setCustomer(testCustomerEntity);
-        workout.setWorkoutType("Rowing");
-        workout.setCalories(550);
-        workout.setDurationMinutes(90);
-        workout.setWorkoutDate(OffsetDateTime.now());
-        testCustomerEntity.setCustomerWorkouts(List.of(workout));
 
         when(customerRepository.findCustomerById(customerId)).thenReturn(Optional.of(testCustomerEntity));
 
