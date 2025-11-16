@@ -19,7 +19,6 @@ public record Customer(
         Integer bodyFat,
         OffsetDateTime memberSince,
         List<String> roles,
-        List<Workout> workouts,
         String username,
         String profileImageId,
         OffsetDateTime lastModifiedDate

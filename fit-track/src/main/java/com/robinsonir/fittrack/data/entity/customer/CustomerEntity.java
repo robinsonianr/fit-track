@@ -63,10 +63,6 @@ public class CustomerEntity extends AbstractModifiedDateEntity implements UserDe
     @Column(name = "member_since")
     private OffsetDateTime memberSince;
 
-    @NotAudited
-    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<WorkoutEntity> customerWorkouts;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));

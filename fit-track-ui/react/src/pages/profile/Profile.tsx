@@ -1,6 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
-import {Customer} from "../../types";
+import {Customer, Workout} from "../../types";
 import {
+    getAllWorkoutsByCustomerId,
     getCustomer,
     getCustomerProfileImage,
     updateCustomer,
@@ -10,6 +11,7 @@ import axios from "axios";
 
 export const Profile = () => {
     const [customer, setCustomer] = useState<Customer | undefined>(undefined);
+    const [workoutData, setWorkoutData] = useState<Workout[]>([]);
     const [pfp, setPfp] = useState<string | undefined>(undefined);
     const defaultImg = "/assets/user.png";
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -68,8 +70,10 @@ export const Profile = () => {
         const fetchData = async () => {
             try {
                 const customerId = parseInt(id, 10);
-                const response = await getCustomer(customerId);
-                setCustomer(response.data);
+                const customerResp= await getCustomer(customerId);
+                const workoutsResp = await getAllWorkoutsByCustomerId(id);
+                setWorkoutData(workoutsResp.data);
+                setCustomer(customerResp.data);
             } catch (error) {
                 console.error("Could not retrieve customer: ", error);
             }
@@ -159,7 +163,7 @@ export const Profile = () => {
                                 <p className="text-black dark:text-gray-400">{memberDate}</p>
                             </div>
                             <div className="bg-[#222] rounded-md p-3 text-white">
-                                <p className="text-2xl font-bold text-black dark:text-white">{customer?.workouts?.length}</p>
+                                <p className="text-2xl font-bold text-black dark:text-white">{workoutData.length}</p>
                                 <p className="text-black dark:text-gray-400">Workouts</p>
                             </div>
                         </div>

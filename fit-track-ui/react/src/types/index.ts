@@ -13,7 +13,6 @@ export interface Customer {
     roles?: string[];
     username?: string;
     profileImageId?: string;
-    workouts?: Workout[];
 }
 
 
@@ -42,14 +41,4 @@ export type HealthInfo = {
     weightGoal?: number
     activity?: string
     bodyFat?: number
-}
-
-
-export type ProfileDetailsWidget = {
-    profile: ProfileDetails;
-    pfp?: string;
-}
-
-export type HealthInfoWidget = {
-    healthInfo: HealthInfo;
 }
