@@ -24,4 +24,7 @@ public class ExerciseEntity extends AbstractEntity {
 
     @Column(name = "reps", nullable = false)
     private Integer reps;
+
+    @Column(name = "weight_per_rep", nullable = false)
+    private Integer weightPerRep;
 }

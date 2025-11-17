@@ -42,6 +42,7 @@ spring:
     locations: classpath:db/migration
     baseline-on-migrate: true
     validate-on-migrate: true
+    out-of-order: true
   config:
     import: optional:file:.env[.properties]
   main:

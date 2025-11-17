@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(config = FitTrackMapperConfig.class, uses = {WorkoutMapper.class})
+@Mapper(config = FitTrackMapperConfig.class)
 public interface CustomerMapper {
 
     @Mapping(target = "roles", source = "authorities")

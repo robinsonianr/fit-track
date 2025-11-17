@@ -7,6 +7,7 @@ import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
 import com.robinsonir.fittrack.data.repository.workout.Workout;
 import com.robinsonir.fittrack.data.repository.workout.WorkoutRepository;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
+import com.robinsonir.fittrack.mappers.ExerciseMapper;
 import com.robinsonir.fittrack.mappers.WorkoutMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,9 @@ public class WorkoutServiceTest {
 
     @Mock
     private WorkoutMapper workoutMapper;
+
+    @Mock
+    private ExerciseMapper exerciseMapper;
 
     @InjectMocks
     private WorkoutService workoutService;
@@ -120,10 +124,11 @@ public class WorkoutServiceTest {
     @Test
     void addWorkout() {
         // Arrange
-        WorkoutCreationRequest workoutCreationRequest = new WorkoutCreationRequest(customer, 1, "Swimming", 400, 60, 15673, OffsetDateTime.now());
+        WorkoutCreationRequest workoutCreationRequest = new WorkoutCreationRequest(customer, new HashSet<>(), "Swimming", 400, 60, 15673, OffsetDateTime.now());
 
         WorkoutEntity newWorkout = new WorkoutEntity();
         newWorkout.setWorkoutType(workoutCreationRequest.workoutType());
+        newWorkout.setExercises(exerciseMapper.mapToExerciseEntities(workoutCreationRequest.exercises()));
         newWorkout.setCalories(workoutCreationRequest.calories());
         newWorkout.setDurationMinutes(workoutCreationRequest.durationMinutes());
         newWorkout.setWorkoutDate(workoutCreationRequest.workoutDate());
