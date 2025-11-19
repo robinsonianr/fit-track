@@ -22,7 +22,7 @@ DO $$
         END IF;
     END $$;
 
-CREATE TABLE IF NOT EXISTS fit_tracker.exercises (
+CREATE TABLE fit_tracker.exercises (
     id SERIAL PRIMARY KEY,
     version INTEGER NOT NULL,
     title VARCHAR(255) NOT NULL,

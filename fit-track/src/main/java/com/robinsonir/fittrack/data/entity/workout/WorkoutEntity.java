@@ -36,9 +36,6 @@ public class WorkoutEntity extends AbstractEntity {
     @JoinColumn(name = "workout_id")
     private Set<ExerciseEntity> exercises;
 
-    @Column(name = "volume")
-    private Integer volume;
-
     @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "customer_id", nullable = false)
     private CustomerEntity customer;

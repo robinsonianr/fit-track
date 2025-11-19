@@ -12,7 +12,6 @@ public record WorkoutCreationRequest(
         String workoutType,
         Integer calories,
         Integer durationMinutes,
-        Integer volume,
         OffsetDateTime workoutDate
 ) {
 }

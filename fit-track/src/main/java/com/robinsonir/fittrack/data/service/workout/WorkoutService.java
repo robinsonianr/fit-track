@@ -60,7 +60,6 @@ public class WorkoutService {
         newWorkout.setExercises(exerciseMapper.mapToExerciseEntities(workoutCreationRequest.exercises()));
         newWorkout.setCalories(workoutCreationRequest.calories());
         newWorkout.setDurationMinutes(workoutCreationRequest.durationMinutes());
-        newWorkout.setVolume(workoutCreationRequest.volume());
         newWorkout.setWorkoutDate(workoutCreationRequest.workoutDate());
 
 
