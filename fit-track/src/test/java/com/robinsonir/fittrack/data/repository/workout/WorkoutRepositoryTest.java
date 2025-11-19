@@ -190,7 +190,6 @@ public class WorkoutRepositoryTest {
         workout1.setDurationMinutes(60);
         workout1.setWorkoutDate(OffsetDateTime.now());
         workout1.setExercises(new HashSet<>());
-        workout1.setVolume(1000);
         workout1.setCustomer(customer);
 
         WorkoutEntity workout2 = new WorkoutEntity();
@@ -199,7 +198,6 @@ public class WorkoutRepositoryTest {
         workout2.setDurationMinutes(45);
         workout2.setWorkoutDate(OffsetDateTime.now());
         workout2.setExercises(new HashSet<>());
-        workout2.setVolume(800);
         workout2.setCustomer(customer);
 
         // Save the customer and workouts

@@ -12,7 +12,6 @@ public record Workout(
         Set<ExerciseEntity> exercises,
         Integer calories,
         Integer durationMinutes,
-        Integer volume,
         OffsetDateTime workoutDate
 ) {
 }

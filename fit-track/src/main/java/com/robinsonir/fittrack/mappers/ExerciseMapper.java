@@ -9,9 +9,10 @@ import java.util.Set;
 @org.mapstruct.Mapper(config = FitTrackMapperConfig.class)
 public interface ExerciseMapper {
 
-    @Mapping(target = "workoutId", source = "workout")
     Set<Exercise> mapToExerciseSet(Set<ExerciseEntity> exerciseEntities);
 
-    @Mapping(target = "workoutId", source = "workout")
     Set<ExerciseEntity> mapToExerciseEntities(Set<Exercise> exercises);
+
+    @Mapping(target = "version", ignore = true)
+    ExerciseEntity mapToExerciseEntity(Exercise exercise);
 }

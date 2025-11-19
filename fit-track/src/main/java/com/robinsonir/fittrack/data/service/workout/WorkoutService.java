@@ -1,7 +1,6 @@
 package com.robinsonir.fittrack.data.service.workout;
 
 import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
-import com.robinsonir.fittrack.data.entity.exercise.ExerciseEntity;
 import com.robinsonir.fittrack.data.entity.workout.WorkoutEntity;
 import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
 import com.robinsonir.fittrack.data.repository.workout.Workout;
@@ -68,7 +67,7 @@ public class WorkoutService {
         workoutRepository.save(newWorkout);
     }
 
-    public void checkIfCustomerExistsOrThrow(Long id) {
+    public void checkIfWorkoutExistsOrThrow(Long id) {
         if (!workoutRepository.existsById(id)) {
             throw new ResourceNotFoundException(
                     "workout with id [%s] not found".formatted(id)
