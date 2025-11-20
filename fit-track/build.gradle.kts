@@ -16,7 +16,7 @@ plugins {
 }
 
 group = "com.robinsonir"
-version = "1.2.1"
+version = "2.0.0"
 
 java {
     sourceCompatibility = JavaVersion.VERSION_17
@@ -61,6 +61,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.30") // Add Lombok annotation processor dependency
     annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
     // Database/Migration postgresql
+    implementation("org.flywaydb:flyway-core")
     runtimeOnly("org.postgresql:postgresql")
 
     // Tests

@@ -6,30 +6,31 @@ import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
 import com.robinsonir.fittrack.data.repository.workout.Workout;
 import com.robinsonir.fittrack.data.repository.workout.WorkoutRepository;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
+import com.robinsonir.fittrack.mappers.ExerciseMapper;
 import com.robinsonir.fittrack.mappers.WorkoutMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class WorkoutService {
 
 
     private final WorkoutMapper workoutMapper;
+    private final ExerciseMapper exerciseMapper;
 
     private final WorkoutRepository workoutRepository;
     private final CustomerRepository customerRepository;
 
     @Autowired
     public WorkoutService(WorkoutMapper workoutMapper,
-                          WorkoutRepository workoutRepository,
+                          WorkoutRepository workoutRepository, ExerciseMapper exerciseMapper,
                           CustomerRepository customerRepository) {
         this.workoutMapper = workoutMapper;
         this.workoutRepository = workoutRepository;
         this.customerRepository = customerRepository;
+        this.exerciseMapper = exerciseMapper;
     }
 
 
@@ -55,10 +56,9 @@ public class WorkoutService {
 
         WorkoutEntity newWorkout = new WorkoutEntity();
         newWorkout.setWorkoutType(workoutCreationRequest.workoutType());
-        newWorkout.setExercises(workoutCreationRequest.exercises());
+        newWorkout.setExercises(exerciseMapper.mapToExerciseEntities(workoutCreationRequest.exercises()));
         newWorkout.setCalories(workoutCreationRequest.calories());
         newWorkout.setDurationMinutes(workoutCreationRequest.durationMinutes());
-        newWorkout.setVolume(workoutCreationRequest.volume());
         newWorkout.setWorkoutDate(workoutCreationRequest.workoutDate());
 
 
@@ -67,7 +67,7 @@ public class WorkoutService {
         workoutRepository.save(newWorkout);
     }
 
-    public void checkIfCustomerExistsOrThrow(Long id) {
+    public void checkIfWorkoutExistsOrThrow(Long id) {
         if (!workoutRepository.existsById(id)) {
             throw new ResourceNotFoundException(
                     "workout with id [%s] not found".formatted(id)

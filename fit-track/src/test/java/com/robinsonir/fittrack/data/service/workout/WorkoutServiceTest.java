@@ -7,6 +7,7 @@ import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
 import com.robinsonir.fittrack.data.repository.workout.Workout;
 import com.robinsonir.fittrack.data.repository.workout.WorkoutRepository;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
+import com.robinsonir.fittrack.mappers.ExerciseMapper;
 import com.robinsonir.fittrack.mappers.WorkoutMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,6 +36,9 @@ public class WorkoutServiceTest {
 
     @Mock
     private WorkoutMapper workoutMapper;
+
+    @Mock
+    private ExerciseMapper exerciseMapper;
 
     @InjectMocks
     private WorkoutService workoutService;
@@ -54,9 +59,9 @@ public class WorkoutServiceTest {
     @Test
     void getAllWorkouts() {
         // Arrange
-        WorkoutEntity workoutEntity1 = new WorkoutEntity("Running", 500, 60, OffsetDateTime.now(), 1, 100, customer);
+        WorkoutEntity workoutEntity1 = new WorkoutEntity("Running", 500, 60, OffsetDateTime.now(), new HashSet<>(), customer);
         workoutEntity1.setId(1L);
-        WorkoutEntity workoutEntity2 = new WorkoutEntity("Cycling", 300, 45, OffsetDateTime.now(), 1, 100, customer);
+        WorkoutEntity workoutEntity2 = new WorkoutEntity("Cycling", 300, 45, OffsetDateTime.now(), new HashSet<>(), customer);
         workoutEntity2.setId(2L);
 
         List<WorkoutEntity> workoutList = new ArrayList<>();
@@ -64,8 +69,8 @@ public class WorkoutServiceTest {
         workoutList.add(workoutEntity2);
         when(workoutRepository.findAllWorkouts()).thenReturn(workoutList);
 
-        Workout workoutDTO1 = new Workout(1L, customer.getId(), "Running", 500, 60, null, null, OffsetDateTime.now());
-        Workout workoutDTO2 = new Workout(2L, customer.getId(), "Cycling", 300, 45, null, null, OffsetDateTime.now());
+        Workout workoutDTO1 = new Workout(1L, customer.getId(), "Running", new HashSet<>(), 500, 50, OffsetDateTime.now());
+        Workout workoutDTO2 = new Workout(2L, customer.getId(), "Cycling", new HashSet<>(), 600, 60, OffsetDateTime.now());
         List<Workout> workouts = new ArrayList<>();
         workouts.add(workoutDTO1);
         workouts.add(workoutDTO2);
@@ -86,8 +91,8 @@ public class WorkoutServiceTest {
     void getWorkoutSuccess() {
         // Arrange
         Long workoutId = 1L;
-        WorkoutEntity workoutEntity = new WorkoutEntity("Running", 500, 60, OffsetDateTime.now(), null, null, customer);
-        Workout expectedWorkout = new Workout(workoutId, customer.getId(), "Running", 500, 60, null, null, OffsetDateTime.now());
+        WorkoutEntity workoutEntity = new WorkoutEntity("Running", 500, 60, OffsetDateTime.now(), null, customer);
+        Workout expectedWorkout = new Workout(workoutId, customer.getId(), "Running", new HashSet<>(), 60, null, OffsetDateTime.now());
 
         when(workoutRepository.findWorkoutById(workoutId)).thenReturn(Optional.of(workoutEntity));
         when(workoutMapper.convertWorkoutEntityToWorkout(workoutEntity)).thenReturn(expectedWorkout);
@@ -119,10 +124,11 @@ public class WorkoutServiceTest {
     @Test
     void addWorkout() {
         // Arrange
-        WorkoutCreationRequest workoutCreationRequest = new WorkoutCreationRequest(customer, 1, "Swimming", 400, 60, 15673, OffsetDateTime.now());
+        WorkoutCreationRequest workoutCreationRequest = new WorkoutCreationRequest(customer, new HashSet<>(), "Swimming", 400, 60, OffsetDateTime.now());
 
         WorkoutEntity newWorkout = new WorkoutEntity();
         newWorkout.setWorkoutType(workoutCreationRequest.workoutType());
+        newWorkout.setExercises(exerciseMapper.mapToExerciseEntities(workoutCreationRequest.exercises()));
         newWorkout.setCalories(workoutCreationRequest.calories());
         newWorkout.setDurationMinutes(workoutCreationRequest.durationMinutes());
         newWorkout.setWorkoutDate(workoutCreationRequest.workoutDate());
@@ -140,25 +146,25 @@ public class WorkoutServiceTest {
     }
 
     @Test
-    void checkIfCustomerExistsOrThrowSuccess() {
+    void checkIfWorkoutExistsOrThrowSuccess() {
         // Arrange
         Long workoutId = 1L;
         when(workoutRepository.existsById(workoutId)).thenReturn(true);
 
         // Act and Assert
-        assertDoesNotThrow(() -> workoutService.checkIfCustomerExistsOrThrow(workoutId));
+        assertDoesNotThrow(() -> workoutService.checkIfWorkoutExistsOrThrow(workoutId));
         verify(workoutRepository, times(1)).existsById(workoutId);
     }
 
     @Test
-    void checkIfCustomerExistsOrThrowThrowsResourceNotFoundException() {
+    void checkIfWorkoutExistsOrThrowThrowsResourceNotFoundException() {
         // Arrange
         Long workoutId = 1L;
         when(workoutRepository.existsById(workoutId)).thenReturn(false);
 
         // Act and Assert
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
-                () -> workoutService.checkIfCustomerExistsOrThrow(workoutId));
+                () -> workoutService.checkIfWorkoutExistsOrThrow(workoutId));
 
         assertEquals("workout with id [1] not found", exception.getMessage());
         verify(workoutRepository, times(1)).existsById(workoutId);
