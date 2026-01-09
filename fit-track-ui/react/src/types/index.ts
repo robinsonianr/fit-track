@@ -23,22 +23,15 @@ export interface Workout {
     calories?: number;
     durationMinutes?: number;
     workoutDate: Date;
-    exercises?: number;
-    volume?: number;
+    exercises?: Exercise[];
 }
 
-export type ProfileDetails = {
-    name?: string
-    email?: string
-    memberSince?: Date
-}
-
-export type HealthInfo = {
-    age?: number
-    gender?: string
-    weight?: number
-    height?: number
-    weightGoal?: number
-    activity?: string
-    bodyFat?: number
+export interface Exercise {
+    title: string;
+    description: string;
+    muscleGroup: string;
+    concentration: string;
+    sets: number;
+    reps: number;
+    weightPerRep: number;
 }
