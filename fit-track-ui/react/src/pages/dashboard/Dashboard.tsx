@@ -1,35 +1,95 @@
 import { useEffect, useState } from "react";
 import { useOutletContext } from "react-router-dom";
-import { Customer } from "../../types/index.ts";
-// import CalorieWidget from "../../components/common/widgets/workout-calorie-visual/CalorieWidget.tsx";
-// import VolumeWidget from "../../components/common/widgets/workout-volume-visual/VolumeWidget.tsx";
-// import DurationWidget from "../../components/common/widgets/workout-duration-visual/DurationWidget.tsx";
-// import AverageInfoWidget from "../../components/common/widgets/number-of-workouts/AverageInfoWidget.tsx";
-// import WorkoutToCalories from "../../components/common/widgets/workout-to-calories/WorkoutToCalories.tsx";
+import { Customer, Workout } from "../../types/index.ts";
+import { getAllWorkoutsByCustomerId } from "../../services/client.ts";
+
+import { 
+    filterWorkoutsThisWeek,
+    calculateTotalCalories,
+    calculateTotalMinutes,
+    calculateTotalVolume,
+    calculateVolumeChange,
+    formatNumber,
+} from "../../utils/dashboardCalculations.ts";
+
 import { isDateInThisWeek, sortWorkoutsAsc } from "../../utils/utilities.ts";
-// import WeightHistory from "../../components/common/widgets/weight-history-visual/WeightHistory.tsx";
+
 import "./dashboard.css";
 
 export const Dashboard = () => {
     const { customer } = useOutletContext<{ customer: Customer | undefined }>();
+    const [workouts, setWorkouts] = useState<Workout[]>([]);
+
+    // Dashboard metrics state
+    const [workoutsThisWeek, setWorkoutsThisWeek] = useState<number>(0);
+    const [caloriesBurned, setCaloriesBurned] = useState<number>(0);
+    const [activeMinutes, setActiveMinutes] = useState<number>(0);
+    const [volumeLifted, setVolumeLifted] = useState<number>(0);
+    const [volumeChange, setVolumeChange] = useState<string>("0%");
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     
     const today = new Date();
     const thisWeek = new Date(today);
     thisWeek.setDate(today.getDate() - today.getDay());
-    // const [selectedWeek, setSelectedWeek] = useState<Date>(thisWeek);
     const [weeks, setWeeks] = useState<Date[]>([]);
 
-    // const handleOnchange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    //     setSelectedWeek(new Date(event.target.value));
-    // };
+    // Fetch workouts separately to avoid unnecessary re-renders
+    useEffect(() => {
+        const fetchWorkouts = async () => {
+            if (!customer?.id) {
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                const response = await getAllWorkoutsByCustomerId(customer.id);
+                setWorkouts(response.data);
+            } catch (error) {
+                console.error("Error fetching workouts:", error);
+                setWorkouts([]);
+            }
+        };
+
+        fetchWorkouts();
+    }, [customer?.id]);
+    
+    // Calculate dashboard metrics (Monday-Sunday week)
+    useEffect(() => {
+        if (!customer || workouts.length === 0) {
+            setIsLoading(false);
+            return;
+        }
+
+        try {
+            const weekWorkouts = filterWorkoutsThisWeek(workouts);
+
+            const workoutCount = weekWorkouts.length;
+            const calories = calculateTotalCalories(weekWorkouts);
+            const minutes = calculateTotalMinutes(weekWorkouts);
+            const volume = calculateTotalVolume(weekWorkouts);
+            const change = calculateVolumeChange(weekWorkouts, workouts);
+
+            // Update state
+            setWorkoutsThisWeek(workoutCount);
+            setCaloriesBurned(calories);
+            setActiveMinutes(minutes);
+            setVolumeLifted(volume);
+            setVolumeChange(change);
+            setIsLoading(false);
+
+        } catch (error) {
+            console.error("Error calculating dashboard metrics:", error);
+            setIsLoading(false);
+        }
+    }, [customer, workouts]);
 
     useEffect(() => {
-        if (customer?.workouts) {
-            const workouts = sortWorkoutsAsc(customer.workouts);
+        if (workouts.length > 0) {
+            const sortedWorkouts = sortWorkoutsAsc(workouts);
             let date: Date;
             const newWeeks: Date[] = [...weeks];
 
-            workouts.forEach((workout) => {
+            sortedWorkouts.forEach((workout) => {
                 date = new Date(workout.workoutDate.toString());
 
                 if (!isDateInThisWeek(date)) {
@@ -92,7 +152,9 @@ export const Dashboard = () => {
                     <div className="widget-content">
                         <div>
                             <p className="widget-info">Workouts This Week</p>
-                            <p className="widget-value">0</p>
+                            <p className="widget-value">
+                                {isLoading ? "..." : workoutsThisWeek}
+                            </p>
                             <p className="widget-target">Target: 4 workouts</p>
                         </div>
                         <div className="widget-icon-container widget-icon-purple">
@@ -107,7 +169,9 @@ export const Dashboard = () => {
                     <div className="widget-content">
                         <div>
                             <p className="widget-info">Calories Burned</p>
-                            <p className="widget-value">0</p>
+                            <p className="widget-value">
+                                {isLoading ? "..." : formatNumber(caloriesBurned)}
+                            </p>
                             <p className="widget-target">Target: 2,500 kcal</p>
                         </div>
                         <div className="widget-icon-container widget-icon-orange">
@@ -122,7 +186,9 @@ export const Dashboard = () => {
                     <div className="widget-content">
                         <div>
                             <p className="widget-info">Active Minutes</p>
-                            <p className="widget-value">0</p>
+                            <p className="widget-value">
+                                {isLoading ? "..." : formatNumber(activeMinutes)}
+                            </p>
                             <p className="widget-target">Target: 150 minutes</p>
                         </div>
                         <div className="widget-icon-container widget-icon-blue">
@@ -137,8 +203,12 @@ export const Dashboard = () => {
                     <div className="widget-content">
                         <div>
                             <p className="widget-info">Volume Lifted</p>
-                            <p className="widget-value">0</p>
-                            <p className="text-sm text-green-600 dark:text-green-400">+12% from last week</p>
+                            <p className="widget-value">
+                                {isLoading ? "..." : formatNumber(volumeLifted)}
+                            </p>
+                            <p className={`text-sm ${volumeChange.startsWith("+") ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                                {volumeChange} from last week
+                            </p>
                         </div>
                         <div className="widget-icon-container widget-icon-green">
                             <svg className="widget-icon icon-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">

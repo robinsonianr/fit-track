@@ -24,6 +24,7 @@ export interface Workout {
     durationMinutes?: number;
     workoutDate: Date;
     exercises?: Exercise[];
+    volume?: number;
 }
 
 export interface Exercise {
