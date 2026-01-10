@@ -64,7 +64,6 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
                     exercises: selectedExercises,
                     workoutDate: new Date().toISOString()
                 };
-                console.log(workoutData);
                 await addWorkout(workoutData);
                 onClose();
 
