@@ -54,3 +54,12 @@
     @apply bg-gray-800 text-gray-100;
   }
 }
+
+@theme {
+  --animate-marquee: marquee 3s linear infinite;
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}

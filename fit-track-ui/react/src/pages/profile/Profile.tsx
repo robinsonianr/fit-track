@@ -118,7 +118,6 @@ export const Profile = () => {
         if (customer?.id) {
             try {
                 await updateCustomer(customer?.id, data);
-
                 setTimeout(() => {
                     window.location.reload();
                 }, 500);
