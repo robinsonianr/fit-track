@@ -26,6 +26,9 @@ public class WorkoutEntity extends AbstractEntity {
     @Column(name = "calories")
     private Integer calories;
 
+    @Column(name = "volume")
+    private Integer volume;
+
     @Column(name = "duration_minutes")
     private Integer durationMinutes;
 

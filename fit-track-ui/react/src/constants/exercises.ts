@@ -177,6 +177,12 @@ export const PREDEFINED_EXERCISES: PredefinedExercise[] = [
         muscleGroup: "Back",
         concentration: "Lower Back"
     },
+    {
+        title: "Seated Back Extension",
+        description: "Seated back extensions for lower back",
+        muscleGroup: "Back",
+        concentration: "Lower Back"
+    },
 
     // Legs
     {
@@ -218,6 +224,12 @@ export const PREDEFINED_EXERCISES: PredefinedExercise[] = [
     {
         title: "Romanian Deadlift",
         description: "Hip-hinge movement for hamstrings and glutes",
+        muscleGroup: "Legs",
+        concentration: "Hamstrings"
+    },
+    {
+        title: "Dumbbell Romanian Deadlift",
+        description: "Hip-hinge movement for hamstrings and glutes while holding a pair of dumbbells next to your hips",
         muscleGroup: "Legs",
         concentration: "Hamstrings"
     },
@@ -296,6 +308,12 @@ export const PREDEFINED_EXERCISES: PredefinedExercise[] = [
     {
         title: "Seated Calf Raises",
         description: "Seated machine calf raises targeting the soleus",
+        muscleGroup: "Legs",
+        concentration: "Calves"
+    },
+    {
+        title: "Standing Machine Calf Raises",
+        description: "Standing machine calf raises targeting the soleus",
         muscleGroup: "Legs",
         concentration: "Calves"
     },
@@ -503,6 +521,12 @@ export const PREDEFINED_EXERCISES: PredefinedExercise[] = [
     {
         title: "Crunches",
         description: "Basic abdominal crunches",
+        muscleGroup: "Core",
+        concentration: "Abs"
+    },
+    {
+        title: "Ab Crunch Machine",
+        description: "Abdominal crunches while sitting upright",
         muscleGroup: "Core",
         concentration: "Abs"
     },
