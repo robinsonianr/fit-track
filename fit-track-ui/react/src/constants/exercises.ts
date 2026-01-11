@@ -580,10 +580,17 @@ export const PREDEFINED_EXERCISES: PredefinedExercise[] = [
     },
     {
         title: "Overhead Tricep Extension",
-        description: "Dumbbell or cable overhead extension for long head triceps",
+        description: "Cable overhead extension for long head triceps",
         muscleGroup: "Arms",
         concentration: "Triceps",
         dumbbells: false
+    },
+    {
+        title: "Dumbbell Overhead Tricep Extension",
+        description: "Dumbbell overhead extension for long head triceps",
+        muscleGroup: "Arms",
+        concentration: "Triceps",
+        dumbbells: true
     },
     {
         title: "Close-Grip Bench Press",
