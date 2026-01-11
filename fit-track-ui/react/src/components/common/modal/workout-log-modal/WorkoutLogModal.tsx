@@ -18,6 +18,7 @@ export const WorkoutLogModal = ({isOpen, onClose, workout}: { isOpen: boolean, o
                 <div className="text-white">
                     <p><b>Workout Type:</b> {workout.workoutType}</p>
                     <p><b>Calories:</b> {workout.calories} kcal</p>
+                    <p><b>Volume:</b> {workout.volume} lbs</p>
                     <p><b>Duration:</b> {Math.floor(workout.durationMinutes! / 60)}hr(s)
                         &nbsp;{workout.durationMinutes! % 60} minute(s)</p>
                 </div>

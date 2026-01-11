@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 import {addWorkout} from "../../../../services/client.ts";
 import {Customer, Exercise} from "../../../../types";
 import ReactDOM from "react-dom";
@@ -11,6 +11,7 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
     const [sets, setSets] = useState(0);
     const [reps, setReps] = useState(0);
     const [weight, setWeight] = useState(0);
+    const [volume, setVolume] = useState(0);
     const [selectedMuscleGroup, setSelectedMuscleGroup] = useState("");
     const [selectedConcentration, setSelectedConcentration] = useState("");
 
@@ -31,6 +32,12 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
         });
     }, [selectedMuscleGroup, selectedConcentration]);
 
+    useEffect(() => {
+        selectedExercises.forEach(ex => {
+            setVolume(volume + ex.sets * ex.reps * ex.weightPerRep);
+        });
+    }, [selectedExercises, setSelectedExercises]);
+
     const addExercise = (selectedTitle: string, sets: number, reps: number, weight: number) => {
         const predefined = PREDEFINED_EXERCISES.find(ex => ex.title === selectedTitle);
         if (!predefined) return;
@@ -50,6 +57,7 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
     const handleClose = () => {
         setSelectedExercises([]);
         onClose();
+        setVolume(0);
     };
 
     const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
@@ -84,7 +92,7 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
     return ReactDOM.createPortal(
         <div className={`fixed inset-0 z-[9999] flex items-center justify-center ${isOpen ? "open" : ""}`}>
             <div className="bg-black/50 absolute inset-0" onClick={handleClose}></div>
-            <div className="bg-[#333] relative z-[10] w-175 h-170 content-center rounded-md flex-col p-4">
+            <div className="bg-[#333] relative z-[10] w-175 h-185 content-center rounded-md flex-col p-4">
                 <span className=" absolute cursor-pointer text-[#888] top-1 right-3.5" onClick={handleClose}>&times;</span>
                 <h1 className="font-bold">Add Workout</h1>
                 <form className="text-white flex flex-col gap-2 text-sm p-2 mt-2 " onSubmit={handleSubmit}>
@@ -160,7 +168,7 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
                                     <input placeholder="Reps" type="number" onChange={(e) => setReps(parseInt(e.target.value))} className="text-sm rounded-md w-full p-2"/>
                                 </div>
                                 <div>
-                                    <label className="font-bold">Weight Per Rep</label>
+                                    <label className="font-bold">Weight Per Rep (lbs)</label>
                                     <input placeholder="Weight" type="number" onChange={(e) => setWeight(parseFloat(e.target.value))} className="text-sm rounded-md w-full p-2"/>
                                 </div>
                             </div>
@@ -173,6 +181,10 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
                                 <span className="text-xs whitespace-nowrap group-hover:animate-marquee">{exercise.title} - {exercise.sets}x{exercise.reps} @ {exercise.weightPerRep} lbs</span>
                             </div>
                         ))}
+                    </div>
+                    <div>
+                        <label className="font-bold">Volume (lbs)</label>
+                        <input className="rounded-md p-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" value={volume} type="number" name="volume" readOnly/>
                     </div>
                     <div>
                         <label className="font-bold">Calories (kcal)</label>
