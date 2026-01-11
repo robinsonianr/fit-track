@@ -15,6 +15,7 @@ public class WorkoutRowMapper implements RowMapper<WorkoutEntity> {
         WorkoutEntity workout = new WorkoutEntity();
         workout.setId(rs.getLong("id"));
         workout.setWorkoutType(rs.getString("workout_type"));
+        workout.setVolume(rs.getInt("volume"));
         workout.setCalories(rs.getInt("calories"));
         workout.setDurationMinutes(rs.getInt("duration_minutes"));
 
