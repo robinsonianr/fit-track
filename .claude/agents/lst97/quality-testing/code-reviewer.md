@@ -183,7 +183,7 @@ Here is an example of the expected output for a hypothetical review:
 
 ---
 
-### **Code Review Summary**
+### Code Review Summary
 
 Overall assessment: Solid contribution with functional core logic
 
@@ -193,9 +193,9 @@ Overall assessment: Solid contribution with functional core logic
 
 ---
 
-### **Critical Issues** 🚨
+### Critical Issues 🚨
 
-**1. SQL Injection Vulnerability**
+## 1. SQL Injection Vulnerability
 
 - **Location**: `src/database.js:42`
 - **Problem**: This database query is vulnerable to SQL injection because it uses template literals to directly insert the `userId` into the query string. An attacker could manipulate the `userId` to execute malicious SQL.
@@ -215,9 +215,9 @@ Overall assessment: Solid contribution with functional core logic
 
 - **Rationale**: Parameterized queries prevent SQL injection by properly escaping user input
 
-### **Warnings** ⚠️
+### Warnings ⚠️
 
-**1. Missing Error Handling**
+### 1. Missing Error Handling
 
 - **Location**: `src/api.js:15`
 - **Problem**: The `fetchUserData` function does not handle potential network errors from the `axios.get` call. If the external API is unavailable, this will result in an unhandled promise rejection.
@@ -247,9 +247,9 @@ Overall assessment: Solid contribution with functional core logic
 
 - **Impact**: Could crash the server if external API is unavailable
 
-### **Suggestions** 💡
+### Suggestions 💡
 
-**1. Ambiguous Function Name**
+#### 1. Ambiguous Function Name
 
 - **Location**: `src/utils.js:8`
 - **Enhancement**: The function `getData()` is too generic. Its name doesn't describe what kind of data it processes or returns.

@@ -148,6 +148,7 @@ Located in `fit-track/src/main/resources/db/migration/`. Flyway manages versione
 
 **State Management:**
 Uses React Context API (no Redux/Zustand):
+
 - **AuthContext**: Manages authentication state, JWT token, and customer data
 - **ThemeContext**: Manages light/dark/system theme preferences
 
@@ -211,9 +212,11 @@ GET    /api/v1/audit/{entityId}                # Get weight audit history
 - Revisions stored in `revinfo` and `customer_aud` tables
 
 ## Subagent Orchestration
+
 When a task requires deep domain expertise or multi-step execution, delegate to the specialized agents located in `.claude/agents/lst97/`.
 
 ### Dispatch Protocol
+
 1. **Identify**: Determine the best specialist for the task (e.g., use `java-architect` for Gradle issues).
 2. **Context**: Provide the subagent with relevant file paths and the specific goal.
 3. **Execute**: Call the agent using the `/agents` command or by referencing their role.
@@ -249,6 +252,7 @@ Test account available:
 ### Backend Patterns
 
 **Entity Design:**
+
 - `AbstractEntity`: Base class with `id` and `version`
 - `AbstractModifiedDateEntity`: Adds `createdDate` and `lastModifiedDate` timestamps
 - `AbstractAuditEntity`: Extends modified date entity with Hibernate Envers auditing

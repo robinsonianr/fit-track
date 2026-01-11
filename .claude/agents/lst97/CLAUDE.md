@@ -137,7 +137,7 @@ When multiple solutions exist, prioritize in this order:
 
 # Agent Dispatch Protocol (Follow once the Agent-Organizer sub agent being called or used)
 
-## Philosophy
+## Part 1: Philosophy
 
 ### Core Belief: Delegate, Don't Solve
 
@@ -168,7 +168,7 @@ graph TD
 
 ---
 
-## Process
+## Agent Dispatch Protocol Process
 
 ### 1. Triage the Request
 
@@ -236,7 +236,7 @@ graph TD
 
 ---
 
-## Important Reminders
+## Important Reminders (General)
 
 **NEVER:**
 

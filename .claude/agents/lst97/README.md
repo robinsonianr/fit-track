@@ -20,7 +20,7 @@ Agents are now organized into logical categories for easier navigation:
 
 ### 🏗️ [Development](agents/development/)
 
-**Frontend & UI Specialists**
+#### Frontend & UI Specialists
 
 - **[frontend-developer](agents/development/frontend-developer.md)** - Build React components, implement responsive layouts, and handle client-side state management
 - **[ui-designer](agents/development/ui-designer.md)** - Creative UI design focused on user-friendly interfaces
@@ -28,23 +28,23 @@ Agents are now organized into logical categories for easier navigation:
 - **[react-pro](agents/development/react-pro.md)** - Expert React development with hooks, performance optimization, and best practices
 - **[nextjs-pro](agents/development/nextjs-pro.md)** - Next.js specialist for SSR, SSG, and full-stack React applications
 
-**Backend & Architecture**
+### Backend & Architecture
 
 - **[backend-architect](agents/development/backend-architect.md)** - Design RESTful APIs, microservice boundaries, and database schemas
 - **[full-stack-developer](agents/development/full-stack-developer.md)** - End-to-end web application development from UI to database with seamless integration
 
-**Language Specialists**
+## Language Specialists
 
 - **[python-pro](agents/development/python-pro.md)** - Write idiomatic Python code with advanced features and optimizations
 - **[golang-pro](agents/development/golang-pro.md)** - Write idiomatic Go code with goroutines, channels, and interfaces
 - **[typescript-pro](agents/development/typescript-pro.md)** - Advanced TypeScript development with type safety and modern patterns
 
-**Platform & Mobile**
+## Platform & Mobile
 
 - **[mobile-developer](agents/development/mobile-developer.md)** - Develop React Native or Flutter apps with native integrations
 - **[electron-pro](agents/development/electorn-pro.md)** - Electron desktop application development and cross-platform solutions
 
-**Developer Experience**
+## Developer Experience
 
 - **[dx-optimizer](agents/development/dx-optimizer.md)** - Developer Experience specialist that improves tooling, setup, and workflows
 - **[legacy-modernizer](agents/development/legacy-modernizer.md)** - Refactor legacy codebases and implement gradual modernization
@@ -67,7 +67,7 @@ Agents are now organized into logical categories for easier navigation:
 
 ### 📊 [Data & AI](agents/data-ai/)
 
-**Data Engineering & Analytics**
+## Data Engineering & Analytics
 
 - **[data-engineer](agents/data-ai/data-engineer.md)** - Build ETL pipelines, data warehouses, and streaming architectures
 - **[data-scientist](agents/data-ai/data-scientist.md)** - Data analysis expert for SQL queries, BigQuery operations, and data insights
@@ -75,7 +75,7 @@ Agents are now organized into logical categories for easier navigation:
 - **[postgres-pro](agents/data-ai/postgres-pro.md)** - PostgreSQL database expert for advanced queries and optimizations
 - **[graphql-architect](agents/data-ai/graphql-architect.md)** - Design GraphQL schemas, resolvers, and federation patterns
 
-**AI & Machine Learning**
+## AI & Machine Learning
 
 - **[ai-engineer](agents/data-ai/ai-engineer.md)** - Build LLM applications, RAG systems, and prompt pipelines
 - **[ml-engineer](agents/data-ai/ml-engineer.md)** - Implement ML pipelines, model serving, and feature engineering
@@ -699,4 +699,4 @@ Both examples include actual token counts, execution times, and deliverable qual
 
 ---
 
-*Happy coding with your AI specialist team! 🚀*
+### Happy coding with your AI specialist team! 🚀
