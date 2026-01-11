@@ -10,6 +10,7 @@ public record WorkoutCreationRequest(
         CustomerEntity customer,
         Set<Exercise> exercises,
         String workoutType,
+        Integer volume,
         Integer calories,
         Integer durationMinutes,
         OffsetDateTime workoutDate

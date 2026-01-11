@@ -1,6 +1,6 @@
 <!-- Thank you for using the Fit Track pull request template. -->
 
-# Fit Track: Title
+# FTRACK-#: Title
 
 ## Description
 

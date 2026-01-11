@@ -10,6 +10,7 @@ public record Workout(
         Long customerId,
         String workoutType,
         Set<ExerciseEntity> exercises,
+        Integer volume,
         Integer calories,
         Integer durationMinutes,
         OffsetDateTime workoutDate

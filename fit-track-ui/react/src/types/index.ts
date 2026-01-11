@@ -21,6 +21,7 @@ export interface Workout {
     customerId?: string;
     workoutType?: string;
     calories?: number;
+    volume?: number;
     durationMinutes?: number;
     workoutDate: Date;
     exercises?: Exercise[];
