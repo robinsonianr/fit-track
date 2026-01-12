@@ -538,10 +538,17 @@ export const PREDEFINED_EXERCISES: PredefinedExercise[] = [
     },
     {
         title: "Skull Crushers",
-        description: "Lying tricep extensions with barbell or dumbbells",
+        description: "Lying tricep extensions with barbell",
         muscleGroup: "Arms",
         concentration: "Triceps",
         dumbbells: false
+    },
+    {
+        title: "Dumbbell Skull Crushers",
+        description: "Lying tricep extensions with dumbbells",
+        muscleGroup: "Arms",
+        concentration: "Triceps",
+        dumbbells: true
     },
     {
         title: "Preacher Curls",
