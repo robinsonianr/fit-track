@@ -25,7 +25,6 @@ export interface Workout {
     durationMinutes?: number;
     workoutDate: Date;
     exercises?: Exercise[];
-    volume?: number;
 }
 
 export interface Exercise {
@@ -36,4 +35,5 @@ export interface Exercise {
     sets: number;
     reps: number;
     weightPerRep: number;
+    dumbbells: boolean;
 }

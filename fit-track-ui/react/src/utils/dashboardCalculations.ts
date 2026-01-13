@@ -98,7 +98,8 @@ export const calculateTotalVolume = (workouts: Workout[]): number => {
                 const sets = exercise.sets ?? 0;
                 const reps = exercise.reps ?? 0;
                 const weightPerRep = exercise.weightPerRep ?? 0;
-                return exerciseTotal + (sets * reps * weightPerRep);
+                const multiplier = exercise.dumbbells ? 2 : 1;
+                return exerciseTotal + (sets * reps * weightPerRep * multiplier);
             }, 0);
             return total + workoutVolume;
         }

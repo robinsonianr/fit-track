@@ -33,10 +33,13 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
     }, [selectedMuscleGroup, selectedConcentration]);
 
     useEffect(() => {
+        let weight = 0;
         selectedExercises.forEach(ex => {
-            setVolume(volume + ex.sets * ex.reps * ex.weightPerRep);
+            const multiplier = ex.dumbbells ? 2 : 1;
+            weight += ex.sets * ex.reps * ex.weightPerRep * multiplier;
         });
-    }, [selectedExercises, setSelectedExercises]);
+        setVolume(weight);
+    }, [selectedExercises]);
 
     const addExercise = (selectedTitle: string, sets: number, reps: number, weight: number) => {
         const predefined = PREDEFINED_EXERCISES.find(ex => ex.title === selectedTitle);
@@ -48,7 +51,8 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
             concentration: predefined.concentration,
             sets: sets,
             reps: reps,
-            weightPerRep: weight
+            weightPerRep: weight,
+            dumbbells: predefined.dumbbells
         };
         setSelectedExercises([...selectedExercises, newExercise]);
         setExerciseTitle("");
