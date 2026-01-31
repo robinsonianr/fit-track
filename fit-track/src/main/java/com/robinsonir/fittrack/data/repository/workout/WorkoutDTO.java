@@ -5,9 +5,10 @@ import com.robinsonir.fittrack.data.entity.exercise.ExerciseEntity;
 import java.time.OffsetDateTime;
 import java.util.Set;
 
-public record Workout(
+public record WorkoutDTO(
         Long id,
         Long customerId,
+        String title,
         String workoutType,
         Set<ExerciseEntity> exercises,
         Integer volume,

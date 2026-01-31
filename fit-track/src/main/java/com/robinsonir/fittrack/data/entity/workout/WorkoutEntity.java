@@ -20,6 +20,9 @@ import java.util.Set;
 @NoArgsConstructor
 public class WorkoutEntity extends AbstractEntity {
 
+    @Column(name = "title", nullable = false)
+    private String title;
+
     @Column(name = "workout_type")
     private String workoutType;
 

@@ -3,6 +3,7 @@ package com.robinsonir.fittrack.data.repository.exercise;
 public record Exercise(
         Long id,
         String title,
+        String equipment,
         String description,
         String muscleGroup,
         Integer reps,

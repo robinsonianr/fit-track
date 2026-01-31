@@ -4,7 +4,7 @@ import com.robinsonir.fittrack.data.Gender;
 import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
 import com.robinsonir.fittrack.data.entity.workout.WorkoutEntity;
 import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
-import com.robinsonir.fittrack.data.repository.workout.Workout;
+import com.robinsonir.fittrack.data.repository.workout.WorkoutDTO;
 import com.robinsonir.fittrack.data.repository.workout.WorkoutRepository;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
 import com.robinsonir.fittrack.mappers.ExerciseMapper;
@@ -59,9 +59,9 @@ public class WorkoutServiceTest {
     @Test
     void getAllWorkouts() {
         // Arrange
-        WorkoutEntity workoutEntity1 = new WorkoutEntity("Running", 500,  12000, 60, OffsetDateTime.now(), new HashSet<>(), customer);
+        WorkoutEntity workoutEntity1 = new WorkoutEntity("Cardio","Running", 500,  12000, 60, OffsetDateTime.now(), new HashSet<>(), customer);
         workoutEntity1.setId(1L);
-        WorkoutEntity workoutEntity2 = new WorkoutEntity("Cycling", 300, 12000, 45, OffsetDateTime.now(), new HashSet<>(), customer);
+        WorkoutEntity workoutEntity2 = new WorkoutEntity("Cardio","Cycling", 300, 12000, 45, OffsetDateTime.now(), new HashSet<>(), customer);
         workoutEntity2.setId(2L);
 
         List<WorkoutEntity> workoutList = new ArrayList<>();
@@ -69,16 +69,16 @@ public class WorkoutServiceTest {
         workoutList.add(workoutEntity2);
         when(workoutRepository.findAllWorkouts()).thenReturn(workoutList);
 
-        Workout workoutDTO1 = new Workout(1L, customer.getId(), "Running", new HashSet<>(), 12000, 500, 50, OffsetDateTime.now());
-        Workout workoutDTO2 = new Workout(2L, customer.getId(), "Cycling", new HashSet<>(), 12000, 600, 60, OffsetDateTime.now());
-        List<Workout> workouts = new ArrayList<>();
+        WorkoutDTO workoutDTO1 = new WorkoutDTO(1L, customer.getId(), "Cardio", "Running", new HashSet<>(), 12000, 500, 50, OffsetDateTime.now());
+        WorkoutDTO workoutDTO2 = new WorkoutDTO(2L, customer.getId(), "Cardio", "Cycling", new HashSet<>(), 12000, 600, 60, OffsetDateTime.now());
+        List<WorkoutDTO> workouts = new ArrayList<>();
         workouts.add(workoutDTO1);
         workouts.add(workoutDTO2);
 
         when(workoutMapper.convertWorkoutEntityListToWorkoutList(workoutList)).thenReturn(workouts);
 
         // Act
-        List<Workout> result = workoutService.getAllWorkouts();
+        List<WorkoutDTO> result = workoutService.getAllWorkouts();
 
         // Assert
         assertEquals(2, result.size());
@@ -91,14 +91,14 @@ public class WorkoutServiceTest {
     void getWorkoutSuccess() {
         // Arrange
         Long workoutId = 1L;
-        WorkoutEntity workoutEntity = new WorkoutEntity("Running", 500, 12000, 60, OffsetDateTime.now(), null, customer);
-        Workout expectedWorkout = new Workout(workoutId, customer.getId(), "Running", new HashSet<>(), 12000, 60, null, OffsetDateTime.now());
+        WorkoutEntity workoutEntity = new WorkoutEntity("Cardio","Running", 500, 12000, 60, OffsetDateTime.now(), null, customer);
+        WorkoutDTO expectedWorkout = new WorkoutDTO(workoutId, customer.getId(),"Cardio", "Running", new HashSet<>(), 12000, 60, null, OffsetDateTime.now());
 
         when(workoutRepository.findWorkoutById(workoutId)).thenReturn(Optional.of(workoutEntity));
         when(workoutMapper.convertWorkoutEntityToWorkout(workoutEntity)).thenReturn(expectedWorkout);
 
         // Act
-        Workout result = workoutService.getWorkout(workoutId);
+        WorkoutDTO result = workoutService.getWorkout(workoutId);
 
         // Assert
         assertEquals(expectedWorkout, result);

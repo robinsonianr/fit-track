@@ -43,3 +43,7 @@ out/
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+
+### Claude ###
+/.claude/settings.local.json
