@@ -208,6 +208,7 @@ public class WorkoutRepositoryTest {
         workout2.setCustomer(customer);
 
         // Save the customer and workouts
+        customerRepository.save(customer);
         workoutRepository.save(workout1);
         workoutRepository.save(workout2);
 
