@@ -124,9 +124,10 @@ public class WorkoutServiceTest {
     @Test
     void addWorkout() {
         // Arrange
-        WorkoutCreationRequest workoutCreationRequest = new WorkoutCreationRequest(customer, new HashSet<>(), "Swimming", 12000, 400, 60, OffsetDateTime.now());
+        WorkoutCreationRequest workoutCreationRequest = new WorkoutCreationRequest(customer, "Cardio", new HashSet<>(), "Swimming", 12000, 400, 60, OffsetDateTime.now());
 
         WorkoutEntity newWorkout = new WorkoutEntity();
+        newWorkout.setTitle(workoutCreationRequest.title());
         newWorkout.setWorkoutType(workoutCreationRequest.workoutType());
         newWorkout.setExercises(exerciseMapper.mapToExerciseEntities(workoutCreationRequest.exercises()));
         newWorkout.setCalories(workoutCreationRequest.calories());

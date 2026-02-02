@@ -1,6 +1,6 @@
 package com.robinsonir.fittrack.data.repository.exercise;
 
-public record Exercise(
+public record ExerciseDTO(
         Long id,
         String title,
         String equipment,

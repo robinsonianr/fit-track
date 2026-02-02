@@ -39,4 +39,9 @@ public class WorkoutController {
         return ResponseEntity.ok().build();
 
     }
+
+    @DeleteMapping("{workoutId}")
+    public void deleteWorkout(@PathVariable("workoutId") Long workoutId) {
+        workoutService.deleteWorkout(workoutId);
+    }
 }

@@ -1,7 +1,7 @@
 package com.robinsonir.fittrack.mappers;
 
 import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
-import com.robinsonir.fittrack.data.repository.customer.Customer;
+import com.robinsonir.fittrack.data.repository.customer.CustomerDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,10 +14,10 @@ import java.util.stream.Collectors;
 public interface CustomerMapper {
 
     @Mapping(target = "roles", source = "authorities")
-    Customer customerEntityToCustomer(CustomerEntity customerEntity);
+    CustomerDTO customerEntityToCustomer(CustomerEntity customerEntity);
 
     @Mapping(target = "roles", source = "authorities")
-    List<Customer> customerEntityListToCustomerList(List<CustomerEntity> customerEntityList);
+    List<CustomerDTO> customerEntityListToCustomerList(List<CustomerEntity> customerEntityList);
 
 
     default List<String> mapAuthorities(Collection<? extends GrantedAuthority> authorities) {

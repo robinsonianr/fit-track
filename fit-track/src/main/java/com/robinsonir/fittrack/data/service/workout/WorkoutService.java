@@ -56,6 +56,7 @@ public class WorkoutService {
 
         WorkoutEntity newWorkout = new WorkoutEntity();
         newWorkout.setWorkoutType(workoutCreationRequest.workoutType());
+        newWorkout.setTitle(workoutCreationRequest.title());
         newWorkout.setExercises(exerciseMapper.mapToExerciseEntities(workoutCreationRequest.exercises()));
         newWorkout.setCalories(workoutCreationRequest.calories());
         newWorkout.setVolume(workoutCreationRequest.volume());
@@ -74,5 +75,10 @@ public class WorkoutService {
                     "workout with id [%s] not found".formatted(id)
             );
         }
+    }
+
+
+    public void deleteWorkout(Long id) {
+        workoutRepository.deleteById(id);
     }
 }

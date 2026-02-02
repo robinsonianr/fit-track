@@ -35,8 +35,14 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
     useEffect(() => {
         let weight = 0;
         selectedExercises.forEach(ex => {
-            const multiplier = ex.dumbbells ? 2 : 1;
-            weight += ex.sets * ex.reps * ex.weightPerRep * multiplier;
+            if (ex.equipment === "Bodyweight") {
+                if (customer?.weight) {
+                    weight += ex.sets * ex.reps * (ex.weightPerRep + customer?.weight);
+                }
+            } else {
+                const multiplier = ex.equipment === "Dumbbell" ? 2 : 1;
+                weight += ex.sets * ex.reps * ex.weightPerRep * multiplier;
+            }
         });
         setVolume(weight);
     }, [selectedExercises]);
@@ -52,7 +58,7 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
             sets: sets,
             reps: reps,
             weightPerRep: weight,
-            dumbbells: predefined.dumbbells
+            equipment: predefined.equipment
         };
         setSelectedExercises([...selectedExercises, newExercise]);
         setExerciseTitle("");
@@ -64,6 +70,23 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
         setVolume(0);
     };
 
+    const deriveTitle = (exercises: Exercise[]) => {
+        const muscleGroups = exercises.map(ex => ex.muscleGroup);
+
+        if (muscleGroups.length < 1) {
+            return "Non-Valid Workout";
+        }
+
+        if (!muscleGroups.includes("Legs")) {
+            return "Upper Body Day";
+        } else if (!muscleGroups.includes("Arms") && !muscleGroups.includes("Back")
+            && !muscleGroups.includes("Shoulders")&& !muscleGroups.includes("Chest")) {
+            return "Lower Body Day";
+        } else {
+            return "Full Body Day";
+        }
+    };
+
     const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (customer?.id) {
@@ -72,6 +95,7 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
                 const formData = Object.fromEntries(inputs.entries());
                 const workoutData = {
                     ...formData,
+                    title: deriveTitle(selectedExercises),
                     customer: {"id": customer.id},
                     exercises: selectedExercises,
                     workoutDate: new Date().toISOString()

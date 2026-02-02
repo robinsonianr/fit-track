@@ -5,7 +5,7 @@ import com.robinsonir.fittrack.data.Gender;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-public record Customer(
+public record CustomerDTO(
         Long id,
         String name,
         String email,
