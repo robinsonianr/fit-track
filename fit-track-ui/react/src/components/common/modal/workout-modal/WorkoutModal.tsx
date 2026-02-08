@@ -38,6 +38,8 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
             if (ex.equipment === "Bodyweight") {
                 if (customer?.weight) {
                     weight += ex.sets * ex.reps * (ex.weightPerRep + customer?.weight);
+                } else {
+                    weight += ex.sets * ex.reps * (ex.weightPerRep + 100);
                 }
             } else {
                 const multiplier = ex.equipment === "Dumbbell" ? 2 : 1;
@@ -72,7 +74,6 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
 
     const deriveTitle = (exercises: Exercise[]) => {
         const muscleGroups = exercises.map(ex => ex.muscleGroup);
-
         if (muscleGroups.length < 1) {
             return "Non-Valid Workout";
         }

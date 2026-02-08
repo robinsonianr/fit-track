@@ -6,7 +6,7 @@ IF NOT EXISTS (
       AND table_name = 'workout'
       AND column_name = 'title'
 ) THEN
-    ALTER TABLE fit_tracker.workout ADD COLUMN title VARCHAR(255);
+    ALTER TABLE fit_tracker.workout ADD COLUMN title VARCHAR(255) NOT NULL DEFAULT 'Untitled Workout';
 END IF;
 
 IF NOT EXISTS (
@@ -15,6 +15,6 @@ IF NOT EXISTS (
       AND table_name = 'exercises'
       AND column_name = 'equipment'
 ) THEN
-    ALTER TABLE fit_tracker.exercises ADD COLUMN equipment VARCHAR(255);
+    ALTER TABLE fit_tracker.exercises ADD COLUMN equipment VARCHAR(255) NOT NULL DEFAULT 'Unknown Equipment';
 END IF;
 END $$;

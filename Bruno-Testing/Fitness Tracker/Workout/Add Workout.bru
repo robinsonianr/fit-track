@@ -16,11 +16,32 @@ auth:bearer {
 
 body:json {
   {
-    "workoutType": "Strength Training",
-    "calories": 639,
-    "durationMinutes": 78,
-    "workoutDate": "2025-11-16T03:41:53.723Z",
-    "exercises": [{"title":"Bicep Curl", "description":"Exercise that builds and strenghtens the bicep muscle", "muscleGroup":"Biceps", "sets": 4, "reps": 6, "weightPerRep":35}, {"title":"EZ-Bar Preacher Curl", "description":"Exercise that builds and strenghtens the bicep muscle", "muscleGroup":"Biceps", "sets": 3, "reps": 8, "weightPerRep":60}, {"title":"Pull Up", "description":"Exercise that builds and strenghtens upper back muscles", "muscleGroup":"Back", "sets": 4, "reps": 6, "weightPerRep":175}, {"title":"Lat Pulldown", "description":"Exercise that builds and strenghtens upper back muscles", "muscleGroup":"Back", "sets": 3, "reps": 8, "weightPerRep":140}, {"title":"Lateral Shoulder Raises", "description":"Exercise that builds and strenghtens shoulder muscles", "muscleGroup":"Back", "sets": 2, "reps": 8, "weightPerRep":20}, {"title":"Dumbbell Shrugs", "description":"Exercise that builds and strenghtens the trap muscles", "muscleGroup":"Traps", "sets": 4, "reps": 8, "weightPerRep":75}],
-    "customer": {"id": 1}
-  }
+      "customer": {"id":1},
+      "title": "Upper Body",
+      "workoutType": "Strength Training",
+      "exercises": [
+        {
+          "title": "Incline Dumbbell Press",
+          "equipment": "Dumbbell",
+          "description": "Incline dumbbell press targeting upper chest",
+          "muscleGroup": "Chest",
+          "reps": 10,
+          "sets": 2,
+          "weightPerRep": 70
+        },
+        {
+          "title": "Push-ups",
+          "equipment": "Bodyweight",
+          "description": "Bodyweight exercise for chest, shoulders, and triceps",
+          "muscleGroup": "Chest",
+          "reps": 15,
+          "sets": 2,
+          "weightPerRep": 70
+        }
+      ],
+      "volume": 2800,
+      "calories": 44,
+      "durationMinutes": 8,
+      "workoutDate": "2026-02-03T21:45:13.018-05:00"
+    }
 }

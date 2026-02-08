@@ -79,6 +79,7 @@ public class WorkoutService {
 
 
     public void deleteWorkout(Long id) {
+        checkIfWorkoutExistsOrThrow(id);
         workoutRepository.deleteById(id);
     }
 }
