@@ -47,6 +47,7 @@ public class WorkoutRepositoryTest {
         // Create a workout entity
         WorkoutEntity workout = new WorkoutEntity();
         workout.setCustomer(customer);
+        workout.setTitle("Cardio");
         workout.setWorkoutType("Running");
         workout.setCalories(500);
         workout.setDurationMinutes(60);
@@ -77,6 +78,7 @@ public class WorkoutRepositoryTest {
         // Create and save a workout
         WorkoutEntity workout = new WorkoutEntity();
         workout.setCustomer(customer);
+        workout.setTitle("Cardio");
         workout.setWorkoutType("Cycling");
         workout.setCalories(300);
         workout.setDurationMinutes(45);
@@ -114,6 +116,7 @@ public class WorkoutRepositoryTest {
         // Create and save workouts
         WorkoutEntity workout1 = new WorkoutEntity();
         workout1.setCustomer(customer1);
+        workout1.setTitle("Cardio");
         workout1.setWorkoutType("Swimming");
         workout1.setCalories(400);
         workout1.setDurationMinutes(50);
@@ -122,6 +125,7 @@ public class WorkoutRepositoryTest {
 
         WorkoutEntity workout2 = new WorkoutEntity();
         workout2.setCustomer(customer2);
+        workout2.setTitle("Cardio");
         workout2.setWorkoutType("Yoga");
         workout2.setCalories(200);
         workout2.setDurationMinutes(30);
@@ -150,6 +154,7 @@ public class WorkoutRepositoryTest {
         // Create and save a workout
         WorkoutEntity workout = new WorkoutEntity();
         workout.setCustomer(customer);
+        workout.setTitle("Strength Training");
         workout.setWorkoutType("Weightlifting");
         workout.setCalories(600);
         workout.setDurationMinutes(75);
@@ -185,6 +190,7 @@ public class WorkoutRepositoryTest {
 
         // Create some workouts for the customer
         WorkoutEntity workout1 = new WorkoutEntity();
+        workout1.setTitle("Cardio");
         workout1.setWorkoutType("Running");
         workout1.setCalories(500);
         workout1.setDurationMinutes(60);
@@ -193,6 +199,7 @@ public class WorkoutRepositoryTest {
         workout1.setCustomer(customer);
 
         WorkoutEntity workout2 = new WorkoutEntity();
+        workout2.setTitle("Cardio");
         workout2.setWorkoutType("Cycling");
         workout2.setCalories(600);
         workout2.setDurationMinutes(45);
@@ -201,6 +208,7 @@ public class WorkoutRepositoryTest {
         workout2.setCustomer(customer);
 
         // Save the customer and workouts
+        customerRepository.save(customer);
         workoutRepository.save(workout1);
         workoutRepository.save(workout2);
 

@@ -2,14 +2,11 @@ package com.robinsonir.fittrack.data.service.customer;
 
 import com.robinsonir.fittrack.data.Gender;
 import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
-import com.robinsonir.fittrack.data.entity.workout.WorkoutEntity;
-import com.robinsonir.fittrack.data.repository.customer.Customer;
+import com.robinsonir.fittrack.data.repository.customer.CustomerDTO;
 import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
 import com.robinsonir.fittrack.mappers.CustomerMapper;
 import com.robinsonir.fittrack.mappers.CustomerMapperImpl;
-import com.robinsonir.fittrack.mappers.WorkoutMapper;
-import com.robinsonir.fittrack.mappers.WorkoutMapperImpl;
 import com.robinsonir.fittrack.s3.S3Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,10 +18,8 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -81,7 +76,7 @@ public class CustomerServiceTest {
         when(customerRepository.findCustomerById(customerId)).thenReturn(Optional.of(customerEntity));
 
         // Act
-        Customer customer = customerTest.getCustomer(customerId);
+        CustomerDTO customer = customerTest.getCustomer(customerId);
 
         // Assert
         assertEquals(customerId, customer.id());

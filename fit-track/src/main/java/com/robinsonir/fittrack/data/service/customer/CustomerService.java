@@ -1,7 +1,7 @@
 package com.robinsonir.fittrack.data.service.customer;
 
 import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
-import com.robinsonir.fittrack.data.repository.customer.Customer;
+import com.robinsonir.fittrack.data.repository.customer.CustomerDTO;
 import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
 import com.robinsonir.fittrack.exception.DuplicateResourceException;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
@@ -51,12 +51,12 @@ public class CustomerService {
         this.customerDataService = customerDataService;
     }
 
-    public List<Customer> getAllCustomers() {
+    public List<CustomerDTO> getAllCustomers() {
         return customerMapper.customerEntityListToCustomerList(customerRepository.findAllCustomers());
     }
 
 
-    public Customer getCustomer(Long id) {
+    public CustomerDTO getCustomer(Long id) {
         CustomerEntity customerEntity = customerRepository.findCustomerById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "customer with id [%s] not found".formatted(id)

@@ -1,15 +1,16 @@
 package com.robinsonir.fittrack.data.repository.workout;
 
-import com.robinsonir.fittrack.data.entity.exercise.ExerciseEntity;
+import com.robinsonir.fittrack.data.repository.exercise.ExerciseDTO;
 
 import java.time.OffsetDateTime;
 import java.util.Set;
 
-public record Workout(
+public record WorkoutDTO(
         Long id,
         Long customerId,
+        String title,
         String workoutType,
-        Set<ExerciseEntity> exercises,
+        Set<ExerciseDTO> exercises,
         Integer volume,
         Integer calories,
         Integer durationMinutes,

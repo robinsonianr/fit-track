@@ -74,6 +74,14 @@ export const addWorkout = async (formData: any) => {
     }
 };
 
+export const deleteWorkout = async (id: any) => {
+    try {
+        return await axiosInstance.delete(`/api/v1/workouts/${id}`);
+    } catch (e) {
+        throw e;
+    }
+};
+
 export const getCustomerWeightHistory= async (entityId: any) => {
     try {
         return await axiosInstance.get(`/api/v1/audit/${entityId}`);

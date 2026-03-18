@@ -1,12 +1,11 @@
 package com.robinsonir.fittrack.data.repository.customer;
 
 import com.robinsonir.fittrack.data.Gender;
-import com.robinsonir.fittrack.data.repository.workout.Workout;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
-public record Customer(
+public record CustomerDTO(
         Long id,
         String name,
         String email,

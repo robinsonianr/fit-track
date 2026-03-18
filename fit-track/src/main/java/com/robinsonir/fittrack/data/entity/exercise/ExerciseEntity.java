@@ -13,6 +13,9 @@ public class ExerciseEntity extends AbstractEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
+    @Column(name = "equipment", nullable = false)
+    private String equipment;
+
     @Column(name = "description", nullable = false)
     private String description;
 

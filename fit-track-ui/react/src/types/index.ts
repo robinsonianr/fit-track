@@ -18,6 +18,7 @@ export interface Customer {
 
 export interface Workout {
     id?: number;
+    title?: string;
     customerId?: string;
     workoutType?: string;
     calories?: number;
@@ -35,5 +36,5 @@ export interface Exercise {
     sets: number;
     reps: number;
     weightPerRep: number;
-    dumbbells: boolean;
+    equipment: string;
 }

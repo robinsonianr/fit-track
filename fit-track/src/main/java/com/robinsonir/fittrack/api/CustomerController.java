@@ -1,6 +1,6 @@
 package com.robinsonir.fittrack.api;
 
-import com.robinsonir.fittrack.data.repository.customer.Customer;
+import com.robinsonir.fittrack.data.repository.customer.CustomerDTO;
 import com.robinsonir.fittrack.data.service.customer.CustomerRegistrationRequest;
 import com.robinsonir.fittrack.data.service.customer.CustomerService;
 import com.robinsonir.fittrack.data.service.customer.CustomerUpdateRequest;
@@ -27,12 +27,12 @@ public class CustomerController {
     }
 
     @GetMapping
-    public List<Customer> getAllCustomers() {
+    public List<CustomerDTO> getAllCustomers() {
         return customerService.getAllCustomers();
     }
 
     @GetMapping("{customerId}")
-    public Customer getCustomer(@PathVariable("customerId") Long customerId) {
+    public CustomerDTO getCustomer(@PathVariable("customerId") Long customerId) {
         return customerService.getCustomer(customerId);
     }
 

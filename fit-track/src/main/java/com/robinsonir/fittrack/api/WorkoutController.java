@@ -1,6 +1,6 @@
 package com.robinsonir.fittrack.api;
 
-import com.robinsonir.fittrack.data.repository.workout.Workout;
+import com.robinsonir.fittrack.data.repository.workout.WorkoutDTO;
 import com.robinsonir.fittrack.data.service.workout.WorkoutCreationRequest;
 import com.robinsonir.fittrack.data.service.workout.WorkoutService;
 import org.springframework.http.ResponseEntity;
@@ -19,17 +19,17 @@ public class WorkoutController {
     }
 
     @GetMapping
-    public List<Workout> getAllWorkouts() {
+    public List<WorkoutDTO> getAllWorkouts() {
         return workoutService.getAllWorkouts();
     }
 
     @GetMapping("{workoutId}")
-    public Workout getWorkout(@PathVariable("workoutId") Long workoutId) {
+    public WorkoutDTO getWorkout(@PathVariable("workoutId") Long workoutId) {
         return workoutService.getWorkout(workoutId);
     }
 
     @GetMapping("log/{customerId}")
-    public List<Workout> getAllWorkoutsCustomerById(@PathVariable("customerId") Long customerId) {
+    public List<WorkoutDTO> getAllWorkoutsCustomerById(@PathVariable("customerId") Long customerId) {
         return workoutService.getAllWorkoutsByCustomerId(customerId);
     }
 
@@ -38,5 +38,11 @@ public class WorkoutController {
         workoutService.addWorkout(request);
         return ResponseEntity.ok().build();
 
+    }
+
+    @DeleteMapping("{workoutId}")
+    public ResponseEntity<?> deleteWorkout(@PathVariable("workoutId") Long workoutId) {
+        workoutService.deleteWorkout(workoutId);
+        return ResponseEntity.noContent().build();
     }
 }

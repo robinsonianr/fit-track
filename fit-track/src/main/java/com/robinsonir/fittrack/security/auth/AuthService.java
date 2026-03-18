@@ -1,7 +1,7 @@
 package com.robinsonir.fittrack.security.auth;
 
 import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
-import com.robinsonir.fittrack.data.repository.customer.Customer;
+import com.robinsonir.fittrack.data.repository.customer.CustomerDTO;
 import com.robinsonir.fittrack.mappers.CustomerMapper;
 import com.robinsonir.fittrack.security.jwt.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +28,7 @@ public class AuthService {
                         request.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         CustomerEntity principal = (CustomerEntity) authentication.getPrincipal();
-        Customer customer = customerMapper.customerEntityToCustomer(principal);
+        CustomerDTO customer = customerMapper.customerEntityToCustomer(principal);
         var token = jwtUtil.generateToken(customer.username(), customer.roles());
         return new AuthResponse(token, customer.id());
     }

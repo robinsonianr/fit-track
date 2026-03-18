@@ -20,6 +20,9 @@ import java.util.Set;
 @NoArgsConstructor
 public class WorkoutEntity extends AbstractEntity {
 
+    @Column(name = "title", nullable = false)
+    private String title;
+
     @Column(name = "workout_type")
     private String workoutType;
 
@@ -39,7 +42,7 @@ public class WorkoutEntity extends AbstractEntity {
     @JoinColumn(name = "workout_id")
     private Set<ExerciseEntity> exercises;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     private CustomerEntity customer;
 }
