@@ -24,7 +24,7 @@ spring:
   datasource:
     username: postgres
     password: root1234
-    url: jdbc:postgresql://localhost:5432/fit-tracker
+    url: jdbc:postgresql://host.docker.internal:5432/fit-tracker
   jpa:
     show-sql: true
     generate-ddl: false
