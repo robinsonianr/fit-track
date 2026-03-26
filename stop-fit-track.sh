@@ -1,3 +1,6 @@
+#!/bin/bash
+
+# Get the directory where this script is located
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 COMPOSE_FILE="docker-compose.yml"
@@ -11,5 +14,5 @@ echo "disconnecting docker container $DB_CONTAINER from fitness network..."
 docker network disconnect "$basename"_fitness "$DB_CONTAINER"
 
 cd "$SCRIPT_DIR"
-docker-compose -f "$COMPOSE_FILE" \
+docker compose -f "$COMPOSE_FILE" \
 	down -v

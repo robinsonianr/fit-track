@@ -14,6 +14,8 @@ services:
       - fitness
     external_links:
       - ${DB_CONTAINER}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
   frontend:
     build:
