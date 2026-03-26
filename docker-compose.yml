@@ -6,14 +6,14 @@ services:
       context: ./fit-track
       dockerfile: Dockerfile
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/fit-tracker
-      SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: root1234
-      SPRING_JPA_HIBERNATE_DDL_AUTO: none
       JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
     ports:
       - "8080:8080"
       - "5005:5005"
+    networks:
+      - fitness
+    external_links:
+      - ${DB_CONTAINER}
 
   frontend:
     build:
@@ -25,6 +25,8 @@ services:
       VITE_API_BASE_URL: http://localhost:8080
     ports:
       - "5173:5173"
+    networks:
+      - fitness
     depends_on:
       - backend
     healthcheck:
@@ -33,3 +35,7 @@ services:
       timeout: 10s
       retries: 3
       start_period: 60s
+
+networks:
+  fitness:
+    driver: bridge
