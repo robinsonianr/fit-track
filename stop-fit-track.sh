@@ -8,7 +8,7 @@ export DB_CONTAINER="fit-db"
 
 
 echo "Stopping environment using $COMPOSE_FILE..."
-basename=`basename "$SCRIPT_DIR"`
+basename=$(basename "$SCRIPT_DIR")
 
 echo "disconnecting docker container $DB_CONTAINER from fitness network..."
 docker network disconnect "$basename"_fitness "$DB_CONTAINER"
