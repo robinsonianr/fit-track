@@ -8,6 +8,8 @@ basename=`basename "$SCRIPT_DIR"`
 
 
 cd "$SCRIPT_DIR"
+./gradlew build --build-cache -x test
+
 docker-compose -f "$COMPOSE_FILE" \
 	up --build -d
 
