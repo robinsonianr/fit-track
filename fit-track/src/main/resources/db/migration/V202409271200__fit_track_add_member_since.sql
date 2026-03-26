@@ -6,6 +6,6 @@ BEGIN
           AND table_name = 'customer'
           AND column_name = 'member_since'
       ) THEN
-ALTER TABLE fit_tracker.customer ADD COLUMN member_since TIMESTAMP DEFAULT CURRENT_TIME;
+ALTER TABLE fit_tracker.customer ADD COLUMN member_since TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
 END IF;
 END $$;
