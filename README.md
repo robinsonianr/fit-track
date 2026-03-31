@@ -4,31 +4,29 @@
 
 ## Table of Contents
 
--   [Installation](#installation)
--   [Usage](#usage)
+-   [Prequisites](#prerequisites)
+-   [Setup](#setup)
+-   [Build and Run](#build)
 -   [Contributing](#contributing)
 
+### Prerequisites
 
-## Installation
+- Java 17+ (Liberica or Zulu) compatible & uses Gradle 7.6.1
+- Node.js 18+
+- For Windows haved WSL installed if starting application with docker containers
+- Recommended IDE IntelliJ
 
-To install this project, follow these steps:
-
-Java 17+ (Liberica or Zulu) compatible & uses Gradle 7.6.1
-
-Node.js 18+
-
-Recommended IDE Intellij
-
+### Setup
 1. Clone the repository.
    
     ```sh
     git clone https://github.com/robinsonianr/fit-track.git
     ```
    
-2. Navigate to the project directory.
-   
-   - cd `fit-track-ui/react`
-
+2. Navigate to the project UI directory.
+   ```sh
+    `cd fit-track-ui/react`
+   ```
 3. Install node package dependencies.
    
     ```sh
@@ -39,32 +37,62 @@ Recommended IDE Intellij
    
    - Install Docker Desktop and enable Docker terminal in the settings then restart Docker Desktop.
      
-   - Run `docker pull postgres` or search for 'postgres' on Docker Desktop and pull the image.
-       
-   In Docker terminal run the following commands below.
+   In Docker terminal or WSL run the following command below.
    ```sh
-   docker network create db
-   docker run --name (my-postgres-container) -p 5432:5432 --network=db -v dbdata:/var/lib/postgres/data -e POSTGRES_PASSWORD=root1234 -e POSTGRES_DB=fit-tracker -d postgres
+   docker run -d --name fit-db \
+   -e POSTGRES_USER=postgres \
+   -e POSTGRES_PASSWORD=root1234 \
+   -e POSTGRES_DB=fit-tracker \
+   -p 5432:5432 \
+   --restart always \
+   postgres:15-alpine
    ```
-
-   - Replace (my-postgres-container) with whatever name you like.
       
-   - Run `docker ps` to see if the container is running; if not, run `docker start (container-name)`.
+   - Run `docker ps` to see if the container is running; if not, run `docker start fit-db`.
   
-   - In Intellij or preferred DB manager, add datasource to database tool by entering the URL `jdbc:postgresql://localhost:5432/fit-tracker` and password.
+   - In IntelliJ or preferred DB manager, add datasource to database tool by entering the URL `jdbc:postgresql://localhost:5432/fit-tracker` and add user and password.
   
-   - After naming the db and successfully connecting to db, add schema to the db called `fit_tracker`.
+   - After successfully connecting to db, add schema to the db called `fit_tracker`.
 
+## Build
 
-## Usage
+### Here's how you can build and run application
 
-Here's how you can use this project:
+#### Build and run application manually
 1. Build and run the application.
    - Build and run the application (recommend Intellij but can use your preferred IDE).
    - In root of project run `.\gradlew build` (If using an IDE other than Intellij)
    - Then run application `.\gradlew run` (If using an IDE other than Intellij)
-2. Start UI with `npm run start` in `fit-track-ui/react`
+2. Start UI
+    change directory with `cd fit-track-ui/react`
+   ```sh
+   npm run start
+   ```
    - Open a web browser and navigate to [http://localhost:5173](http://localhost:5173).
+  
+> Or
+
+#### Start application using Docker container  
+Change directory to the root of the project
+
+```sh
+cd [location of project]
+```
+Then run start script
+> MacOS
+
+```sh
+sh start-fit-track.sh
+```
+> WSL
+```sh
+./start-fit-track.sh
+```
+
+Output should look like this:
+<img width="1579" height="381" alt="Screenshot 2026-03-31 183037" src="https://github.com/user-attachments/assets/b3d9064c-4568-4acc-a6d8-012b4d5a4ab7" />
+
+Access fit-track locally at [http://localhost:5173](http://localhost:5173)
 
 Development Url:
 - http://fit-track-dev.eba-jpnjhwum.us-east-1.elasticbeanstalk.com
