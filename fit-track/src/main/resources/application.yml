@@ -1,7 +1,5 @@
 server:
   port: 8080
-  error:
-    include-message: always
 
 management:
   endpoints:
@@ -20,11 +18,14 @@ s3:
   bucket:
     name: fitness-tracker-customers
 
+jwt:
+  secret-key: R3PW02E9zhkohQbJgeYjY2+59hrQSG7YV3x6G4gSfR5WiK325OriQG6nSABK9XE3EPHw0VXtk/aBQkf+CrC9eA==
+
 spring:
   datasource:
     username: postgres
     password: root1234
-    url: jdbc:postgresql://host.docker.internal:5432/fit-tracker
+    url: jdbc:postgresql://${HTTP_HOST:localhost}:5432/fit-tracker
   jpa:
     show-sql: true
     generate-ddl: false
@@ -56,6 +57,9 @@ spring:
     jdbc:
       repositories:
         enabled: off
+  web:
+    error:
+      include-message: always
 logging:
   level:
 #    org.springframework: DEBUG

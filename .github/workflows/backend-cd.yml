@@ -1,6 +1,6 @@
 name: CD - Backend
 
-
+# TODO: update gradle version
 on:
   workflow_dispatch:
   push:
@@ -38,7 +38,7 @@ jobs:
           distribution: 'liberica'
       - name: Build Number
         id: build-number
-        run: echo "::set-output name=BUILD_NUMBER::$(date '+%-d.%-m.%Y.%-H.%-M.%-S')"
+        run: echo "BUILD_NUMBER=$(date '+%-d.%-m.%Y.%-H.%-M.%-S')" >> $GITHUB_OUTPUT
       - name: Docker Login
         uses: docker/login-action@f3364599c6aa293cdc2b8391b1b56d0c30e45c8a
         with:
@@ -47,7 +47,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
         with:
-          gradle-version: 7.6.1
+          gradle-version: 8.14.4
       - name: Create fit_tracker schema
         run: |
           echo "CREATE SCHEMA IF NOT EXISTS fit_tracker;" | PGPASSWORD=${{ env.POSTGRESQL_PASSWORD }} psql -h localhost -U ${{ env.POSTGRESQL_USER }} ${{ env.POSTGRESQL_DB }}
@@ -73,6 +73,10 @@ jobs:
 
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.EB_REGION }}.amazonaws.com/fit-track:${{ steps.build-number.outputs.BUILD_NUMBER }}
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.EB_REGION }}.amazonaws.com/fit-track:latest
+        working-directory: fit-track
+      - name: Update Dockerrun.aws.json with version
+        run: |
+          sed -i "s|fit-track:latest|fit-track:${{ steps.build-number.outputs.BUILD_NUMBER }}|g" Dockerrun.aws.json
         working-directory: fit-track
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21

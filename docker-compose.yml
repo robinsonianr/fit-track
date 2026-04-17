@@ -7,13 +7,16 @@ services:
       dockerfile: Dockerfile
     environment:
       JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      HTTP_HOST: host.docker.internal
     ports:
       - "8080:8080"
       - "5005:5005"
+    volumes:
+      - ~/.aws:/root/.aws:ro
     networks:
       - fitness
     external_links:
-      - ${DB_CONTAINER}
+      - fit-db
     extra_hosts:
       - "host.docker.internal:host-gateway"
 

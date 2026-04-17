@@ -3,14 +3,12 @@ package com.robinsonir.fittrack.data.repository.customer;
 import com.robinsonir.fittrack.data.Gender;
 import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
 import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 public class CustomerRepositoryImpl implements CustomerUpdateRepository {
 
-    private final EntityManager entityManager;
-
-    public CustomerRepositoryImpl(EntityManager entityManager) {
-        this.entityManager = entityManager;
-    }
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public void updateProfileImageId(String profileImageId, Long customerId) {
