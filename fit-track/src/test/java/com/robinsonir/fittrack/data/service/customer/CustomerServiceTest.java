@@ -6,7 +6,6 @@ import com.robinsonir.fittrack.data.repository.customer.CustomerDTO;
 import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
 import com.robinsonir.fittrack.mappers.CustomerMapper;
-import com.robinsonir.fittrack.mappers.CustomerMapperImpl;
 import com.robinsonir.fittrack.s3.S3Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,13 +29,11 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CustomerServiceTest {
-    private final CustomerMapper customerMapper = new CustomerMapperImpl();
+
+    private CustomerMapper customerMapper;
 
     @Mock
     private CustomerRepository customerRepository;
-
-    @Mock
-    private CustomerDataService customerDataService;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -48,7 +45,7 @@ public class CustomerServiceTest {
 
     @BeforeEach
     void setUp() {
-        customerTest = new CustomerService(customerMapper, passwordEncoder, s3Service, customerRepository, customerDataService);
+        customerTest = new CustomerService(customerMapper, passwordEncoder, s3Service, customerRepository);
         customerTest.setS3Bucket("fitness-tracker-customers");
     }
 
@@ -115,28 +112,6 @@ public class CustomerServiceTest {
                                 customer.getMemberSince().equals(registrationRequest.memberSince())
                 )
         );
-    }
-
-    @Test
-    void checkIfCustomerExistsOrThrowCustomerExists() {
-        // Arrange: Mock behavior for customerRepository.existById to return true (customer exists).
-        Long customerId = 1L;
-        when(customerRepository.existsById(customerId)).thenReturn(true);
-
-        // Act: Check if the customer exists.
-        assertDoesNotThrow(() -> customerTest.checkIfCustomerExistsOrThrow(customerId));
-
-        // Assert: No exception should be thrown.
-    }
-
-    @Test
-    void checkIfCustomerExistsOrThrowCustomerNotFound() {
-        // Arrange: Mock behavior for customerRepository.existById to return false (customer not found).
-        Long customerId = 1L;
-        when(customerRepository.existsById(customerId)).thenReturn(false);
-
-        // Act and Assert: Checking for a non-existent customer should throw a ResourceNotFoundException.
-        assertThrows(ResourceNotFoundException.class, () -> customerTest.checkIfCustomerExistsOrThrow(customerId));
     }
 
     @Test
