@@ -31,6 +31,15 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir("build/generated/sources/annotationProcessor/java/main")
+        }
+    }
+}
+
+
 dependencies {
     // Springboot dependencies
     implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -47,6 +56,8 @@ dependencies {
     // AWS S3 dependencies
     implementation(platform("software.amazon.awssdk:bom:2.31.6"))
     implementation("software.amazon.awssdk:s3")
+    // OpenApi dependencies
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:3.0.3")
     // Other Dependencies
     implementation("io.github.cdimascio:dotenv-kotlin:6.4.1")
     implementation("org.apache.commons:commons-lang3:3.18.0")

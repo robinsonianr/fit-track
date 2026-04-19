@@ -6,6 +6,7 @@ import com.robinsonir.fittrack.data.repository.customer.CustomerDTO;
 import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
 import com.robinsonir.fittrack.mappers.CustomerMapper;
+import com.robinsonir.fittrack.mappers.CustomerMapperImpl;
 import com.robinsonir.fittrack.s3.S3Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,14 +24,14 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CustomerServiceTest {
 
-    private CustomerMapper customerMapper;
+    private CustomerMapper customerMapper = new CustomerMapperImpl();
 
     @Mock
     private CustomerRepository customerRepository;
@@ -162,7 +163,6 @@ public class CustomerServiceTest {
     void uploadCustomerProfilePicture() {
         // Arrange: Create a test customer, mock behavior, and prepare a test file.
         Long customerId = 1L;
-        when(customerRepository.existsById(customerId)).thenReturn(true);
 
         byte[] bytes = "Hello World".getBytes();
 

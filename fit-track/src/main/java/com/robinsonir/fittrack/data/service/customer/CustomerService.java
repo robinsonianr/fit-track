@@ -61,7 +61,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public void addCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
+    public CustomerDTO addCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
         String email = customerRegistrationRequest.email();
         if (customerRepository.existsByEmail(email)) {
             throw new DuplicateResourceException(
@@ -82,6 +82,7 @@ public class CustomerService {
         } finally {
             SecurityContextHolder.clearContext();
         }
+        return customerMapper.customerEntityToCustomer(customerEntity);
     }
 
     @Transactional

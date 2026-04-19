@@ -52,7 +52,7 @@ public class WorkoutService {
         return workoutMapper.convertWorkoutEntityListToWorkoutList(workoutEntities);
     }
 
-    public void addWorkout(WorkoutCreationRequest workoutCreationRequest) {
+    public WorkoutDTO addWorkout(WorkoutCreationRequest workoutCreationRequest) {
 
         WorkoutEntity newWorkout = new WorkoutEntity();
         newWorkout.setWorkoutType(workoutCreationRequest.workoutType());
@@ -67,6 +67,7 @@ public class WorkoutService {
         Optional<CustomerEntity> customerEntity = customerRepository.findCustomerById(workoutCreationRequest.customer().getId());
         customerEntity.ifPresent(newWorkout::setCustomer);
         workoutRepository.save(newWorkout);
+        return workoutMapper.convertWorkoutEntityToWorkout(newWorkout);
     }
 
     public void checkIfWorkoutExistsOrThrow(Long id) {
