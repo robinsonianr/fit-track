@@ -4,6 +4,8 @@ import com.robinsonir.fittrack.data.repository.customer.CustomerDTO;
 import com.robinsonir.fittrack.data.service.customer.CustomerRegistrationRequest;
 import com.robinsonir.fittrack.data.service.customer.CustomerService;
 import com.robinsonir.fittrack.data.service.customer.CustomerUpdateRequest;
+import com.robinsonir.fittrack.messages.ApiMessage;
+import com.robinsonir.fittrack.messages.FitTrackKeys;
 import com.robinsonir.fittrack.security.jwt.JwtTokenUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -36,20 +38,21 @@ public class CustomerController {
         return customerService.getAllCustomers();
     }
 
+    @ApiResponse(responseCode = "401", description = "Unauthorized")
     @ApiResponse(responseCode = "404", description = "Customer not found")
+    @Operation(security = {}, summary = "Get customer by ID")
     @GetMapping("{customerId}")
     public CustomerDTO getCustomer(@PathVariable(name = "customerId") final Long customerId) {
         return customerService.getCustomer(customerId);
     }
 
-    @ApiResponse(responseCode = "400", description = "Invalid request")
     @ApiResponse(responseCode = "409", description = "Customer already exists")
     @Operation(security = {}, summary = "Register a new customer")
     @PostMapping
     public ResponseEntity<CustomerDTO> registerCustomer(@RequestBody CustomerRegistrationRequest request) {
         CustomerDTO created = customerService.addCustomer(request);
         URI location = URI.create("/api/v1/customers/" + created.id());
-        String jwtToken = jwtUtil.generateToken(request.email(), "ROLE_USER");
+        String jwtToken = jwtUtil.generateToken(request.email(), created.roles());
         return ResponseEntity.created(location)
                 .header(HttpHeaders.AUTHORIZATION, jwtToken)
                 .body(created);
@@ -57,23 +60,22 @@ public class CustomerController {
 
 
     @ApiResponse(responseCode = "404", description = "Customer not found")
-    @ApiResponse(responseCode = "400", description = "Invalid request")
     @Operation(summary = "Update customer details")
-    @PutMapping("update/{customerId}")
-    public void updateCustomer(@PathVariable(name = "customerId") final Long customerId,
-            @RequestBody CustomerUpdateRequest updateRequest) {
-        customerService.updateCustomer(customerId, updateRequest);
+    @PatchMapping("{customerId}")
+    public CustomerDTO updateCustomer(@PathVariable(name = "customerId") final Long customerId,
+                                     @RequestBody CustomerUpdateRequest updateRequest) {
+        return customerService.updateCustomer(customerId, updateRequest);
     }
 
-    @ApiResponse(responseCode = "500", description = "Internal server error")
     @Operation(summary = "Upload profile image for customer")
     @PutMapping(
             value = "{customerId}/profile-image",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    public void uploadCustomerProfileImage(@PathVariable( name = "customerId") final Long customerId,
+    public ApiMessage uploadCustomerProfileImage(@PathVariable( name = "customerId") final Long customerId,
             @RequestParam("file") MultipartFile file) {
         customerService.uploadCustomerProfilePicture(customerId, file);
+        return FitTrackKeys.CUSTOMER_IMAGE_UPLOAD_SUCCESS.toApiMessage();
     }
 
     @ApiResponse(responseCode = "404", description = "Customer not found")
@@ -82,7 +84,7 @@ public class CustomerController {
             value = "{customerId}/profile-image",
             produces = MediaType.IMAGE_JPEG_VALUE
     )
-    public byte[] getCustomerProfileImage(@PathVariable("customerId") Long customerId) {
+    public byte[] getCustomerProfileImage(@PathVariable(name = "customerId") Long customerId) {
         return customerService.getProfilePicture(customerId);
     }
 }

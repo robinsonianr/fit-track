@@ -121,7 +121,7 @@ public class CustomerService {
     }
 
     @Transactional
-    public void updateCustomer(Long id, CustomerUpdateRequest updateRequest) {
+    public CustomerDTO updateCustomer(Long id, CustomerUpdateRequest updateRequest) {
         CustomerEntity customerEntity = customerRepository.findCustomerById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "customer with id [%s] not found".formatted(id)
@@ -137,17 +137,24 @@ public class CustomerService {
             customerEntity.setEmail(updateRequest.email());
         }
 
-        customerRepository.updateCustomer(id,
-                updateRequest.name(),
-                updateRequest.email(),
-                updateRequest.age(),
-                updateRequest.gender(),
-                updateRequest.weight(),
-                updateRequest.height(),
-                updateRequest.weightGoal(),
-                updateRequest.activity(),
-                updateRequest.bodyFat()
-        );
+        if (updateRequest.name()       != null)
+            customerEntity.setName(updateRequest.name());
+        if (updateRequest.age()        != null)
+            customerEntity.setAge(updateRequest.age());
+        if (updateRequest.gender()     != null)
+            customerEntity.setGender(updateRequest.gender());
+        if (updateRequest.weight()     != null)
+            customerEntity.setWeight(updateRequest.weight());
+        if (updateRequest.height()     != null)
+            customerEntity.setHeight(updateRequest.height());
+        if (updateRequest.weightGoal() != null)
+            customerEntity.setWeightGoal(updateRequest.weightGoal());
+        if (updateRequest.activity()   != null)
+            customerEntity.setActivity(updateRequest.activity());
+        if (updateRequest.bodyFat()    != null)
+            customerEntity.setBodyFat(updateRequest.bodyFat());
+
+        return customerMapper.customerEntityToCustomer(customerEntity);
     }
 
 

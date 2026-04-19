@@ -23,30 +23,4 @@ public class CustomerRepositoryImpl implements CustomerUpdateRepository {
 
         customerEntity.setProfileImageId(profileImageId);
     }
-
-    @Override
-    public void updateCustomer(Long id,
-                               String name,
-                               String email,
-                               Integer age,
-                               Gender gender,
-                               Integer weight,
-                               Integer height,
-                               Integer weightGoal,
-                               String activity,
-                               Integer bodyFat) {
-        CustomerEntity customerEntity = entityManager.find(CustomerEntity.class, id);
-        if (customerEntity != null) {
-            customerEntity.setName(name);
-            customerEntity.setEmail(email);
-            customerEntity.setAge(age);
-            customerEntity.setGender(gender);
-            customerEntity.setWeight(weight);
-            customerEntity.setHeight(height);
-            customerEntity.setWeightGoal(weightGoal);
-            customerEntity.setActivity(activity);
-            customerEntity.setBodyFat(bodyFat);
-        }
-
-    }
 }
