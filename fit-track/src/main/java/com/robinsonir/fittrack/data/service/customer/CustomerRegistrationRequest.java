@@ -7,11 +7,15 @@ import java.time.OffsetDateTime;
 
 @Schema(name = "CustomerRegistrationRequest")
 public record CustomerRegistrationRequest(
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         String name,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         String email,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         String password,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         Integer age,
-        Gender gender,
-        OffsetDateTime memberSince
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+        Gender gender
 ) {
 }

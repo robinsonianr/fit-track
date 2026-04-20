@@ -5,8 +5,10 @@ import com.robinsonir.fittrack.data.repository.workout.WorkoutRepository;
 import com.robinsonir.fittrack.data.service.workout.WorkoutCreationRequest;
 import com.robinsonir.fittrack.data.service.workout.WorkoutService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,21 +35,24 @@ public class WorkoutController {
     @Operation(summary = "Get a workout by ID")
     @ApiResponse(responseCode = "404", description = "Workout not found")
     @GetMapping("{workoutId}")
-    public WorkoutDTO getWorkout(@PathVariable("workoutId") final Long workoutId) {
+    public WorkoutDTO getWorkout(
+            @Parameter(description = "workoutId") @PathVariable final Long workoutId) {
         return workoutService.getWorkout(workoutId);
     }
 
     @Operation(summary = "Get all workouts for a customer")
     @ApiResponse(responseCode = "404", description = "Customer not found")
     @GetMapping("log/{customerId}")
-    public List<WorkoutDTO> getAllWorkoutsCustomerById(@PathVariable("customerId") final Long customerId) {
+    public List<WorkoutDTO> getAllWorkoutsByCustomerId(
+            @Parameter(description = "customerId") @PathVariable final Long customerId) {
         return workoutService.getAllWorkoutsByCustomerId(customerId);
     }
 
     @Operation(summary = "Create a new workout")
     @ApiResponse(responseCode = "400", description = "Invalid request")
     @PostMapping
-    public ResponseEntity<WorkoutDTO> createWorkout(@RequestBody WorkoutCreationRequest request) {
+    public ResponseEntity<WorkoutDTO> createWorkout(
+            @Parameter(description = "request") @Valid @RequestBody WorkoutCreationRequest request) {
         WorkoutDTO created = workoutService.addWorkout(request);
         URI location = URI.create("/api/v1/workouts/" + created.id());
 
@@ -58,7 +63,8 @@ public class WorkoutController {
     @Operation(summary = "Delete a workout")
     @ApiResponse(responseCode = "404", description = "Workout not found")
     @DeleteMapping("{workoutId}")
-    public ResponseEntity<Void> deleteWorkout(@PathVariable("workoutId") final Long workoutId) {
+    public ResponseEntity<Void> deleteWorkout(
+            @Parameter(description = "workoutId") @PathVariable final Long workoutId) {
         workoutService.deleteWorkout(workoutId);
         return ResponseEntity.noContent().build();
     }

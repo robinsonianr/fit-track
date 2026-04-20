@@ -7,6 +7,7 @@ plugins {
     id("org.springframework.boot") version "4.0.5"
     id("io.spring.dependency-management") version "1.1.0"
     id("org.flywaydb.flyway") version "12.3.0"
+    id("org.springdoc.openapi-gradle-plugin") version "1.9.0"
     val kotlinVer = "2.3.20"
     kotlin("jvm") version kotlinVer
     kotlin("plugin.spring") version kotlinVer
@@ -75,7 +76,22 @@ dependencies {
     // Tests
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.boot:spring-boot-data-jpa-test")
-    testImplementation("com.h2database:h2")
+    runtimeOnly("com.h2database:h2")
+}
+
+openApi {
+    apiDocsUrl.set("http://localhost:8080/v3/api-docs")
+    outputDir.set(layout.buildDirectory.dir("openapi"))
+    outputFileName.set("api.json")
+    customBootRun{
+        args.add("--spring.profiles.active=openapi")
+    }
+}
+
+tasks.register<Copy>("exportOpenApiSpec") {
+    dependsOn("generateOpenApiDocs")
+    from(layout.buildDirectory.file("openapi/api.json"))
+            into(rootProject.layout.projectDirectory.dir("openapi"))
 }
 
 tasks.withType<Test> {

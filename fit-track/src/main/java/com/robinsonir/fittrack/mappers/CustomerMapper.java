@@ -27,8 +27,7 @@ public interface CustomerMapper {
     @Mapping(target = "password", source = "password")
     @Mapping(target = "age", source = "age")
     @Mapping(target = "gender", source = "gender")
-    @Mapping(target = "memberSince", source =
-            "memberSince")
+    @Mapping(target = "memberSince", ignore = true)
     CustomerEntity registrationRequestToEntity(CustomerRegistrationRequest registrationRequest);
 
     default List<String> mapAuthorities(Collection<? extends GrantedAuthority> authorities) {

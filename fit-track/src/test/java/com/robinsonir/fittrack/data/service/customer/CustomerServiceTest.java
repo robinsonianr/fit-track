@@ -105,8 +105,7 @@ public class CustomerServiceTest {
                 "johndoe@example.com",
                 "password123",
                 30,
-                Gender.MALE,
-                new Date().toInstant().atOffset(ZoneOffset.UTC)
+                Gender.MALE
         );
 
         when(customerRepository.existsByEmail(registrationRequest.email())).thenReturn(false);
@@ -122,8 +121,7 @@ public class CustomerServiceTest {
                                 customer.getEmail().equals(registrationRequest.email()) &&
                                 customer.getPassword().equals("hashedPassword") &&
                                 customer.getAge().equals(registrationRequest.age()) &&
-                                customer.getGender().equals(registrationRequest.gender()) &&
-                                customer.getMemberSince().equals(registrationRequest.memberSince())
+                                customer.getGender().equals(registrationRequest.gender())
                 )
         );
 
@@ -142,8 +140,7 @@ public class CustomerServiceTest {
                 "johndoe@example.com",
                 "password123",
                 30,
-                Gender.MALE,
-                new Date().toInstant().atOffset(ZoneOffset.UTC)
+                Gender.MALE
         );
         when(customerRepository.existsByEmail(registrationRequest.email())).thenReturn(true);
 

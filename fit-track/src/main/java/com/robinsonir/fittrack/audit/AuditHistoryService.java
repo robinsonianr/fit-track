@@ -7,6 +7,7 @@ import org.hibernate.envers.query.AuditQuery;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,8 +21,8 @@ public class AuditHistoryService {
         this.auditReader = auditReader;
     }
 
-    public Map<Integer, OffsetDateTime> getCustomerWeightHistory(Long entityId) {
-        Map<Integer, OffsetDateTime> weightAudit = new HashMap<>();
+    public List<WeightAuditHistoryDTO> getCustomerWeightHistory(Long entityId) {
+        List<WeightAuditHistoryDTO> weightAudit = new ArrayList<>();
         AuditQuery auditQuery = auditReader.createQuery()
                 .forRevisionsOfEntity(CustomerEntity.class, true,true)
                 .add(AuditEntity.id().eq(entityId))
@@ -30,7 +31,9 @@ public class AuditHistoryService {
         List items = auditQuery.getResultList();
         for (Object item : items) {
             CustomerEntity customer = (CustomerEntity) item;
-            weightAudit.put(customer.getWeight(), customer.getLastModifiedDate());
+            Map<Integer, OffsetDateTime> weightAuditMap = new HashMap<>();
+            weightAuditMap.put(customer.getWeight(), customer.getLastModifiedDate());
+            weightAudit.add(new WeightAuditHistoryDTO(weightAuditMap));
         }
 
         return weightAudit;

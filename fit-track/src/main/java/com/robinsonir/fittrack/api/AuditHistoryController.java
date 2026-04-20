@@ -1,7 +1,9 @@
 package com.robinsonir.fittrack.api;
 
 import com.robinsonir.fittrack.audit.AuditHistoryService;
+import com.robinsonir.fittrack.audit.WeightAuditHistoryDTO;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -28,7 +31,8 @@ public class AuditHistoryController {
     @Operation(summary = "Get customer weight audit history")
     @ApiResponse(responseCode = "404", description = "Customer not found")
     @GetMapping("{entityId}")
-    public ResponseEntity<Map<Integer, OffsetDateTime>> getCustomerWeightAuditHistory(@PathVariable("entityId") final Long entityId) {
+    public ResponseEntity<List<WeightAuditHistoryDTO>> getCustomerWeightAuditHistory(
+            @Parameter(description = "entityId") @PathVariable final Long entityId) {
         return ResponseEntity.ok(auditHistoryService.getCustomerWeightHistory(entityId));
     }
 }

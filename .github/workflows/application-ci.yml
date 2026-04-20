@@ -67,3 +67,18 @@ jobs:
 
       - name: Build with Gradle
         run: gradle build
+
+      - name: Generate OpenAPI spec
+        run: gradle exportOpenApiSpec
+
+      - name: Assert OpenAPI spec is in sync with code
+        run: |
+          if ! git diff --exit-code 
+            openapi/api.json; then
+            echo "::error::OpenAPI spec drift
+            detected."
+            echo "Run './gradlew
+            exportOpenApiSpec' locally and commit
+            openapi/api.json."
+            exit 1
+            fi

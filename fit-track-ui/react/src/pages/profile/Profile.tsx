@@ -1,21 +1,20 @@
 import React, {useEffect, useRef, useState} from "react";
-import {Customer, Workout} from "../../types";
-import {
-    getAllWorkoutsByCustomerId,
-    getCustomer,
-    getCustomerProfileImage,
-    updateCustomer,
-    uploadCustomerProfileImage
-} from "../../services/client.ts";
+import {getCustomerProfileImage, updateCustomer, uploadCustomerProfileImage} from "../../services/client.ts";
 import axios from "axios";
+import {getCustomerApi} from "../../api/generated/endpoints/customer-api/customer-api.ts";
+import {CustomerDTO, WorkoutDTO} from "../../api/generated/models";
+import {getWorkoutsApi} from "../../api/generated/endpoints/workouts-api/workouts-api.ts";
+
 
 export const Profile = () => {
-    const [customer, setCustomer] = useState<Customer | undefined>(undefined);
-    const [workoutData, setWorkoutData] = useState<Workout[]>([]);
+    const [customer, setCustomer] = useState<CustomerDTO>();
+    const [workoutData, setWorkoutData] = useState<WorkoutDTO[]>([]);
     const [pfp, setPfp] = useState<string | undefined>(undefined);
     const defaultImg = "/assets/user.png";
     const fileInputRef = useRef<HTMLInputElement>(null);
     const id = localStorage.getItem("customerId")!;
+    const {getCustomer} = getCustomerApi();
+    const {getAllWorkoutsByCustomerId} = getWorkoutsApi();
 
 
     const profile = {
@@ -70,10 +69,10 @@ export const Profile = () => {
         const fetchData = async () => {
             try {
                 const customerId = parseInt(id, 10);
-                const customerResp= await getCustomer(customerId);
-                const workoutsResp = await getAllWorkoutsByCustomerId(id);
-                setWorkoutData(workoutsResp.data);
-                setCustomer(customerResp.data);
+                const customerResp = await getCustomer(customerId);
+                const workoutsResp = await getAllWorkoutsByCustomerId(customerId);
+                setWorkoutData(workoutsResp);
+                setCustomer(customerResp);
             } catch (error) {
                 console.error("Could not retrieve customer: ", error);
             }
@@ -117,6 +116,7 @@ export const Profile = () => {
 
         if (customer?.id) {
             try {
+                // Todo: update how the customer is updated
                 await updateCustomer(customer?.id, data);
                 setTimeout(() => {
                     window.location.reload();
@@ -140,7 +140,7 @@ export const Profile = () => {
                     <div className="flex flex-col items-center">
                         <div className="w-24 h-24 mb-4 relative">
                             <img className="rounded-[50%] object-cover w-20 h-20 z-1"
-                                src={pfp != undefined ? pfp : defaultImg} alt="pfp"/>
+                                 src={pfp != undefined ? pfp : defaultImg} alt="pfp"/>
                             <input
                                 type="file"
                                 ref={fileInputRef}
@@ -180,38 +180,38 @@ export const Profile = () => {
                                 <div className="space-y-2">
                                     <label htmlFor="firstName">First Name</label>
                                     <input name="firstName" type="text" defaultValue={customer?.name?.split(" ")[0]}
-                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="lastName">Last Name</label>
                                     <input name="lastName" type="text" defaultValue={customer?.name?.split(" ")[1]}
-                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="age">Age</label>
                                     <input name="age" type="text" defaultValue={healthInfo.age}
-                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="weight">Weight (lbs)</label>
                                     <input name="weight" type="text" defaultValue={healthInfo.weight}
-                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="height">Height (inches)</label>
                                     <input name="height" type="number" defaultValue={healthInfo.height}
-                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="bodyFat">Body Fat%</label>
                                     <input name="bodyFat" type="number" defaultValue={healthInfo.bodyFat}
-                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="gender">Gender</label>
                                     {customer && (
                                         <select name="gender" defaultValue={healthInfo.gender}
-                                            className="border-2 border-gray-600 rounded-md p-2 w-full">
+                                                className="border-2 border-gray-600 rounded-md p-2 w-full">
                                             <option value="">
                                                 Select Gender
                                             </option>
@@ -225,7 +225,7 @@ export const Profile = () => {
                                     <label htmlFor="activity">Fitness Experience</label>
                                     {customer && (
                                         <select name="activity" defaultValue={healthInfo.activity}
-                                            className="border-2 border-gray-600 rounded-md p-2 w-full">
+                                                className="border-2 border-gray-600 rounded-md p-2 w-full">
                                             <option value="">
                                                 Select Activity Experience
                                             </option>
@@ -241,7 +241,7 @@ export const Profile = () => {
                                 <div className="space-y-2">
                                     <label htmlFor="email">Email</label>
                                     <input name="email" type="text" defaultValue={customer?.email}
-                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                             </div>
                             <button

@@ -10,7 +10,7 @@ services:
       - "8080:8080"
       - "5005:5005"
     volumes:
-      - ~/.aws:/root/.aws:ro
+      - ~/.aws:/home/appuser/.aws:ro
     networks:
       - fitness
     external_links:
@@ -20,14 +20,17 @@ services:
 
   frontend:
     build:
-      context: ./fit-track-ui/react
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./fit-track-ui/react/Dockerfile.local
       args:
         api_base_url: http://localhost:8080
     environment:
       VITE_API_BASE_URL: http://localhost:8080
     ports:
       - "5173:5173"
+    volumes:
+      - ./fit-track-ui/react/src:/app/fit-track-ui/react/src
+      - ./openapi:/app/openapi
     networks:
       - fitness
     depends_on:

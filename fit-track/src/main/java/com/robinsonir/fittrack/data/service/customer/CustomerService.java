@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -72,6 +73,7 @@ public class CustomerService {
 
         CustomerEntity customerEntity = customerMapper.registrationRequestToEntity(customerRegistrationRequest);
         customerEntity.setPassword(passwordEncoder.encode(customerRegistrationRequest.password()));
+        customerEntity.setMemberSince(OffsetDateTime.now());
 
         // Allows revinfo to obtain username after customer is persisted
         Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
