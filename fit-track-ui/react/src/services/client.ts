@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from
-        "axios";
+    "axios";
 
 
 const axiosInstance = axios.create({
