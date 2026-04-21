@@ -15,7 +15,7 @@ env:
   POSTGRESQL_USER: postgres
   POSTGRESQL_PASSWORD: root1234
   JAVA_VERSION: 17
-  NODE_VERSION: 20
+  NODE_VERSION: 22
 
 jobs:
   build:

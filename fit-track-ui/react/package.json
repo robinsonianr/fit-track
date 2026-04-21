@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": "18.x",
-    "npm": "9.x"
+    "node": "22.x",
+    "npm": "10.x"
   },
   "scripts": {
     "start": "vite --host",
@@ -27,7 +27,7 @@
     "@testing-library/user-event": "^13.5.0",
     "@types/jest": "^27.5.2",
     "@uidotdev/usehooks": "^2.4.1",
-    "axios": "1.8.2",
+    "axios": "^1.15.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "echarts": "^5.5.1",
@@ -54,7 +54,7 @@
     "autoprefixer": "^10.4.21",
     "cssnano": "^7.0.6",
     "globals": "^16.2.0",
-    "markdownlint-cli": "^0.37.0",
+    "markdownlint-cli": "^0.48.0",
     "orval": "^7.13.2",
     "postcss": "^8.5.5",
     "postcss-browser-reporter": "^0.7.0",
@@ -65,11 +65,10 @@
     "postcss-nested": "^7.0.2",
     "postcss-preset-env": "^10.1.5",
     "postcss-reporter": "^7.1.0",
-    "postcss-utilities": "^0.8.4",
     "sass": "^1.84.0",
     "stylelint": "^16.20.0",
     "stylelint-config-standard": "^38.0.0",
     "stylelint-config-tailwindcss": "^1.0.0",
-    "vite": "6.3.4"
+    "vite": "^6.4.2"
   }
 }

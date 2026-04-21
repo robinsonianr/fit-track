@@ -16,7 +16,7 @@ root.render(
         <ThemeProvider>
             <AuthProvider>
                 <RouterProvider router={router}/>
-                <Toaster richColors position="top-right"
+                <Toaster richColors position="top-center"
                     expand                    // don't collapse
                     closeButton               // adds an X to
                     duration={4000}           // default 4s

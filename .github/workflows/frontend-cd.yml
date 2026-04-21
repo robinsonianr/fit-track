@@ -16,18 +16,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-      - name: Check for changes in fit-track/ directory
-        id: check-changes
-        run: |
-          if git diff --quiet HEAD^ HEAD -- fit-track/; then
-            echo "No changes detected in fit-track/"
-            echo "skip_wait=true" >> $GITHUB_ENV
-          else
-            echo "Changes detected in fit-track/"
-            echo "skip_wait=false" >> $GITHUB_ENV
-          fi
       - name: Build Number
         id: build-number
         run: echo "BUILD_NUMBER=$(date '+%-d.%-m.%Y.%-H.%-M.%-S')" >> $GITHUB_OUTPUT
@@ -44,8 +32,6 @@ jobs:
           aws-region: ${{ secrets.EB_REGION }}
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
-      - name: Type-check & build frontend
-        run: cd ./fit-track-ui/react && npm run build
       - name: Build and push to ECR
         run: |
           docker build . \
@@ -63,8 +49,8 @@ jobs:
         run: |
           sed -i "s|fit-track-ui:latest|fit-track-ui:${{ steps.build-number.outputs.BUILD_NUMBER }}|g" Dockerrun.aws.json
         working-directory: fit-track-ui/react
-      - name: Wait for Elastic Beanstalk env to be ready to used
-        if: env.skip_wait == 'false'
+      - name: Wait for Elastic Beanstalk env to be Ready
+        timeout-minutes: 10
         run: |
           aws elasticbeanstalk wait environment-updated --environment-name ${{ secrets.EB_ENVIRONMENT_NAME }} --region ${{ secrets.EB_REGION }}
       - name: Deploy to Elastic Beanstalk
