@@ -53,7 +53,7 @@ public class CustomerController {
     @Operation(security = {}, summary = "Register a new customer")
     @PostMapping
     public ResponseEntity<CustomerDTO> registerCustomer(
-            @Parameter(description = "request") @Valid @RequestBody CustomerRegistrationRequest request) {
+            @Parameter(description = "request") @RequestBody CustomerRegistrationRequest request) {
         CustomerDTO created = customerService.addCustomer(request);
         URI location = URI.create("/api/v1/customers/" + created.id());
         String jwtToken = jwtUtil.generateToken(request.email(), created.roles());
@@ -68,7 +68,7 @@ public class CustomerController {
     @PatchMapping("{customerId}")
     public CustomerDTO updateCustomer(
             @Parameter(description = "customerId") @PathVariable final Long customerId,
-            @Parameter(description = "updateRequest") @Valid @RequestBody CustomerUpdateRequest updateRequest) {
+            @Parameter(description = "updateRequest") @RequestBody CustomerUpdateRequest updateRequest) {
         return customerService.updateCustomer(customerId, updateRequest);
     }
 
@@ -90,7 +90,8 @@ public class CustomerController {
             value = "{customerId}/profile-image",
             produces = MediaType.IMAGE_JPEG_VALUE
     )
-    public byte[] getCustomerProfileImage(@PathVariable(name = "customerId") Long customerId) {
+    public byte[] getCustomerProfileImage(
+            @Parameter(description = "customerId") @PathVariable Long customerId) {
         return customerService.getProfilePicture(customerId);
     }
 }

@@ -52,7 +52,7 @@ public class WorkoutController {
     @ApiResponse(responseCode = "400", description = "Invalid request")
     @PostMapping
     public ResponseEntity<WorkoutDTO> createWorkout(
-            @Parameter(description = "request") @Valid @RequestBody WorkoutCreationRequest request) {
+            @Parameter(description = "request") @RequestBody WorkoutCreationRequest request) {
         WorkoutDTO created = workoutService.addWorkout(request);
         URI location = URI.create("/api/v1/workouts/" + created.id());
 
