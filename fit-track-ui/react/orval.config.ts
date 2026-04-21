@@ -1,9 +1,8 @@
-import {defineConfig} from "vite";
+import {defineConfig} from "orval";
 
 export default defineConfig({
     fitTrack: {
-        input: { target:
-                '../../openapi/api.json' },
+        input: { target: '../../openapi/api.json' },
         output: {
             mode: 'tags-split',
             target: 'src/api/generated/endpoints',
@@ -13,7 +12,8 @@ export default defineConfig({
                 mutator: {
                     path: 'src/services/client.ts',
                     name: 'customInstance'
-                } },
+                }
+            },
             clean: true,
         },
     },

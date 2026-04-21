@@ -33,6 +33,7 @@ export const customInstance = <T>(config:
     return axiosInstance(config).then(({ data }) => data);
 };
 
+export const buildProfileImage = (id: number) => `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers/${id}/profile-image`;
 
 export const getCustomer = async (id: any) => {
     try {

@@ -1,19 +1,18 @@
 import React, {useEffect, useRef, useState} from "react";
-import {getCustomerProfileImage, updateCustomer, uploadCustomerProfileImage} from "../../services/client.ts";
-import axios from "axios";
 import {getCustomerApi} from "../../api/generated/endpoints/customer-api/customer-api.ts";
-import {CustomerDTO, WorkoutDTO} from "../../api/generated/models";
+import {CustomerDTO, CustomerUpdateRequest, Gender, WorkoutDTO} from "../../api/generated/models";
 import {getWorkoutsApi} from "../../api/generated/endpoints/workouts-api/workouts-api.ts";
+import {buildProfileImage} from "../../services/client.ts";
+import {toast} from "sonner";
 
 
 export const Profile = () => {
     const [customer, setCustomer] = useState<CustomerDTO>();
     const [workoutData, setWorkoutData] = useState<WorkoutDTO[]>([]);
-    const [pfp, setPfp] = useState<string | undefined>(undefined);
     const defaultImg = "/assets/user.png";
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const id = localStorage.getItem("customerId")!;
-    const {getCustomer} = getCustomerApi();
+    const id = Number.parseInt(localStorage.getItem("customerId")!);
+    const {getCustomer, updateCustomer, uploadCustomerProfileImage} = getCustomerApi();
     const {getAllWorkoutsByCustomerId} = getWorkoutsApi();
 
 
@@ -41,34 +40,13 @@ export const Profile = () => {
     ];
     const month = new Date(profileMember!).getMonth();
     const memberDate = monthNames[month] + " " + new Date(profileMember!).getFullYear();
+    const pfp = customer?.profileImageId ? buildProfileImage(id) : defaultImg;
 
-    const fetchPfp = async (id: any) => {
-        try {
-            const res = getCustomerProfileImage(id);
-            const isImage = await checkImageUrl(res);
-            if (isImage) {
-                setPfp(res);
-            }
-        } catch (error) {
-            console.error("Could not retrieve customer profile image: ", error);
-        }
-    };
-
-    const checkImageUrl = async (url: string): Promise<boolean> => {
-        try {
-            const response = await axios.get(url);
-            const contentType = response.headers["content-type"];
-            return contentType && contentType.startsWith("image/");
-        } catch (error) {
-            console.error("Error checking image URL:", error);
-            return false;
-        }
-    };
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const customerId = parseInt(id, 10);
+                const customerId = id;
                 const customerResp = await getCustomer(customerId);
                 const workoutsResp = await getAllWorkoutsByCustomerId(customerId);
                 setWorkoutData(workoutsResp);
@@ -77,10 +55,8 @@ export const Profile = () => {
                 console.error("Could not retrieve customer: ", error);
             }
         };
-
-        fetchPfp(id);
         fetchData();
-    }, []);
+    }, [id]);
 
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -92,11 +68,9 @@ export const Profile = () => {
     };
 
     const uploadPFP = async (file: File) => {
-        const formData = new FormData();
-        formData.append("file", file);
-
         try {
-            await uploadCustomerProfileImage(id, formData);
+           const msg = await uploadCustomerProfileImage(id, {file});
+           toast.success(msg.message);
         } catch (error) {
             console.error("File upload failed", error);
         }
@@ -112,17 +86,27 @@ export const Profile = () => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget);
         formData.append("name", formData.get("firstName") + " " + formData.get("lastName"));
-        const data = Object.fromEntries(formData.entries());
+
+        const update: CustomerUpdateRequest = {
+            name: String(formData.get("name")),
+            email: formData.get("email") as string,
+            age: Number(formData.get("age")) || undefined,
+            gender: formData.get("gender") as Gender,
+            weight: Number(formData.get("weight")) || undefined,
+            height: Number(formData.get("height")) || undefined,
+            weightGoal: Number(formData.get("weightGoal")) || undefined,
+            activity: String(formData.get("activity")) || undefined,
+            bodyFat: Number(formData.get("bodyFat")) || undefined
+        }
 
         if (customer?.id) {
             try {
-                // Todo: update how the customer is updated
-                await updateCustomer(customer?.id, data);
-                setTimeout(() => {
-                    window.location.reload();
-                }, 500);
+                const response = await updateCustomer(customer?.id, update);
+                setCustomer(response);
+                toast.success("Profile updated successfully!");
             } catch (error) {
                 console.error("Failed to update customer.", error);
+                toast.error("Failed to update profile.");
             }
         }
     };
@@ -140,7 +124,7 @@ export const Profile = () => {
                     <div className="flex flex-col items-center">
                         <div className="w-24 h-24 mb-4 relative">
                             <img className="rounded-[50%] object-cover w-20 h-20 z-1"
-                                 src={pfp != undefined ? pfp : defaultImg} alt="pfp"/>
+                                 src={pfp} alt="pfp"/>
                             <input
                                 type="file"
                                 ref={fileInputRef}
