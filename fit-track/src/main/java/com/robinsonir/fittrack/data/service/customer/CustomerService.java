@@ -139,21 +139,21 @@ public class CustomerService {
             customerEntity.setEmail(updateRequest.email());
         }
 
-        if (updateRequest.name()       != null)
+        if (updateRequest.name() != null)
             customerEntity.setName(updateRequest.name());
-        if (updateRequest.age()        != null)
+        if (updateRequest.age() != null)
             customerEntity.setAge(updateRequest.age());
-        if (updateRequest.gender()     != null)
+        if (updateRequest.gender() != null)
             customerEntity.setGender(updateRequest.gender());
-        if (updateRequest.weight()     != null)
+        if (updateRequest.weight() != null)
             customerEntity.setWeight(updateRequest.weight());
-        if (updateRequest.height()     != null)
+        if (updateRequest.height() != null)
             customerEntity.setHeight(updateRequest.height());
         if (updateRequest.weightGoal() != null)
             customerEntity.setWeightGoal(updateRequest.weightGoal());
-        if (updateRequest.activity()   != null)
+        if (updateRequest.activity() != null)
             customerEntity.setActivity(updateRequest.activity());
-        if (updateRequest.bodyFat()    != null)
+        if (updateRequest.bodyFat() != null)
             customerEntity.setBodyFat(updateRequest.bodyFat());
 
         return customerMapper.customerEntityToCustomer(customerEntity);

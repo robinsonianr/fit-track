@@ -124,7 +124,7 @@ public class WorkoutServiceTest {
     @Test
     void addWorkout() {
         // Arrange
-        WorkoutCreationRequest workoutCreationRequest = new WorkoutCreationRequest(customer, "Cardio", new HashSet<>(), "Swimming", 12000, 400, 60, OffsetDateTime.now());
+        WorkoutCreationRequest workoutCreationRequest = new WorkoutCreationRequest(customer.getId(), "Cardio", new HashSet<>(), "Swimming", 12000, 400, 60);
 
         WorkoutEntity newWorkout = new WorkoutEntity();
         newWorkout.setTitle(workoutCreationRequest.title());
@@ -132,7 +132,6 @@ public class WorkoutServiceTest {
         newWorkout.setExercises(exerciseMapper.mapToExerciseEntities(workoutCreationRequest.exercises()));
         newWorkout.setCalories(workoutCreationRequest.calories());
         newWorkout.setDurationMinutes(workoutCreationRequest.durationMinutes());
-        newWorkout.setWorkoutDate(workoutCreationRequest.workoutDate());
 
         Optional<CustomerEntity> cust = customerRepository.findCustomerById(customer.getId());
         cust.ifPresent(newWorkout::setCustomer);
