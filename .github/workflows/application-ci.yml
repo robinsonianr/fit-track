@@ -65,20 +65,14 @@ jobs:
       - name: Run ESLint
         run: cd ./fit-track-ui/react && npm run lint
 
-      - name: Build with Gradle
-        run: gradle build
+      - name: Type-check & Build Frontend
+        run: cd ./fit-track-ui/react && npm run build
 
       - name: Generate OpenAPI spec
         run: gradle exportOpenApiSpec
 
       - name: Assert OpenAPI spec is in sync with code
-        run: |
-          if ! git diff --exit-code 
-            openapi/api.json; then
-            echo "::error::OpenAPI spec drift
-            detected."
-            echo "Run './gradlew
-            exportOpenApiSpec' locally and commit
-            openapi/api.json."
-            exit 1
-            fi
+        run: git diff --exit-code openapi/api.json || { echo "::error::OpenAPI drift — run './gradlew exportOpenApiSpec' and commit."; exit 1; }
+
+      - name: Build with Gradle
+        run: ./gradlew build

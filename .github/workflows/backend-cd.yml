@@ -51,21 +51,12 @@ jobs:
       - name: Create fit_tracker schema
         run: |
           echo "CREATE SCHEMA IF NOT EXISTS fit_tracker;" | PGPASSWORD=${{ env.POSTGRESQL_PASSWORD }} psql -h localhost -U ${{ env.POSTGRESQL_USER }} ${{ env.POSTGRESQL_DB }}
-      - name: Build JAR
-        run: gradle bootJar -x test
       - name: Generate OpenAPI spec
         run: gradle exportOpenApiSpec
       - name: Assert OpenAPI spec is in sync with code
-        run: |
-          if ! git diff --exit-code 
-            openapi/api.json; then
-            echo "::error::OpenAPI spec drift
-            detected."
-            echo "Run './gradlew
-            exportOpenApiSpec' locally and commit
-            openapi/api.json."
-            exit 1
-            fi
+        run: git diff --exit-code openapi/api.json || { echo "::error::OpenAPI drift — run './gradlew exportOpenApiSpec' and commit."; exit 1; }
+      - name: Build JAR
+        run: ./gradlew bootJar -x test
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
