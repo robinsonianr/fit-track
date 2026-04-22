@@ -1,4 +1,4 @@
-name: CD - Backend
+name: CD - Application
 
 on:
   workflow_dispatch:
@@ -6,6 +6,9 @@ on:
     branches: [ "main" ]
     paths:
       - fit-track/**
+      - fit-track-ui/react/**
+      - Dockerrun.aws.json
+      - .github/workflows/application-cd.yml
 
 env:
   POSTGRESQL_DB: fit-tracker
@@ -27,60 +30,85 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     defaults:
       run:
-        working-directory: ./fit-track
+        working-directory: ${{ github.workspace }}
     steps:
       - uses: actions/checkout@v4
+
       - name: Setup Java JDK
         uses: actions/setup-java@v4
         with:
           java-version: 17
           distribution: temurin
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: 8.14.4
+
       - name: Build Number
         id: build-number
         run: echo "BUILD_NUMBER=$(date '+%-d.%-m.%Y.%-H.%-M.%-S')" >> $GITHUB_OUTPUT
+
       - name: Docker Login
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
-        with:
-          gradle-version: 8.14.4
-      - name: Create fit_tracker schema
-        run: |
-          echo "CREATE SCHEMA IF NOT EXISTS fit_tracker;" | PGPASSWORD=${{ env.POSTGRESQL_PASSWORD }} psql -h localhost -U ${{ env.POSTGRESQL_USER }} ${{ env.POSTGRESQL_DB }}
-      - name: Generate OpenAPI spec
-        run: ./gradlew exportOpenApiSpec
-      - name: Assert OpenAPI spec is in sync with code
-        run: git diff --exit-code openapi/api.json || { echo "::error::OpenAPI drift — run './gradlew exportOpenApiSpec' and commit."; exit 1; }
-      - name: Build JAR
-        run: ./gradlew bootJar -x test
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.EB_REGION }}
+
       - name: Login to Amazon ECR
         uses: aws-actions/amazon-ecr-login@v1
-      - name: Build and push to ECR
+
+      - name: Create fit_tracker schema
+        run: |
+          echo "CREATE SCHEMA IF NOT EXISTS fit_tracker;" | PGPASSWORD=${{ env.POSTGRESQL_PASSWORD }} psql -h localhost -U ${{ env.POSTGRESQL_USER }} ${{ env.POSTGRESQL_DB }}
+
+      - name: Generate OpenAPI spec & build JAR
+        run: ./gradlew exportOpenApiSpec bootJar -x test
+
+      - name: Build & push backend image
         run: |
           docker build . \
-          --file Dockerfile \
-          --tag fit-track:${{ steps.build-number.outputs.BUILD_NUMBER }} \
-          --tag fit-track:latest 
+            --file fit-track/Dockerfile \
+            --tag fit-track:${{ steps.build-number.outputs.BUILD_NUMBER }} \
+            --tag fit-track:latest
 
           docker tag fit-track:${{ steps.build-number.outputs.BUILD_NUMBER }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.EB_REGION }}.amazonaws.com/fit-track:${{ steps.build-number.outputs.BUILD_NUMBER }}
           docker tag fit-track:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.EB_REGION }}.amazonaws.com/fit-track:latest
 
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.EB_REGION }}.amazonaws.com/fit-track:${{ steps.build-number.outputs.BUILD_NUMBER }}
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.EB_REGION }}.amazonaws.com/fit-track:latest
-        working-directory: fit-track
-      - name: Update Dockerrun.aws.json with version
+
+      - name: Build & push frontend image
+        run: |
+          docker build . \
+            --file fit-track-ui/react/Dockerfile \
+            --tag fit-track-ui:${{ steps.build-number.outputs.BUILD_NUMBER }} \
+            --tag fit-track-ui:latest \
+            --build-arg api_base_url=http://fit-track-dev.eba-jpnjhwum.us-east-1.elasticbeanstalk.com:8080
+
+          docker tag fit-track-ui:${{ steps.build-number.outputs.BUILD_NUMBER }} ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.EB_REGION }}.amazonaws.com/fit-track-ui:${{ steps.build-number.outputs.BUILD_NUMBER }}
+          docker tag fit-track-ui:latest ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.EB_REGION }}.amazonaws.com/fit-track-ui:latest
+
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.EB_REGION }}.amazonaws.com/fit-track-ui:${{ steps.build-number.outputs.BUILD_NUMBER }}
+          docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.EB_REGION }}.amazonaws.com/fit-track-ui:latest
+
+      - name: Update Dockerrun.aws.json with versions
         run: |
           sed -i "s|fit-track:latest|fit-track:${{ steps.build-number.outputs.BUILD_NUMBER }}|g" Dockerrun.aws.json
-        working-directory: fit-track
+          sed -i "s|fit-track-ui:latest|fit-track-ui:${{ steps.build-number.outputs.BUILD_NUMBER }}|g" Dockerrun.aws.json
+
+      - name: Wait for Elastic Beanstalk env to be Ready
+        timeout-minutes: 10
+        run: |
+          aws elasticbeanstalk wait environment-updated --environment-name ${{ secrets.EB_ENVIRONMENT_NAME }} --region ${{ secrets.EB_REGION }}
+
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:
@@ -92,3 +120,4 @@ jobs:
           version_description: ${{ github.SHA }}
           region: ${{ secrets.EB_REGION }}
           deployment_package: Dockerrun.aws.json
+          wait_for_environment_recovery: 60

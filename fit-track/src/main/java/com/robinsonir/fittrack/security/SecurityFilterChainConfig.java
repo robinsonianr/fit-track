@@ -50,11 +50,11 @@ public class SecurityFilterChainConfig {
                         HttpMethod.GET,
                         "/ping",
                         "/api/v1/customers/*/profile-image",
-                        "/api/v1/customers",
-                        "/actuator/**"
+                        "/api/v1/customers"
                 )
                 .permitAll()
                 .requestMatchers("/swagger-ui/**",
+                        "/actuator/**",
                         "/swagger-ui.html",
                         "/v3/api-docs/**",
                         "/swagger-resources/**",

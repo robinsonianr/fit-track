@@ -1,8 +1,8 @@
 # Use a base image that includes Java
-FROM eclipse-temurin:17-jre-alpine
+FROM eclipse-temurin:17-jre
 
-RUN apk add --no-cache tini
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN apt-get update && apt-get install -y tini wget && rm -rf /var/lib/apt/lists/*
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
 # Copy the backend (Java application) JAR file into the image
 COPY build/libs/fit-track-*.jar fit-track.jar
@@ -14,7 +14,7 @@ EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:8080/actuator/health || exit 1
 
-ENTRYPOINT ["/sbin/tini", "--"]
+ENTRYPOINT ["/usr/bin/tini", "--"]
 CMD ["java", \
     "-XX:+UseContainerSupport", \
     "-XX:MaxRAMPercentage=75.0", \
