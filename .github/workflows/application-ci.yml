@@ -15,7 +15,7 @@ env:
   POSTGRESQL_USER: postgres
   POSTGRESQL_PASSWORD: root1234
   JAVA_VERSION: 17
-  NODE_VERSION: 20
+  NODE_VERSION: 22
 
 jobs:
   build:
@@ -36,7 +36,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
-          distribution: 'liberica'
+          distribution: temurin
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -50,7 +50,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
         with:
-          gradle-version: 7.6.1
+          gradle-version: 8.14.4
 
       - name: Create fit_tracker schema
         run: |
@@ -65,5 +65,14 @@ jobs:
       - name: Run ESLint
         run: cd ./fit-track-ui/react && npm run lint
 
+      - name: Generate OpenAPI spec
+        run: ./gradlew exportOpenApiSpec
+
+      - name: Assert OpenAPI spec is in sync with code
+        run: git diff --exit-code openapi/api.json || { echo "::error::OpenAPI drift — run './gradlew exportOpenApiSpec' and commit."; exit 1; }
+
+      - name: Type-check & Build Frontend
+        run: cd ./fit-track-ui/react && npm run build
+
       - name: Build with Gradle
-        run: gradle build
+        run: ./gradlew build

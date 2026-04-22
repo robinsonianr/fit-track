@@ -4,6 +4,7 @@ import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
 import com.robinsonir.fittrack.data.repository.customer.CustomerDTO;
 import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
 import com.robinsonir.fittrack.exception.DuplicateResourceException;
+import com.robinsonir.fittrack.exception.FileUploadException;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
 import com.robinsonir.fittrack.mappers.CustomerMapper;
 import com.robinsonir.fittrack.s3.S3Service;
@@ -14,13 +15,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.OffsetDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +33,6 @@ public class CustomerService {
 
     private final S3Service s3Service;
     private final CustomerRepository customerRepository;
-    private final CustomerDataService customerDataService;
 
     @Setter
     @Value("${s3.bucket.name}")
@@ -42,13 +41,11 @@ public class CustomerService {
     public CustomerService(CustomerMapper customerMapper,
                            PasswordEncoder passwordEncoder,
                            S3Service s3Service,
-                           CustomerRepository customerRepository,
-                           CustomerDataService customerDataService) {
+                           CustomerRepository customerRepository) {
         this.customerMapper = customerMapper;
         this.passwordEncoder = passwordEncoder;
         this.s3Service = s3Service;
         this.customerRepository = customerRepository;
-        this.customerDataService = customerDataService;
     }
 
     public List<CustomerDTO> getAllCustomers() {
@@ -64,56 +61,46 @@ public class CustomerService {
         return customerMapper.customerEntityToCustomer(customerEntity);
     }
 
-    public void addCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
+    @Transactional
+    public CustomerDTO addCustomer(CustomerRegistrationRequest customerRegistrationRequest) {
         String email = customerRegistrationRequest.email();
-        if (customerDataService.existsByEmail(email)) {
+        if (customerRepository.existsByEmail(email)) {
             throw new DuplicateResourceException(
                     "email already taken"
             );
         }
 
+
+        CustomerEntity customerEntity = customerMapper.registrationRequestToEntity(customerRegistrationRequest);
+        customerEntity.setPassword(passwordEncoder.encode(customerRegistrationRequest.password()));
+        customerEntity.setMemberSince(OffsetDateTime.now());
+
         // Allows revinfo to obtain username after customer is persisted
-        UserDetails userDetails = new User(customerRegistrationRequest.email(), customerRegistrationRequest.password(), Collections.emptyList());
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(),
-                customerRegistrationRequest.password());
+        Authentication authentication = new UsernamePasswordAuthenticationToken(email, null, Collections.emptyList());
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        CustomerEntity customerEntity = new CustomerEntity();
-        customerEntity.setName(customerRegistrationRequest.name());
-        customerEntity.setEmail(customerRegistrationRequest.email());
-        customerEntity.setPassword(passwordEncoder.encode(customerRegistrationRequest.password()));
-        customerEntity.setAge(customerRegistrationRequest.age());
-        customerEntity.setGender(customerRegistrationRequest.gender());
-        customerEntity.setMemberSince(customerRegistrationRequest.memberSince());
-
-        customerRepository.save(customerEntity);
-    }
-
-
-    public void checkIfCustomerExistsOrThrow(Long customerId) {
-        if (!customerRepository.existsById(customerId)) {
-            throw new ResourceNotFoundException(
-                    "customer with id [%s] not found".formatted(customerId)
-            );
+        try {
+            customerRepository.save(customerEntity);
+        } finally {
+            SecurityContextHolder.clearContext();
         }
+        return customerMapper.customerEntityToCustomer(customerEntity);
     }
 
     @Transactional
     public void uploadCustomerProfilePicture(Long customerId, MultipartFile file) {
-        checkIfCustomerExistsOrThrow(customerId);
         String profileImageId = UUID.randomUUID().toString();
 
+        customerRepository.updateProfileImageId(profileImageId, customerId);
         try {
             s3Service.putObject(
                     s3Bucket,
-                    "profile-images/%s/%s".formatted(customerId, profileImageId),
+                    profileImageKey(customerId, profileImageId),
                     file.getBytes());
 
         } catch (IOException e) {
-            throw new RuntimeException("failed to upload profile image", e);
+            throw new FileUploadException("failed to upload profile image", e);
         }
-
-        customerRepository.updateProfileImageId(profileImageId, customerId);
     }
 
 
@@ -123,21 +110,20 @@ public class CustomerService {
                         "customer with id [%s] not found".formatted(customerId)
                 ));
 
-        var customer = customerMapper.customerEntityToCustomer(customerEntity);
 
-        if (StringUtils.isBlank(customer.profileImageId())) {
+        if (StringUtils.isBlank(customerEntity.getProfileImageId())) {
             throw new ResourceNotFoundException(
                     "customer with id [%s] profile image not found".formatted(customerId));
         }
 
         return s3Service.getObject(
                 s3Bucket,
-                "profile-images/%s/%s".formatted(customerId, customer.profileImageId())
+                profileImageKey(customerId, customerEntity.getProfileImageId())
         );
     }
 
     @Transactional
-    public void updateCustomer(Long id, CustomerUpdateRequest updateRequest) {
+    public CustomerDTO updateCustomer(Long id, CustomerUpdateRequest updateRequest) {
         CustomerEntity customerEntity = customerRepository.findCustomerById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "customer with id [%s] not found".formatted(id)
@@ -153,17 +139,29 @@ public class CustomerService {
             customerEntity.setEmail(updateRequest.email());
         }
 
-        customerRepository.updateCustomer(id,
-                updateRequest.name(),
-                updateRequest.email(),
-                updateRequest.age(),
-                updateRequest.gender(),
-                updateRequest.weight(),
-                updateRequest.height(),
-                updateRequest.weightGoal(),
-                updateRequest.activity(),
-                updateRequest.bodyFat()
-        );
+        if (updateRequest.name() != null)
+            customerEntity.setName(updateRequest.name());
+        if (updateRequest.age() != null)
+            customerEntity.setAge(updateRequest.age());
+        if (updateRequest.gender() != null)
+            customerEntity.setGender(updateRequest.gender());
+        if (updateRequest.weight() != null)
+            customerEntity.setWeight(updateRequest.weight());
+        if (updateRequest.height() != null)
+            customerEntity.setHeight(updateRequest.height());
+        if (updateRequest.weightGoal() != null)
+            customerEntity.setWeightGoal(updateRequest.weightGoal());
+        if (updateRequest.activity() != null)
+            customerEntity.setActivity(updateRequest.activity());
+        if (updateRequest.bodyFat() != null)
+            customerEntity.setBodyFat(updateRequest.bodyFat());
+
+        return customerMapper.customerEntityToCustomer(customerEntity);
+    }
+
+
+    private String profileImageKey(Long customerId, String profileImageId) {
+        return "profile-images/%s/%s".formatted(customerId, profileImageId);
     }
 
 }

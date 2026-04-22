@@ -6,8 +6,9 @@ build/
 !**/src/test/**/build/
 /.env
 /node_modules
+/openapi
 
-### STS ###
+### STS ###f
 .apt_generated
 .classpath
 .factorypath

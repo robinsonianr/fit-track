@@ -2,11 +2,11 @@ package com.robinsonir.fittrack.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -16,7 +16,8 @@ import java.util.Map;
 @Service
 public class JwtTokenUtil {
 
-    private static final String SECRET_KEY = "fitness_tracker_8702_tracker_fitness_2078";
+    @Value( "${jwt.secret-key}")
+    private String secretKey;
 
     public String generateToken(String subject, String... roles) {
         return generateToken(subject, Map.of("scopes", roles));
@@ -33,12 +34,12 @@ public class JwtTokenUtil {
     public String generateToken(String subject, Map<String, Object> claims) {
         return Jwts
                 .builder()
-                .setClaims(claims)
-                .setSubject(subject)
-                .setIssuer("Robinsonir")
-                .setIssuedAt(Date.from(Instant.now()))
-                .setExpiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .claims(claims)
+                .subject(subject)
+                .issuer("fittrack")
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
+                .signWith(getSigningKey())
                 .compact();
     }
 
@@ -49,11 +50,12 @@ public class JwtTokenUtil {
 
     private Claims getClaims(String token) {
         return Jwts
-                .parserBuilder()
-                .setSigningKey(getSigningKey())
+                .parser()
+                .requireIssuer("fittrack")
+                .verifyWith(getSigningKey())
                 .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .parseSignedClaims(token)
+                .getPayload();
     }
 
 
@@ -63,8 +65,8 @@ public class JwtTokenUtil {
     }
 
 
-    private Key getSigningKey() {
-        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    private SecretKey getSigningKey() {
+        return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
 }

@@ -14,10 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,11 +55,15 @@ class AuditHistoryServiceTest {
         when(auditQuery.add(any(AuditCriterion.class))).thenReturn(auditQuery);
         when(auditQuery.getResultList()).thenReturn(mockResults);
 
-        Map<Integer, OffsetDateTime> result = auditHistoryService.getCustomerWeightHistory(entityId);
+        List<WeightAuditHistoryDTO> result = auditHistoryService.getCustomerWeightHistory(entityId);
 
-        Map<Integer, OffsetDateTime> expected = new HashMap<>();
-        expected.put(70, OffsetDateTime.parse("2024-01-01T10:00:00Z"));
-        expected.put(75, OffsetDateTime.parse("2024-02-01T10:00:00Z"));
+        List<WeightAuditHistoryDTO> expected = new ArrayList<>();
+        Map<Integer, OffsetDateTime> weightAuditMap1 = new HashMap<>();
+        Map<Integer, OffsetDateTime> weightAuditMap2 = new HashMap<>();
+        weightAuditMap1.put(70, OffsetDateTime.parse("2024-01-01T10:00:00Z"));
+        weightAuditMap2.put(75, OffsetDateTime.parse("2024-02-01T10:00:00Z"));
+        expected.add(new WeightAuditHistoryDTO(weightAuditMap1));
+        expected.add(new WeightAuditHistoryDTO(weightAuditMap2));
 
         assertEquals(expected, result);
     }

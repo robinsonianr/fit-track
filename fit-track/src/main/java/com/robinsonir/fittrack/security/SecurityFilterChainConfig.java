@@ -9,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
@@ -36,10 +37,10 @@ public class SecurityFilterChainConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf().disable()
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(Customizer.withDefaults())
-                .authorizeHttpRequests()
-                .requestMatchers(
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers(
                         HttpMethod.POST,
                         "/api/v1/customers",
                         "/api/v1/auth/login"
@@ -49,24 +50,29 @@ public class SecurityFilterChainConfig {
                         HttpMethod.GET,
                         "/ping",
                         "/api/v1/customers/*/profile-image",
-                        "/api/v1/customers"
+                        "/api/v1/customers",
+                        "/actuator/**"
                 )
                 .permitAll()
-                .requestMatchers(HttpMethod.GET, "/actuator/**")
-                .permitAll()
+                .requestMatchers("/swagger-ui/**",
+                        "/swagger-ui.html",
+                        "/v3/api-docs/**",
+                        "/swagger-resources/**",
+                        "/webjars/**"
+                ).permitAll()
                 .anyRequest()
                 .authenticated()
-                .and()
-                .sessionManagement()
+                )
+                .sessionManagement((session) -> session
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                )
                 .authenticationProvider(authenticationProvider)
                 .addFilterBefore(
                         jwtAuthenticationFilter,
                         UsernamePasswordAuthenticationFilter.class
                 )
-                .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint);
+                .exceptionHandling((ex) -> ex
+                .authenticationEntryPoint(authenticationEntryPoint));
         return http.build();
     }
 

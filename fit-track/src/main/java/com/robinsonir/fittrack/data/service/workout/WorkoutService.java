@@ -11,6 +11,7 @@ import com.robinsonir.fittrack.mappers.WorkoutMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.*;
 
 @Service
@@ -52,7 +53,7 @@ public class WorkoutService {
         return workoutMapper.convertWorkoutEntityListToWorkoutList(workoutEntities);
     }
 
-    public void addWorkout(WorkoutCreationRequest workoutCreationRequest) {
+    public WorkoutDTO addWorkout(WorkoutCreationRequest workoutCreationRequest) {
 
         WorkoutEntity newWorkout = new WorkoutEntity();
         newWorkout.setWorkoutType(workoutCreationRequest.workoutType());
@@ -61,12 +62,13 @@ public class WorkoutService {
         newWorkout.setCalories(workoutCreationRequest.calories());
         newWorkout.setVolume(workoutCreationRequest.volume());
         newWorkout.setDurationMinutes(workoutCreationRequest.durationMinutes());
-        newWorkout.setWorkoutDate(workoutCreationRequest.workoutDate());
+        newWorkout.setWorkoutDate(OffsetDateTime.now());
 
 
-        Optional<CustomerEntity> customerEntity = customerRepository.findCustomerById(workoutCreationRequest.customer().getId());
+        Optional<CustomerEntity> customerEntity = customerRepository.findCustomerById(workoutCreationRequest.customerId());
         customerEntity.ifPresent(newWorkout::setCustomer);
         workoutRepository.save(newWorkout);
+        return workoutMapper.convertWorkoutEntityToWorkout(newWorkout);
     }
 
     public void checkIfWorkoutExistsOrThrow(Long id) {

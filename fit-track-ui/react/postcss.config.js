@@ -15,7 +15,6 @@ export default {
             preserve: true,
         },
         "postcss-custom-media": {},
-        "postcss-utilities": {},
 
         // Modern CSS features
         "postcss-preset-env": {

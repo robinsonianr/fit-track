@@ -4,6 +4,7 @@ import com.robinsonir.fittrack.data.Gender;
 import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
 import com.robinsonir.fittrack.data.repository.customer.CustomerDTO;
 import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
+import com.robinsonir.fittrack.exception.DuplicateResourceException;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
 import com.robinsonir.fittrack.mappers.CustomerMapper;
 import com.robinsonir.fittrack.mappers.CustomerMapperImpl;
@@ -24,19 +25,17 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class CustomerServiceTest {
-    private final CustomerMapper customerMapper = new CustomerMapperImpl();
+
+    private CustomerMapper customerMapper = new CustomerMapperImpl();
 
     @Mock
     private CustomerRepository customerRepository;
-
-    @Mock
-    private CustomerDataService customerDataService;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -48,7 +47,7 @@ public class CustomerServiceTest {
 
     @BeforeEach
     void setUp() {
-        customerTest = new CustomerService(customerMapper, passwordEncoder, s3Service, customerRepository, customerDataService);
+        customerTest = new CustomerService(customerMapper, passwordEncoder, s3Service, customerRepository);
         customerTest.setS3Bucket("fitness-tracker-customers");
     }
 
@@ -87,56 +86,70 @@ public class CustomerServiceTest {
     }
 
     @Test
+    void testGetCustomerNotFound() {
+        // Arrange
+        Long customerId = 99L;
+        when(customerRepository.findCustomerById(customerId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThatThrownBy(() -> customerTest.getCustomer(customerId))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("customer with id [99] not found");
+    }
+
+    @Test
     void addCustomer() {
-        // Arrange: Create a test customer registration request and mock behavior.
+        // Arrange
         CustomerRegistrationRequest registrationRequest = new CustomerRegistrationRequest(
                 "John Doe",
                 "johndoe@example.com",
                 "password123",
                 30,
-                Gender.MALE,
-                new Date().toInstant().atOffset(ZoneOffset.UTC)
+                Gender.MALE
         );
 
-        // Mock behavior for passwordEncoder.encode to return the hashed password.
+        when(customerRepository.existsByEmail(registrationRequest.email())).thenReturn(false);
         when(passwordEncoder.encode(registrationRequest.password())).thenReturn("hashedPassword");
 
-        // Act: Add the customer.
-        customerTest.addCustomer(registrationRequest);
+        // Act
+        CustomerDTO result = customerTest.addCustomer(registrationRequest);
 
-        // Assert: Verify that the customerDAO.insertCustomer method is called with the expected customer.
+        // Assert — repository was called with the mapped entity
         verify(customerRepository).save(
                 argThat(customer ->
                         customer.getName().equals(registrationRequest.name()) &&
                                 customer.getEmail().equals(registrationRequest.email()) &&
-                                customer.getPassword().equals("hashedPassword") && // Hashed password
+                                customer.getPassword().equals("hashedPassword") &&
                                 customer.getAge().equals(registrationRequest.age()) &&
-                                customer.getGender().equals(registrationRequest.gender()) &&
-                                customer.getMemberSince().equals(registrationRequest.memberSince())
+                                customer.getGender().equals(registrationRequest.gender())
                 )
         );
+
+        // Assert — returned DTO reflects the registered customer
+        assertThat(result.name()).isEqualTo("John Doe");
+        assertThat(result.email()).isEqualTo("johndoe@example.com");
+        assertThat(result.age()).isEqualTo(30);
+        assertThat(result.gender()).isEqualTo(Gender.MALE);
     }
 
     @Test
-    void checkIfCustomerExistsOrThrowCustomerExists() {
-        // Arrange: Mock behavior for customerRepository.existById to return true (customer exists).
-        Long customerId = 1L;
-        when(customerRepository.existsById(customerId)).thenReturn(true);
+    void addCustomerThrowsWhenEmailExists() {
+        // Arrange
+        CustomerRegistrationRequest registrationRequest = new CustomerRegistrationRequest(
+                "John Doe",
+                "johndoe@example.com",
+                "password123",
+                30,
+                Gender.MALE
+        );
+        when(customerRepository.existsByEmail(registrationRequest.email())).thenReturn(true);
 
-        // Act: Check if the customer exists.
-        assertDoesNotThrow(() -> customerTest.checkIfCustomerExistsOrThrow(customerId));
+        // Act & Assert
+        assertThatThrownBy(() -> customerTest.addCustomer(registrationRequest))
+                .isInstanceOf(DuplicateResourceException.class)
+                .hasMessage("email already taken");
 
-        // Assert: No exception should be thrown.
-    }
-
-    @Test
-    void checkIfCustomerExistsOrThrowCustomerNotFound() {
-        // Arrange: Mock behavior for customerRepository.existById to return false (customer not found).
-        Long customerId = 1L;
-        when(customerRepository.existsById(customerId)).thenReturn(false);
-
-        // Act and Assert: Checking for a non-existent customer should throw a ResourceNotFoundException.
-        assertThrows(ResourceNotFoundException.class, () -> customerTest.checkIfCustomerExistsOrThrow(customerId));
+        verify(customerRepository, never()).save(any());
     }
 
     @Test
@@ -152,51 +165,149 @@ public class CustomerServiceTest {
         existingCustomer.setGender(Gender.MALE);
 
         CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
-                "Jane Doe",             // Updated name
-                "jane@example.com",     // Updated email
-                28,                     // Updated age
-                Gender.FEMALE,          // Updated gender
-                65,                     // Updated weight
-                170,                    // Updated height
-                60,                     // Updated weight goal
-                "Cycling",              // Updated activity
-                18                      // Updated body fat
+                "Jane Doe",
+                "jane@example.com",
+                28,
+                Gender.FEMALE,
+                65,
+                170,
+                60,
+                "Cycling",
+                18
         );
 
         when(customerRepository.findCustomerById(customerId)).thenReturn(Optional.of(existingCustomer));
         when(customerRepository.existsByEmail(updateRequest.email())).thenReturn(false);
 
         // Act
+        CustomerDTO result = customerTest.updateCustomer(customerId, updateRequest);
+
+        // Assert — returned DTO reflects the updates
+        assertThat(result.name()).isEqualTo("Jane Doe");
+        assertThat(result.email()).isEqualTo("jane@example.com");
+        assertThat(result.age()).isEqualTo(28);
+        assertThat(result.gender()).isEqualTo(Gender.FEMALE);
+        assertThat(result.weight()).isEqualTo(65);
+        assertThat(result.height()).isEqualTo(170);
+        assertThat(result.weightGoal()).isEqualTo(60);
+        assertThat(result.activity()).isEqualTo("Cycling");
+        assertThat(result.bodyFat()).isEqualTo(18);
+
+        // Assert — dirty tracking applied to managed entity; no explicit save call
+        assertThat(existingCustomer.getName()).isEqualTo("Jane Doe");
+        assertThat(existingCustomer.getEmail()).isEqualTo("jane@example.com");
+    }
+
+    @Test
+    void testUpdateCustomerPartialOnlyUpdatesNonNullFields() {
+        // Arrange
+        Long customerId = 1L;
+        CustomerEntity existingCustomer = new CustomerEntity();
+        existingCustomer.setId(customerId);
+        existingCustomer.setName("John Doe");
+        existingCustomer.setEmail("john.doe@example.com");
+        existingCustomer.setAge(30);
+        existingCustomer.setGender(Gender.MALE);
+        existingCustomer.setWeight(80);
+        existingCustomer.setActivity("Running");
+
+        CustomerUpdateRequest partialRequest = new CustomerUpdateRequest(
+                null,      // name — unchanged
+                null,      // email — unchanged
+                null,      // age — unchanged
+                null,      // gender — unchanged
+                75,        // weight — updated
+                null,      // height — unchanged
+                70,        // weightGoal — updated
+                null,      // activity — unchanged
+                null       // bodyFat — unchanged
+        );
+
+        when(customerRepository.findCustomerById(customerId)).thenReturn(Optional.of(existingCustomer));
+
+        // Act
+        CustomerDTO result = customerTest.updateCustomer(customerId, partialRequest);
+
+        // Assert — only weight and weightGoal changed; rest preserved
+        assertThat(result.name()).isEqualTo("John Doe");
+        assertThat(result.email()).isEqualTo("john.doe@example.com");
+        assertThat(result.age()).isEqualTo(30);
+        assertThat(result.gender()).isEqualTo(Gender.MALE);
+        assertThat(result.weight()).isEqualTo(75);
+        assertThat(result.weightGoal()).isEqualTo(70);
+        assertThat(result.activity()).isEqualTo("Running");
+    }
+
+    @Test
+    void testUpdateCustomerNotFound() {
+        // Arrange
+        Long customerId = 99L;
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
+                "Jane Doe", null, null, null, null, null, null, null, null
+        );
+        when(customerRepository.findCustomerById(customerId)).thenReturn(Optional.empty());
+
+        // Act & Assert
+        assertThatThrownBy(() -> customerTest.updateCustomer(customerId, updateRequest))
+                .isInstanceOf(ResourceNotFoundException.class)
+                .hasMessage("customer with id [99] not found");
+    }
+
+    @Test
+    void testUpdateCustomerThrowsWhenEmailAlreadyUsed() {
+        // Arrange
+        Long customerId = 1L;
+        CustomerEntity existingCustomer = new CustomerEntity();
+        existingCustomer.setId(customerId);
+        existingCustomer.setEmail("john.doe@example.com");
+
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
+                null, "taken@example.com", null, null, null, null, null, null, null
+        );
+
+        when(customerRepository.findCustomerById(customerId)).thenReturn(Optional.of(existingCustomer));
+        when(customerRepository.existsByEmail("taken@example.com")).thenReturn(true);
+
+        // Act & Assert
+        assertThatThrownBy(() -> customerTest.updateCustomer(customerId, updateRequest))
+                .isInstanceOf(DuplicateResourceException.class)
+                .hasMessage("email already used.");
+
+        // Email on entity was not changed
+        assertThat(existingCustomer.getEmail()).isEqualTo("john.doe@example.com");
+    }
+
+    @Test
+    void testUpdateCustomerSameEmailDoesNotCheckUniqueness() {
+        // Arrange — request email matches current email
+        Long customerId = 1L;
+        CustomerEntity existingCustomer = new CustomerEntity();
+        existingCustomer.setId(customerId);
+        existingCustomer.setEmail("john.doe@example.com");
+        existingCustomer.setName("John Doe");
+
+        CustomerUpdateRequest updateRequest = new CustomerUpdateRequest(
+                "John Updated", "john.doe@example.com", null, null, null, null, null, null, null
+        );
+
+        when(customerRepository.findCustomerById(customerId)).thenReturn(Optional.of(existingCustomer));
+
+        // Act
         customerTest.updateCustomer(customerId, updateRequest);
 
-        // Assert
-        verify(customerRepository).updateCustomer(customerId,
-                updateRequest.name(),
-                updateRequest.email(),
-                updateRequest.age(),
-                updateRequest.gender(),
-                updateRequest.weight(),
-                updateRequest.height(),
-                updateRequest.weightGoal(),
-                updateRequest.activity(),
-                updateRequest.bodyFat()
-        );
+        // Assert — existsByEmail not called because email didn't change
+        verify(customerRepository, never()).existsByEmail(any());
     }
 
     @Test
     void uploadCustomerProfilePicture() {
-        // Arrange: Create a test customer, mock behavior, and prepare a test file.
+        // Arrange
         Long customerId = 1L;
-        when(customerRepository.existsById(customerId)).thenReturn(true);
-
         byte[] bytes = "Hello World".getBytes();
-
         MultipartFile testFile = new MockMultipartFile("file", bytes);
-
-
         String bucket = "fitness-tracker-customers";
 
-        // Act: Upload the profile picture.
+        // Act
         customerTest.uploadCustomerProfilePicture(customerId, testFile);
 
         // Then
@@ -204,23 +315,20 @@ public class CustomerServiceTest {
 
         verify(customerRepository).updateProfileImageId(profileImageIdArgumentCaptor.capture(), eq(customerId));
 
-        // Assert: Verify that s3Service.putObject is called with the correct arguments.
         verify(s3Service).putObject(
-                bucket, // Replace with the actual S3 bucket name
-                "profile-images/%s/%s".formatted(customerId, profileImageIdArgumentCaptor.getValue()), // Replace with the expected S3 key
-                bytes // Any byte array representing the file content
+                bucket,
+                "profile-images/%s/%s".formatted(customerId, profileImageIdArgumentCaptor.getValue()),
+                bytes
         );
-
     }
 
 
     @Test
     void getProfilePictureCustomerExists() {
-        // Arrange: Create a test customer and mock behavior.
+        // Arrange
         Long customerId = 1L;
         String profileImageId = "ca4cd8f6-3487-4e79-ba0f-56e8047d5a62";
         byte[] expectedImageData = "Hello World".getBytes();
-        // Create and save a workout
 
         CustomerEntity testCustomerEntity = new CustomerEntity();
         testCustomerEntity.setId(customerId);
@@ -235,7 +343,7 @@ public class CustomerServiceTest {
         when(s3Service.getObject("fitness-tracker-customers", "profile-images/1/ca4cd8f6-3487-4e79-ba0f-56e8047d5a62"))
                 .thenReturn(expectedImageData);
 
-        // Act: Get the profile picture.
+        // Act
         byte[] actualImageData = customerTest.getProfilePicture(customerId);
 
         // Then
@@ -244,11 +352,11 @@ public class CustomerServiceTest {
 
     @Test
     void getProfilePictureCustomerDoesNotExist() {
-        // Arrange: Mock behavior for a customer that does not exist.
+        // Arrange
         Long customerId = 1L;
         when(customerRepository.findCustomerById(customerId)).thenReturn(Optional.empty());
 
-        // Act and Assert: Ensure that a ResourceNotFoundException is thrown.
+        // Act & Assert
         assertThatThrownBy(() -> customerTest.getProfilePicture(customerId))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("customer with id [1] not found");
@@ -256,7 +364,7 @@ public class CustomerServiceTest {
 
     @Test
     void getProfilePictureCustomerHasNoProfileImage() {
-        // Arrange: Create a test customer with no profile image.
+        // Arrange
         Long customerId = 1L;
         CustomerEntity testCustomerEntity = new CustomerEntity();
         testCustomerEntity.setId(customerId);
@@ -268,7 +376,7 @@ public class CustomerServiceTest {
 
         when(customerRepository.findCustomerById(customerId)).thenReturn(Optional.of(testCustomerEntity));
 
-        // Act and Assert: Ensure that a ResourceNotFoundException is thrown.
+        // Act & Assert
         assertThatThrownBy(() -> customerTest.getProfilePicture(customerId))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("customer with id [1] profile image not found");

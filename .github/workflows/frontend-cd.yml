@@ -16,23 +16,11 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 2
-      - name: Check for changes in fit-track/ directory
-        id: check-changes
-        run: |
-          if git diff --quiet HEAD^ HEAD -- fit-track/; then
-            echo "No changes detected in fit-track/"
-            echo "skip_wait=true" >> $GITHUB_ENV
-          else
-            echo "Changes detected in fit-track/"
-            echo "skip_wait=false" >> $GITHUB_ENV
-          fi
       - name: Build Number
         id: build-number
-        run: echo "::set-output name=BUILD_NUMBER::$(date '+%-d.%-m.%Y.%-H.%-M.%-S')"
+        run: echo "BUILD_NUMBER=$(date '+%-d.%-m.%Y.%-H.%-M.%-S')" >> $GITHUB_OUTPUT
       - name: Docker Login
-        uses: docker/login-action@f3364599c6aa293cdc2b8391b1b56d0c30e45c8a
+        uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_PASSWORD }}
@@ -47,7 +35,7 @@ jobs:
       - name: Build and push to ECR
         run: |
           docker build . \
-          --file Dockerfile \
+          --file fit-track-ui/react/Dockerfile \
           --tag fit-track-ui:${{ steps.build-number.outputs.BUILD_NUMBER }} \
           --tag fit-track-ui:latest \
           --build-arg api_base_url=http://fit-track-dev.eba-jpnjhwum.us-east-1.elasticbeanstalk.com:8080
@@ -57,12 +45,14 @@ jobs:
 
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.EB_REGION }}.amazonaws.com/fit-track-ui:${{ steps.build-number.outputs.BUILD_NUMBER }}
           docker push ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.EB_REGION }}.amazonaws.com/fit-track-ui:latest
-        working-directory: fit-track-ui/react
-      - name: Wait 2 and half minutes for Elastic Beanstalk env to be ready to used
-        if: env.skip_wait == 'false'
+      - name: Update Dockerrun.aws.json with version
         run: |
-          echo "Waiting 180 seconds for Elastic Beanstalk status"
-          sleep 150  # Wait for 150 seconds
+          sed -i "s|fit-track-ui:latest|fit-track-ui:${{ steps.build-number.outputs.BUILD_NUMBER }}|g" Dockerrun.aws.json
+        working-directory: fit-track-ui/react
+      - name: Wait for Elastic Beanstalk env to be Ready
+        timeout-minutes: 10
+        run: |
+          aws elasticbeanstalk wait environment-updated --environment-name ${{ secrets.EB_ENVIRONMENT_NAME }} --region ${{ secrets.EB_REGION }}
       - name: Deploy to Elastic Beanstalk
         uses: einaregilsson/beanstalk-deploy@v21
         with:

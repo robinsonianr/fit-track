@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build:
@@ -7,26 +5,32 @@ services:
       dockerfile: Dockerfile
     environment:
       JAVA_TOOL_OPTIONS: "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005"
+      HTTP_HOST: host.docker.internal
     ports:
       - "8080:8080"
       - "5005:5005"
+    volumes:
+      - ~/.aws:/home/appuser/.aws:ro
     networks:
       - fitness
     external_links:
-      - ${DB_CONTAINER}
+      - fit-db
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
   frontend:
     build:
-      context: ./fit-track-ui/react
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: ./fit-track-ui/react/Dockerfile.local
       args:
         api_base_url: http://localhost:8080
     environment:
       VITE_API_BASE_URL: http://localhost:8080
     ports:
       - "5173:5173"
+    volumes:
+      - ./fit-track-ui/react/src:/app/fit-track-ui/react/src
+      - ./openapi:/app/openapi
     networks:
       - fitness
     depends_on:

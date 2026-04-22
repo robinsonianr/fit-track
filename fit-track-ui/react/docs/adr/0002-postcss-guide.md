@@ -15,7 +15,6 @@ export default {
         "postcss-nested": {},
         "postcss-custom-properties": {},
         "postcss-custom-media": {},
-        "postcss-utilities": {},
 
         // Modern CSS features
         "postcss-preset-env": {
