@@ -11,7 +11,7 @@ const ProtectedRoute = ({children}: { children: any }) => {
         if (!isCustomerAuthenticated()) {
             navigate("/login");
         }
-    });
+    }, []);
 
     return isCustomerAuthenticated() ? children : "";
 };
