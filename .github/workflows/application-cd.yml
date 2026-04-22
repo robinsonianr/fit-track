@@ -74,7 +74,7 @@ jobs:
 
       - name: Build & push backend image
         run: |
-          docker build . \
+          docker build ./fit-track \
             --file fit-track/Dockerfile \
             --tag fit-track:${{ steps.build-number.outputs.BUILD_NUMBER }} \
             --tag fit-track:latest
