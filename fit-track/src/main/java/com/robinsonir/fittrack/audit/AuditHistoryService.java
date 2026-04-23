@@ -31,9 +31,7 @@ public class AuditHistoryService {
         List items = auditQuery.getResultList();
         for (Object item : items) {
             MemberEntity member = (MemberEntity) item;
-            Map<Integer, OffsetDateTime> weightAuditMap = new HashMap<>();
-            weightAuditMap.put(member.getWeight(), member.getLastModifiedDate());
-            weightAudit.add(new WeightAuditHistoryDTO(weightAuditMap));
+            weightAudit.add(new WeightAuditHistoryDTO(member.getWeight(), member.getLastModifiedDate()));
         }
 
         return weightAudit;

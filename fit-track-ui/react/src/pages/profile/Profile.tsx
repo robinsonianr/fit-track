@@ -46,9 +46,9 @@ export const Profile = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const customerId = id;
-                const customerResp = await getMember(customerId);
-                const workoutsResp = await getAllWorkoutsByMemberId(customerId);
+                const memberId = id;
+                const customerResp = await getMember(memberId);
+                const workoutsResp = await getAllWorkoutsByMemberId(memberId);
                 setWorkoutData(workoutsResp);
                 setMember(customerResp);
             } catch (error) {
