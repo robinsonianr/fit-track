@@ -58,12 +58,8 @@ class AuditHistoryServiceTest {
         List<WeightAuditHistoryDTO> result = auditHistoryService.getCustomerWeightHistory(entityId);
 
         List<WeightAuditHistoryDTO> expected = new ArrayList<>();
-        Map<Integer, OffsetDateTime> weightAuditMap1 = new HashMap<>();
-        Map<Integer, OffsetDateTime> weightAuditMap2 = new HashMap<>();
-        weightAuditMap1.put(70, OffsetDateTime.parse("2024-01-01T10:00:00Z"));
-        weightAuditMap2.put(75, OffsetDateTime.parse("2024-02-01T10:00:00Z"));
-        expected.add(new WeightAuditHistoryDTO(weightAuditMap1));
-        expected.add(new WeightAuditHistoryDTO(weightAuditMap2));
+        expected.add(new WeightAuditHistoryDTO(70, OffsetDateTime.parse("2024-01-01T10:00:00Z")));
+        expected.add(new WeightAuditHistoryDTO(75, OffsetDateTime.parse("2024-02-01T10:00:00Z")));
 
         assertEquals(expected, result);
     }
