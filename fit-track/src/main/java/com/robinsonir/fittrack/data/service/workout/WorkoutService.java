@@ -1,8 +1,8 @@
 package com.robinsonir.fittrack.data.service.workout;
 
-import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
+import com.robinsonir.fittrack.data.entity.member.MemberEntity;
 import com.robinsonir.fittrack.data.entity.workout.WorkoutEntity;
-import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
+import com.robinsonir.fittrack.data.repository.member.MemberRepository;
 import com.robinsonir.fittrack.data.repository.workout.WorkoutDTO;
 import com.robinsonir.fittrack.data.repository.workout.WorkoutRepository;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
@@ -22,34 +22,34 @@ public class WorkoutService {
     private final ExerciseMapper exerciseMapper;
 
     private final WorkoutRepository workoutRepository;
-    private final CustomerRepository customerRepository;
+    private final MemberRepository memberRepository;
 
     @Autowired
     public WorkoutService(WorkoutMapper workoutMapper,
                           WorkoutRepository workoutRepository, ExerciseMapper exerciseMapper,
-                          CustomerRepository customerRepository) {
+                          MemberRepository memberRepository) {
         this.workoutMapper = workoutMapper;
         this.workoutRepository = workoutRepository;
-        this.customerRepository = customerRepository;
+        this.memberRepository = memberRepository;
         this.exerciseMapper = exerciseMapper;
     }
 
 
     public List<WorkoutDTO> getAllWorkouts() {
-        List<WorkoutEntity> workoutEntities = new ArrayList<>(workoutRepository.findAllWorkouts());
+        List<WorkoutEntity> workoutEntities = new ArrayList<>(workoutRepository.findAll());
         return workoutMapper.convertWorkoutEntityListToWorkoutList(workoutEntities);
     }
 
     public WorkoutDTO getWorkout(Long id) {
-        WorkoutEntity workoutEntity = workoutRepository.findWorkoutById(id)
+        WorkoutEntity workoutEntity = workoutRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "workout with id [%s] not found".formatted(id)
                 ));
         return workoutMapper.convertWorkoutEntityToWorkout(workoutEntity);
     }
 
-    public List<WorkoutDTO> getAllWorkoutsByCustomerId(Long id) {
-        List<WorkoutEntity> workoutEntities = new ArrayList<>(workoutRepository.findAllWorkoutsByCustomerId(id));
+    public List<WorkoutDTO> getAllWorkoutsByMemberId(Long id) {
+        List<WorkoutEntity> workoutEntities = new ArrayList<>(workoutRepository.findAllWorkoutsByMember_Id(id));
         return workoutMapper.convertWorkoutEntityListToWorkoutList(workoutEntities);
     }
 
@@ -65,8 +65,8 @@ public class WorkoutService {
         newWorkout.setWorkoutDate(OffsetDateTime.now());
 
 
-        Optional<CustomerEntity> customerEntity = customerRepository.findCustomerById(workoutCreationRequest.customerId());
-        customerEntity.ifPresent(newWorkout::setCustomer);
+        Optional<MemberEntity> memberEntity = memberRepository.findById(workoutCreationRequest.memberId());
+        memberEntity.ifPresent(newWorkout::setMember);
         workoutRepository.save(newWorkout);
         return workoutMapper.convertWorkoutEntityToWorkout(newWorkout);
     }

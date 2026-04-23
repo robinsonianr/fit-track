@@ -1,23 +1,23 @@
-package com.robinsonir.fittrack.data.service.customer;
+package com.robinsonir.fittrack.data.service.member;
 
-import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
+import com.robinsonir.fittrack.data.repository.member.MemberRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomerUserDetailService implements UserDetailsService {
+public class MemberUserDetailService implements UserDetailsService {
 
-    private final CustomerRepository customerRepository;
+    private final MemberRepository memberRepository;
 
-    public CustomerUserDetailService(CustomerRepository customerRepository) {
-        this.customerRepository = customerRepository;
+    public MemberUserDetailService(MemberRepository memberRepository) {
+        this.memberRepository = memberRepository;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return customerRepository.findCustomerByUsername(username)
+        return memberRepository.findMemberByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "Username " + username + " not found"));
     }

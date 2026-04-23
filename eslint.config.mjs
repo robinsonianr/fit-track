@@ -16,48 +16,50 @@ const compat = new FlatCompat({
     allConfig: js.configs.all
 });
 
-export default defineConfig([{
-    extends: compat.extends(
-        "eslint:recommended",
-        "plugin:react/recommended",
-        "plugin:@typescript-eslint/recommended",
-    ),
+export default defineConfig([
+    {
+        extends: compat.extends(
+            "eslint:recommended",
+            "plugin:react/recommended",
+            "plugin:@typescript-eslint/recommended",
+        ),
 
-    plugins: {
+        plugins: {
         react,
         "@typescript-eslint": typescriptEslint,
-    },
-
-    languageOptions: {
-        globals: {
-            ...globals.browser,
-            ...globals.jest,
         },
 
-        parser: tsParser,
-        ecmaVersion: "latest",
-        sourceType: "module",
+        languageOptions: {
+            globals: {
+                ...globals.browser,
+                ...globals.jest,
+            },
 
-        parserOptions: {
-            ecmaFeatures: {
-                tsx: true,
+            parser: tsParser,
+            ecmaVersion: "latest",
+            sourceType: "module",
+
+            parserOptions: {
+                ecmaFeatures: {
+                    tsx: true,
+                },
             },
         },
-    },
 
-    settings: {
-        react: {
-            version: "detect",
+        settings: {
+            react: {
+                version: "detect",
+            },
+        },
+
+        rules: {
+            "react/react-in-jsx-scope": "off",
+            "@typescript-eslint/no-explicit-any": "off",
+            "react/prop-types": "off",
+            indent: ["error", 4],
+            semi: ["error", "always"],
+            quotes: ["error", "double"],
+            "no-useless-catch": "off",
         },
     },
-
-    rules: {
-        "react/react-in-jsx-scope": "off",
-        "@typescript-eslint/no-explicit-any": "off",
-        "react/prop-types": "off",
-        indent: ["error", 4],
-        semi: ["error", "always"],
-        quotes: ["error", "double"],
-        "no-useless-catch": "off",
-    },
-}]);
+]);

@@ -1,6 +1,6 @@
 package com.robinsonir.fittrack.audit;
 
-import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
+import com.robinsonir.fittrack.data.entity.member.MemberEntity;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.query.AuditQuery;
 import org.hibernate.envers.query.AuditQueryCreator;
@@ -37,20 +37,20 @@ class AuditHistoryServiceTest {
     @Test
     void testGetCustomerWeightAuditHistory() {
         Long entityId = 1L;
-        CustomerEntity customer1 = new CustomerEntity();
+        MemberEntity customer1 = new MemberEntity();
         customer1.setWeight(70);
         customer1.setLastModifiedDate(OffsetDateTime.parse("2024-01-01T10:00:00Z"));
 
-        CustomerEntity customer2 = new CustomerEntity();
+        MemberEntity customer2 = new MemberEntity();
         customer2.setWeight(75);
         customer2.setLastModifiedDate(OffsetDateTime.parse("2024-02-01T10:00:00Z"));
 
-        List<CustomerEntity> mockResults = Arrays.asList(customer1, customer2);
+        List<MemberEntity> mockResults = Arrays.asList(customer1, customer2);
         AuditQueryCreator auditQueryCreator = Mockito.mock(AuditQueryCreator.class);
         AuditQuery auditQuery = Mockito.mock(AuditQuery.class);
 
         when(auditReader.createQuery()).thenReturn(auditQueryCreator);
-        when(auditQueryCreator.forRevisionsOfEntity(CustomerEntity.class, true, true))
+        when(auditQueryCreator.forRevisionsOfEntity(MemberEntity.class, true, true))
                 .thenReturn(auditQuery);
         when(auditQuery.add(any(AuditCriterion.class))).thenReturn(auditQuery);
         when(auditQuery.getResultList()).thenReturn(mockResults);

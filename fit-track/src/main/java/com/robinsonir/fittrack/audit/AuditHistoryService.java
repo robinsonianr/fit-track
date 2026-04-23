@@ -1,6 +1,6 @@
 package com.robinsonir.fittrack.audit;
 
-import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
+import com.robinsonir.fittrack.data.entity.member.MemberEntity;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.envers.query.AuditQuery;
@@ -24,15 +24,15 @@ public class AuditHistoryService {
     public List<WeightAuditHistoryDTO> getCustomerWeightHistory(Long entityId) {
         List<WeightAuditHistoryDTO> weightAudit = new ArrayList<>();
         AuditQuery auditQuery = auditReader.createQuery()
-                .forRevisionsOfEntity(CustomerEntity.class, true,true)
+                .forRevisionsOfEntity(MemberEntity.class, true,true)
                 .add(AuditEntity.id().eq(entityId))
                 .add(AuditEntity.property("weight").hasChanged());
 
         List items = auditQuery.getResultList();
         for (Object item : items) {
-            CustomerEntity customer = (CustomerEntity) item;
+            MemberEntity member = (MemberEntity) item;
             Map<Integer, OffsetDateTime> weightAuditMap = new HashMap<>();
-            weightAuditMap.put(customer.getWeight(), customer.getLastModifiedDate());
+            weightAuditMap.put(member.getWeight(), member.getLastModifiedDate());
             weightAudit.add(new WeightAuditHistoryDTO(weightAuditMap));
         }
 

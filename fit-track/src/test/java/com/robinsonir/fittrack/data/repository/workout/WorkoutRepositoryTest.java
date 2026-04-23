@@ -1,15 +1,12 @@
 package com.robinsonir.fittrack.data.repository.workout;
 
 import com.robinsonir.fittrack.data.Gender;
-import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
+import com.robinsonir.fittrack.data.entity.member.MemberEntity;
 import com.robinsonir.fittrack.data.entity.workout.WorkoutEntity;
-import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
+import com.robinsonir.fittrack.data.repository.member.MemberRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
-import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
-import org.springframework.test.annotation.Rollback;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
 import java.util.HashSet;
@@ -27,23 +24,23 @@ public class WorkoutRepositoryTest {
     private WorkoutRepository workoutRepository;
 
     @Autowired
-    private CustomerRepository customerRepository;
+    private MemberRepository memberRepository;
 
     @Test
     void testSaveWorkout() {
-        // Create and save a customer
-        CustomerEntity customer = new CustomerEntity();
-        customer.setName("John Doe");
-        customer.setEmail("john.doe@example.com");
-        customer.setPassword("password123");
-        customer.setAge(30);
-        customer.setGender(Gender.MALE);
+        // Create and save a member
+        MemberEntity member = new MemberEntity();
+        member.setName("John Doe");
+        member.setEmail("john.doe@example.com");
+        member.setPassword("password123");
+        member.setAge(30);
+        member.setGender(Gender.MALE);
 
-        customerRepository.save(customer);
+        memberRepository.save(member);
 
         // Create a workout entity
         WorkoutEntity workout = new WorkoutEntity();
-        workout.setCustomer(customer);
+        workout.setMember(member);
         workout.setTitle("Cardio");
         workout.setWorkoutType("Running");
         workout.setCalories(500);
@@ -62,19 +59,19 @@ public class WorkoutRepositoryTest {
 
     @Test
     void testFindWorkoutById() {
-        // Create and save a customer
-        CustomerEntity customer = new CustomerEntity();
-        customer.setName("Jane Doe");
-        customer.setEmail("jane.doe@example.com");
-        customer.setPassword("securePass");
-        customer.setAge(28);
-        customer.setGender(Gender.FEMALE);
+        // Create and save a member
+        MemberEntity member = new MemberEntity();
+        member.setName("Jane Doe");
+        member.setEmail("jane.doe@example.com");
+        member.setPassword("securePass");
+        member.setAge(28);
+        member.setGender(Gender.FEMALE);
 
-        customerRepository.save(customer);
+        memberRepository.save(member);
 
         // Create and save a workout
         WorkoutEntity workout = new WorkoutEntity();
-        workout.setCustomer(customer);
+        workout.setMember(member);
         workout.setTitle("Cardio");
         workout.setWorkoutType("Cycling");
         workout.setCalories(300);
@@ -83,7 +80,7 @@ public class WorkoutRepositoryTest {
         workoutRepository.save(workout);
 
         // Fetch the workout by ID
-        Optional<WorkoutEntity> foundWorkout = workoutRepository.findWorkoutById(workout.getId());
+        Optional<WorkoutEntity> foundWorkout = workoutRepository.findById(workout.getId());
 
         // Assert the workout was found and data is correct
         assertTrue(foundWorkout.isPresent());
@@ -92,27 +89,27 @@ public class WorkoutRepositoryTest {
 
     @Test
     void testFindAllWorkouts() {
-        // Create and save customers
-        CustomerEntity customer1 = new CustomerEntity();
-        customer1.setName("Bob Smith");
-        customer1.setEmail("bob.smith@example.com");
-        customer1.setPassword("bobPass");
-        customer1.setAge(35);
-        customer1.setGender(Gender.MALE);
+        // Create and save members
+        MemberEntity member1 = new MemberEntity();
+        member1.setName("Bob Smith");
+        member1.setEmail("bob.smith@example.com");
+        member1.setPassword("bobPass");
+        member1.setAge(35);
+        member1.setGender(Gender.MALE);
 
-        customerRepository.save(customer1);
+        memberRepository.save(member1);
 
-        CustomerEntity customer2 = new CustomerEntity();
-        customer2.setName("Alice Johnson");
-        customer2.setEmail("alice.johnson@example.com");
-        customer2.setPassword("alicePass");
-        customer2.setAge(29);
-        customer2.setGender(Gender.FEMALE);
-        customerRepository.save(customer2);
+        MemberEntity member2 = new MemberEntity();
+        member2.setName("Alice Johnson");
+        member2.setEmail("alice.johnson@example.com");
+        member2.setPassword("alicePass");
+        member2.setAge(29);
+        member2.setGender(Gender.FEMALE);
+        memberRepository.save(member2);
 
         // Create and save workouts
         WorkoutEntity workout1 = new WorkoutEntity();
-        workout1.setCustomer(customer1);
+        workout1.setMember(member1);
         workout1.setTitle("Cardio");
         workout1.setWorkoutType("Swimming");
         workout1.setCalories(400);
@@ -121,7 +118,7 @@ public class WorkoutRepositoryTest {
         workoutRepository.save(workout1);
 
         WorkoutEntity workout2 = new WorkoutEntity();
-        workout2.setCustomer(customer2);
+        workout2.setMember(member2);
         workout2.setTitle("Cardio");
         workout2.setWorkoutType("Yoga");
         workout2.setCalories(200);
@@ -130,7 +127,7 @@ public class WorkoutRepositoryTest {
         workoutRepository.save(workout2);
 
         // Fetch all workouts
-        List<WorkoutEntity> workouts = workoutRepository.findAllWorkouts();
+        List<WorkoutEntity> workouts = workoutRepository.findAll();
 
         // Assert that the workouts were fetched
         assertThat(workouts).isNotNull();
@@ -138,19 +135,19 @@ public class WorkoutRepositoryTest {
     }
 
     @Test
-    void testExistsWorkoutEntityByCustomer() {
-        // Create and save a customer
-        CustomerEntity customer = new CustomerEntity();
-        customer.setName("Chris Evans");
-        customer.setEmail("chris.evans@example.com");
-        customer.setPassword("captain123");
-        customer.setAge(40);
-        customer.setGender(Gender.MALE);
-        customerRepository.save(customer);
+    void testExistsWorkoutEntityByMember() {
+        // Create and save a member
+        MemberEntity member = new MemberEntity();
+        member.setName("Chris Evans");
+        member.setEmail("chris.evans@example.com");
+        member.setPassword("captain123");
+        member.setAge(40);
+        member.setGender(Gender.MALE);
+        memberRepository.save(member);
 
         // Create and save a workout
         WorkoutEntity workout = new WorkoutEntity();
-        workout.setCustomer(customer);
+        workout.setMember(member);
         workout.setTitle("Strength Training");
         workout.setWorkoutType("Weightlifting");
         workout.setCalories(600);
@@ -158,34 +155,34 @@ public class WorkoutRepositoryTest {
         workout.setWorkoutDate(OffsetDateTime.now());
         workoutRepository.save(workout);
 
-        // Test if a workout exists for the customer
-        boolean exists = workoutRepository.existsWorkoutEntityByCustomer(customer);
+        // Test if a workout exists for the member
+        boolean exists = workoutRepository.existsWorkoutEntityByMember(member);
         assertTrue(exists);
 
-        // Test for a non-existent customer (without any workouts)
-        CustomerEntity newCustomer = new CustomerEntity();
-        newCustomer.setName("Mark Ruffalo");
-        newCustomer.setEmail("mark.ruffalo@example.com");
-        newCustomer.setPassword("hulk123");
-        newCustomer.setAge(53);
-        newCustomer.setGender(Gender.MALE);
-        customerRepository.save(newCustomer);
+        // Test for a non-existent member (without any workouts)
+        MemberEntity newMember = new MemberEntity();
+        newMember.setName("Mark Ruffalo");
+        newMember.setEmail("mark.ruffalo@example.com");
+        newMember.setPassword("hulk123");
+        newMember.setAge(53);
+        newMember.setGender(Gender.MALE);
+        memberRepository.save(newMember);
 
-        boolean notExists = workoutRepository.existsWorkoutEntityByCustomer(newCustomer);
+        boolean notExists = workoutRepository.existsWorkoutEntityByMember(newMember);
         assertFalse(notExists);
     }
 
     @Test
-    void testFindAllWorkoutsByCustomerId() {
-        // Create a customer entity
-        CustomerEntity customer = new CustomerEntity();
-        customer.setName("John Doe");
-        customer.setEmail("johndoe@example.com");
-        customer.setPassword("password");
-        customer.setAge(30);
-        customer.setGender(Gender.MALE);
+    void testFindAllWorkoutsByMemberId() {
+        // Create a member entity
+        MemberEntity member = new MemberEntity();
+        member.setName("John Doe");
+        member.setEmail("johndoe@example.com");
+        member.setPassword("password");
+        member.setAge(30);
+        member.setGender(Gender.MALE);
 
-        // Create some workouts for the customer
+        // Create some workouts for the member
         WorkoutEntity workout1 = new WorkoutEntity();
         workout1.setTitle("Cardio");
         workout1.setWorkoutType("Running");
@@ -193,7 +190,7 @@ public class WorkoutRepositoryTest {
         workout1.setDurationMinutes(60);
         workout1.setWorkoutDate(OffsetDateTime.now());
         workout1.setExercises(new HashSet<>());
-        workout1.setCustomer(customer);
+        workout1.setMember(member);
 
         WorkoutEntity workout2 = new WorkoutEntity();
         workout2.setTitle("Cardio");
@@ -202,19 +199,19 @@ public class WorkoutRepositoryTest {
         workout2.setDurationMinutes(45);
         workout2.setWorkoutDate(OffsetDateTime.now());
         workout2.setExercises(new HashSet<>());
-        workout2.setCustomer(customer);
+        workout2.setMember(member);
 
-        // Save the customer and workouts
-        customerRepository.save(customer);
+        // Save the member and workouts
+        memberRepository.save(member);
         workoutRepository.save(workout1);
         workoutRepository.save(workout2);
 
         // When
-        List<WorkoutEntity> workouts = workoutRepository.findAllWorkoutsByCustomerId(customer.getId());
+        List<WorkoutEntity> workouts = workoutRepository.findAllWorkoutsByMember_Id(member.getId());
 
         // Then
         assertThat(workouts).isNotEmpty();
         assertThat(workouts.size()).isEqualTo(2);
-        assertThat(workouts.get(0).getCustomer().getId()).isEqualTo(customer.getId());
+        assertThat(workouts.get(0).getMember().getId()).isEqualTo(member.getId());
     }
 }

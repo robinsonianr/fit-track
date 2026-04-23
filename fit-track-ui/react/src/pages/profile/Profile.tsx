@@ -1,35 +1,35 @@
 import React, {useEffect, useRef, useState} from "react";
-import {getCustomerApi} from "../../api/generated/endpoints/customer-api/customer-api.ts";
-import {CustomerDTO, CustomerUpdateRequest, Gender, WorkoutDTO} from "../../api/generated/models";
+import {getMemberApi} from "../../api/generated/endpoints/member-api/member-api.ts";
+import {MemberDTO, MemberUpdateRequest, Gender, WorkoutDTO} from "../../api/generated/models";
 import {getWorkoutsApi} from "../../api/generated/endpoints/workouts-api/workouts-api.ts";
 import {buildProfileImage} from "../../services/client.ts";
 import {toast} from "sonner";
 
 
 export const Profile = () => {
-    const [customer, setCustomer] = useState<CustomerDTO>();
+    const [member, setMember] = useState<MemberDTO>();
     const [workoutData, setWorkoutData] = useState<WorkoutDTO[]>([]);
     const defaultImg = "/assets/user.png";
     const fileInputRef = useRef<HTMLInputElement>(null);
     const id = Number.parseInt(localStorage.getItem("customerId")!);
-    const {getCustomer, updateCustomer, uploadCustomerProfileImage} = getCustomerApi();
-    const {getAllWorkoutsByCustomerId} = getWorkoutsApi();
+    const {getMember, updateMember, uploadMemberProfileImage} = getMemberApi();
+    const {getAllWorkoutsByMemberId} = getWorkoutsApi();
 
 
     const profile = {
-        name: customer?.name,
-        email: customer?.email,
-        memberSince: customer?.memberSince
+        name: member?.name,
+        email: member?.email,
+        memberSince: member?.memberSince
     };
 
     const healthInfo = {
-        age: customer?.age,
-        gender: customer?.gender,
-        weight: customer?.weight,
-        height: customer?.height,
-        weightGoal: customer?.weightGoal,
-        activity: customer?.activity,
-        bodyFat: customer?.bodyFat
+        age: member?.age,
+        gender: member?.gender,
+        weight: member?.weight,
+        height: member?.height,
+        weightGoal: member?.weightGoal,
+        activity: member?.activity,
+        bodyFat: member?.bodyFat
     };
 
 
@@ -40,17 +40,17 @@ export const Profile = () => {
     ];
     const month = new Date(profileMember!).getMonth();
     const memberDate = monthNames[month] + " " + new Date(profileMember!).getFullYear();
-    const pfp = customer?.profileImageId ? buildProfileImage(id) : defaultImg;
+    const pfp = member?.profileImageId ? buildProfileImage(id) : defaultImg;
 
 
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const customerId = id;
-                const customerResp = await getCustomer(customerId);
-                const workoutsResp = await getAllWorkoutsByCustomerId(customerId);
+                const customerResp = await getMember(customerId);
+                const workoutsResp = await getAllWorkoutsByMemberId(customerId);
                 setWorkoutData(workoutsResp);
-                setCustomer(customerResp);
+                setMember(customerResp);
             } catch (error) {
                 console.error("Could not retrieve customer: ", error);
             }
@@ -69,7 +69,7 @@ export const Profile = () => {
 
     const uploadPFP = async (file: File) => {
         try {
-            const msg = await uploadCustomerProfileImage(id, {file});
+            const msg = await uploadMemberProfileImage(id, {file});
             toast.success(msg.message);
         } catch (error) {
             console.error("File upload failed", error);
@@ -87,7 +87,7 @@ export const Profile = () => {
         const formData = new FormData(e.currentTarget);
         formData.append("name", formData.get("firstName") + " " + formData.get("lastName"));
 
-        const update: CustomerUpdateRequest = {
+        const update: MemberUpdateRequest = {
             name: String(formData.get("name")),
             email: formData.get("email") as string,
             age: Number(formData.get("age")) || undefined,
@@ -99,10 +99,10 @@ export const Profile = () => {
             bodyFat: Number(formData.get("bodyFat")) || undefined
         };
 
-        if (customer?.id) {
+        if (member?.id) {
             try {
-                const response = await updateCustomer(customer?.id, update);
-                setCustomer(response);
+                const response = await updateMember(member?.id, update);
+                setMember(response);
                 toast.success("Profile updated successfully!");
             } catch (error) {
                 console.error("Failed to update customer.", error);
@@ -137,7 +137,7 @@ export const Profile = () => {
                                 onClick={handleButtonClick}>✎
                             </button>
                         </div>
-                        <h2 className="text-2xl text-black dark:text-white mb-2 font-bold">{customer?.name}</h2>
+                        <h2 className="text-2xl text-black dark:text-white mb-2 font-bold">{member?.name}</h2>
                         <p className="text-xl text-black dark:text-gray-400 mb-2">Fitness
                             Experience: {healthInfo.activity}</p>
                         <div className="grid grid-cols-2 gap-4 w-full text-center p-6">
@@ -163,12 +163,12 @@ export const Profile = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label htmlFor="firstName">First Name</label>
-                                    <input name="firstName" type="text" defaultValue={customer?.name?.split(" ")[0]}
+                                    <input name="firstName" type="text" defaultValue={member?.name?.split(" ")[0]}
                                         className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="lastName">Last Name</label>
-                                    <input name="lastName" type="text" defaultValue={customer?.name?.split(" ")[1]}
+                                    <input name="lastName" type="text" defaultValue={member?.name?.split(" ")[1]}
                                         className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
@@ -193,7 +193,7 @@ export const Profile = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="gender">Gender</label>
-                                    {customer && (
+                                    {member && (
                                         <select name="gender" defaultValue={healthInfo.gender}
                                             className="border-2 border-gray-600 rounded-md p-2 w-full">
                                             <option value="">
@@ -207,7 +207,7 @@ export const Profile = () => {
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="activity">Fitness Experience</label>
-                                    {customer && (
+                                    {member && (
                                         <select name="activity" defaultValue={healthInfo.activity}
                                             className="border-2 border-gray-600 rounded-md p-2 w-full">
                                             <option value="">
@@ -224,7 +224,7 @@ export const Profile = () => {
                             <div className="space-y-4 w-full">
                                 <div className="space-y-2">
                                     <label htmlFor="email">Email</label>
-                                    <input name="email" type="text" defaultValue={customer?.email}
+                                    <input name="email" type="text" defaultValue={member?.email}
                                         className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                             </div>

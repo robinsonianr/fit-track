@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public enum FitTrackMessageKeys {
 
-    CUSTOMER_UPDATED_SUCCESS("customer.updated","Customer updated successfully"),
-    CUSTOMER_IMAGE_UPLOAD_SUCCESS("customer.image.updated","Customer image updated successfully");
+    MEMBER_UPDATED_SUCCESS("member.updated","Customer updated successfully"),
+    MEMBER_IMAGE_UPLOAD_SUCCESS("member.image.updated","Customer image updated successfully");
 
     private final String key;
     private final String message;
