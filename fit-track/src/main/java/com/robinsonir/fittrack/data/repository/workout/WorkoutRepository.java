@@ -11,7 +11,7 @@ import java.util.List;
 public interface WorkoutRepository extends JpaRepository<WorkoutEntity, Long> {
 
     @Query("select w from WorkoutEntity w where w.member.id = ?1")
-    List<WorkoutEntity> findAllWorkoutsByMember_Id(Long memberId);
+    List<WorkoutEntity> findAllWorkoutsByMemberId(Long memberId);
 
     boolean existsWorkoutEntityByMember(MemberEntity member);
 }

@@ -207,7 +207,7 @@ public class WorkoutRepositoryTest {
         workoutRepository.save(workout2);
 
         // When
-        List<WorkoutEntity> workouts = workoutRepository.findAllWorkoutsByMember_Id(member.getId());
+        List<WorkoutEntity> workouts = workoutRepository.findAllWorkoutsByMemberId(member.getId());
 
         // Then
         assertThat(workouts).isNotEmpty();

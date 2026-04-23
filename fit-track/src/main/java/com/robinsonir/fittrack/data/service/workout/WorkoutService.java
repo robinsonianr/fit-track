@@ -49,7 +49,7 @@ public class WorkoutService {
     }
 
     public List<WorkoutDTO> getAllWorkoutsByMemberId(Long id) {
-        List<WorkoutEntity> workoutEntities = new ArrayList<>(workoutRepository.findAllWorkoutsByMember_Id(id));
+        List<WorkoutEntity> workoutEntities = new ArrayList<>(workoutRepository.findAllWorkoutsByMemberId(id));
         return workoutMapper.convertWorkoutEntityListToWorkoutList(workoutEntities);
     }
 
