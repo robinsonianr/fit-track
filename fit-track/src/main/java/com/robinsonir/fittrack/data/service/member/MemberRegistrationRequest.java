@@ -1,12 +1,10 @@
-package com.robinsonir.fittrack.data.service.customer;
+package com.robinsonir.fittrack.data.service.member;
 
 import com.robinsonir.fittrack.data.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-import java.time.OffsetDateTime;
-
-@Schema(name = "CustomerRegistrationRequest")
-public record CustomerRegistrationRequest(
+@Schema(name = "MemberRegistrationRequest")
+public record MemberRegistrationRequest(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         String name,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)

@@ -1,16 +1,13 @@
 package com.robinsonir.fittrack.audit;
 
-import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
+import com.robinsonir.fittrack.data.entity.member.MemberEntity;
 import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.query.AuditEntity;
 import org.hibernate.envers.query.AuditQuery;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class AuditHistoryService {
@@ -21,19 +18,17 @@ public class AuditHistoryService {
         this.auditReader = auditReader;
     }
 
-    public List<WeightAuditHistoryDTO> getCustomerWeightHistory(Long entityId) {
-        List<WeightAuditHistoryDTO> weightAudit = new ArrayList<>();
+    public List<WeightTrendDTO> getMemberWeightTrend(Long memberId) {
+        List<WeightTrendDTO> weightAudit = new ArrayList<>();
         AuditQuery auditQuery = auditReader.createQuery()
-                .forRevisionsOfEntity(CustomerEntity.class, true,true)
-                .add(AuditEntity.id().eq(entityId))
+                .forRevisionsOfEntity(MemberEntity.class, true, true)
+                .add(AuditEntity.id().eq(memberId))
                 .add(AuditEntity.property("weight").hasChanged());
 
         List items = auditQuery.getResultList();
         for (Object item : items) {
-            CustomerEntity customer = (CustomerEntity) item;
-            Map<Integer, OffsetDateTime> weightAuditMap = new HashMap<>();
-            weightAuditMap.put(customer.getWeight(), customer.getLastModifiedDate());
-            weightAudit.add(new WeightAuditHistoryDTO(weightAuditMap));
+            MemberEntity member = (MemberEntity) item;
+            weightAudit.add(new WeightTrendDTO(member.getWeight(), member.getLastModifiedDate()));
         }
 
         return weightAudit;

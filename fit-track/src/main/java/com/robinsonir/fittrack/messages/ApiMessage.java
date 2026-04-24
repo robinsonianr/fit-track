@@ -4,9 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Standard success response carrying a stable key and a human-readable message")
 public record ApiMessage(
-        @Schema(description = "Stable identifier for i18n or programmatic branching", example = "customer.updated")
+        @Schema(description = "Stable identifier for i18n or programmatic branching", example = "member.updated")
         String key,
-        @Schema(description = "Human-readable success message", example = "Customer updated successfully")
+        @Schema(description = "Human-readable success message", example = "Member updated successfully")
         String message
 ) {
     public static ApiMessage of(String key, String message) {

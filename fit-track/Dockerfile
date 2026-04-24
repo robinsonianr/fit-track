@@ -1,7 +1,7 @@
 # Use a base image that includes Java
 FROM eclipse-temurin:17-jre
 
-RUN apt-get update && apt-get install -y tini wget && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends tini wget && rm -rf /var/lib/apt/lists/*
 RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
 # Copy the backend (Java application) JAR file into the image

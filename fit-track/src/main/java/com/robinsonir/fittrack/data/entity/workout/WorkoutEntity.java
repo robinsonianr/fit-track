@@ -1,7 +1,7 @@
 package com.robinsonir.fittrack.data.entity.workout;
 
 import com.robinsonir.fittrack.data.entity.AbstractEntity;
-import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
+import com.robinsonir.fittrack.data.entity.member.MemberEntity;
 import com.robinsonir.fittrack.data.entity.exercise.ExerciseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -43,6 +43,6 @@ public class WorkoutEntity extends AbstractEntity {
     private Set<ExerciseEntity> exercises;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
-    private CustomerEntity customer;
+    @JoinColumn(name = "member_id", nullable = false)
+    private MemberEntity member;
 }

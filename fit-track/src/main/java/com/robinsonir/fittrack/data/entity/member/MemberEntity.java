@@ -1,11 +1,11 @@
-package com.robinsonir.fittrack.data.entity.customer;
+package com.robinsonir.fittrack.data.entity.member;
 
 import com.robinsonir.fittrack.data.Gender;
 import com.robinsonir.fittrack.data.entity.AbstractModifiedDateEntity;
-import com.robinsonir.fittrack.data.entity.workout.WorkoutEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,8 +20,9 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Audited(withModifiedFlag = true)
-@Table(schema = "fit_tracker", name = "customer")
-public class CustomerEntity extends AbstractModifiedDateEntity implements UserDetails {
+@AuditTable(value = "member_aud", schema = "fit_tracker")
+@Table(schema = "fit_tracker", name = "member")
+public class MemberEntity extends AbstractModifiedDateEntity implements UserDetails {
 
     @NotAudited
     @Column(name = "name", nullable = false)

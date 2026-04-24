@@ -33,7 +33,7 @@ export const customInstance = <T>(config:
     return axiosInstance(config).then(({ data }) => data);
 };
 
-export const buildProfileImage = (id: number) => `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers/${id}/profile-image`;
+export const buildProfileImage = (id: number) => `${import.meta.env.VITE_API_BASE_URL}/api/v1/members/${id}/profile-image`;
 
 export const getCustomer = async (id: any) => {
     try {
@@ -108,4 +108,4 @@ export const uploadCustomerProfileImage = async (id: any, formData: any) => {
 
 };
 
-export const getCustomerProfileImage = (id: any) => `${import.meta.env.VITE_API_BASE_URL}/api/v1/customers/${id}/profile-image`;
+export const getCustomerProfileImage = (id: any) => `${import.meta.env.VITE_API_BASE_URL}/api/v1/members/${id}/profile-image`;

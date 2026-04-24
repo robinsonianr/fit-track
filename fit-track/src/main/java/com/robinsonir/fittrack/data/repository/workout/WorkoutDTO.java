@@ -11,7 +11,7 @@ public record WorkoutDTO(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         Long id,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-        Long customerId,
+        Long memberId,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         String title,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)

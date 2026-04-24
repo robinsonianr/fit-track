@@ -1,8 +1,8 @@
 package com.robinsonir.fittrack.security.auth;
 
-import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
-import com.robinsonir.fittrack.data.repository.customer.CustomerDTO;
-import com.robinsonir.fittrack.mappers.CustomerMapper;
+import com.robinsonir.fittrack.data.entity.member.MemberEntity;
+import com.robinsonir.fittrack.data.repository.member.MemberDTO;
+import com.robinsonir.fittrack.mappers.MemberMapper;
 import com.robinsonir.fittrack.security.jwt.JwtTokenUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,7 +17,7 @@ public class AuthService {
 
     private final AuthenticationManager authenticationManager;
 
-    private final CustomerMapper customerMapper;
+    private final MemberMapper memberMapper;
 
     private final JwtTokenUtil jwtUtil;
 
@@ -27,8 +27,8 @@ public class AuthService {
                 new UsernamePasswordAuthenticationToken(request.email(),
                         request.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        CustomerEntity principal = (CustomerEntity) authentication.getPrincipal();
-        CustomerDTO customer = customerMapper.customerEntityToCustomer(principal);
+        MemberEntity principal = (MemberEntity) authentication.getPrincipal();
+        MemberDTO customer = memberMapper.memberEntityToMemberDTO(principal);
         var token = jwtUtil.generateToken(customer.username(), customer.roles());
         return new AuthResponse(token, customer.id());
     }

@@ -1,14 +1,12 @@
 package com.robinsonir.fittrack.api;
 
 import com.robinsonir.fittrack.data.repository.workout.WorkoutDTO;
-import com.robinsonir.fittrack.data.repository.workout.WorkoutRepository;
 import com.robinsonir.fittrack.data.service.workout.WorkoutCreationRequest;
 import com.robinsonir.fittrack.data.service.workout.WorkoutService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,12 +38,12 @@ public class WorkoutController {
         return workoutService.getWorkout(workoutId);
     }
 
-    @Operation(summary = "Get all workouts for a customer")
-    @ApiResponse(responseCode = "404", description = "Customer not found")
-    @GetMapping("log/{customerId}")
-    public List<WorkoutDTO> getAllWorkoutsByCustomerId(
-            @Parameter(description = "customerId") @PathVariable final Long customerId) {
-        return workoutService.getAllWorkoutsByCustomerId(customerId);
+    @Operation(summary = "Get all workouts for a member")
+    @ApiResponse(responseCode = "404", description = "Member not found")
+    @GetMapping("log/{memberId}")
+    public List<WorkoutDTO> getAllWorkoutsByMemberId(
+            @Parameter(description = "memberId") @PathVariable final Long memberId) {
+        return workoutService.getAllWorkoutsByMemberId(memberId);
     }
 
     @Operation(summary = "Create a new workout")

@@ -1,26 +1,25 @@
-package com.robinsonir.fittrack.data.repository.customer;
+package com.robinsonir.fittrack.data.repository.member;
 
-import com.robinsonir.fittrack.data.Gender;
-import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
+import com.robinsonir.fittrack.data.entity.member.MemberEntity;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 
-public class CustomerRepositoryImpl implements CustomerUpdateRepository {
+public class MemberRepositoryImpl implements MemberUpdateRepository {
 
     @PersistenceContext
     private EntityManager entityManager;
 
     @Override
     public void updateProfileImageId(String profileImageId, Long customerId) {
-        CustomerEntity customerEntity = entityManager.find(CustomerEntity.class, customerId);
+        MemberEntity memberEntity = entityManager.find(MemberEntity.class, customerId);
 
-        if (customerEntity == null) {
+        if (memberEntity == null) {
             throw new ResourceNotFoundException(
                     "customer with id [%s] not found".formatted(customerId)
             );
         }
 
-        customerEntity.setProfileImageId(profileImageId);
+        memberEntity.setProfileImageId(profileImageId);
     }
 }

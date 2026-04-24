@@ -1,8 +1,8 @@
 package com.robinsonir.fittrack.mappers;
 
-import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
-import com.robinsonir.fittrack.data.repository.customer.CustomerDTO;
-import com.robinsonir.fittrack.data.service.customer.CustomerRegistrationRequest;
+import com.robinsonir.fittrack.data.entity.member.MemberEntity;
+import com.robinsonir.fittrack.data.repository.member.MemberDTO;
+import com.robinsonir.fittrack.data.service.member.MemberRegistrationRequest;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,13 +13,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Mapper(config = FitTrackMapperConfig.class)
-public interface CustomerMapper {
+public interface MemberMapper {
 
     @Mapping(target = "roles", source = "authorities")
-    CustomerDTO customerEntityToCustomer(CustomerEntity customerEntity);
+    MemberDTO memberEntityToMemberDTO(MemberEntity memberEntity);
 
     @Mapping(target = "roles", source = "authorities")
-    List<CustomerDTO> customerEntityListToCustomerList(List<CustomerEntity> customerEntityList);
+    List<MemberDTO> memberEntityListToMemberDTOList(List<MemberEntity> memberEntityList);
 
     @BeanMapping(ignoreByDefault = true)
     @Mapping(target = "name", source = "name")
@@ -28,7 +28,7 @@ public interface CustomerMapper {
     @Mapping(target = "age", source = "age")
     @Mapping(target = "gender", source = "gender")
     @Mapping(target = "memberSince", ignore = true)
-    CustomerEntity registrationRequestToEntity(CustomerRegistrationRequest registrationRequest);
+    MemberEntity registrationRequestToEntity(MemberRegistrationRequest registrationRequest);
 
     default List<String> mapAuthorities(Collection<? extends GrantedAuthority> authorities) {
         return authorities == null ? List.of() :

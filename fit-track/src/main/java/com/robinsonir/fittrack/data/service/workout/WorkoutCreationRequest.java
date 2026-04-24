@@ -7,7 +7,7 @@ import java.util.Set;
 
 public record WorkoutCreationRequest(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-        Long customerId,
+        Long memberId,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         String title,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)

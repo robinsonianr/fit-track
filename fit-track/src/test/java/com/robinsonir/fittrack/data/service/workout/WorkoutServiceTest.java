@@ -1,9 +1,9 @@
 package com.robinsonir.fittrack.data.service.workout;
 
 import com.robinsonir.fittrack.data.Gender;
-import com.robinsonir.fittrack.data.entity.customer.CustomerEntity;
+import com.robinsonir.fittrack.data.entity.member.MemberEntity;
 import com.robinsonir.fittrack.data.entity.workout.WorkoutEntity;
-import com.robinsonir.fittrack.data.repository.customer.CustomerRepository;
+import com.robinsonir.fittrack.data.repository.member.MemberRepository;
 import com.robinsonir.fittrack.data.repository.workout.WorkoutDTO;
 import com.robinsonir.fittrack.data.repository.workout.WorkoutRepository;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
@@ -32,7 +32,7 @@ public class WorkoutServiceTest {
     private WorkoutRepository workoutRepository;
 
     @Mock
-    private CustomerRepository customerRepository;
+    private MemberRepository memberRepository;
 
     @Mock
     private WorkoutMapper workoutMapper;
@@ -43,39 +43,39 @@ public class WorkoutServiceTest {
     @InjectMocks
     private WorkoutService workoutService;
 
-    private CustomerEntity customer;
+    private MemberEntity member;
 
     @BeforeEach
     void setUp() {
-        customer = new CustomerEntity();
-        customer.setId(1L);
-        customer.setName("John Doe");
-        customer.setEmail("john.doe@example.com");
-        customer.setPassword("password");
-        customer.setAge(30);
-        customer.setGender(Gender.MALE);
+        member = new MemberEntity();
+        member.setId(1L);
+        member.setName("John Doe");
+        member.setEmail("john.doe@example.com");
+        member.setPassword("password");
+        member.setAge(30);
+        member.setGender(Gender.MALE);
     }
 
     @Test
     void getAllWorkouts() {
         // Arrange
-        WorkoutEntity workoutEntity1 = new WorkoutEntity("Cardio","Running", 500,  12000, 60, OffsetDateTime.now(), new HashSet<>(), customer);
+        WorkoutEntity workoutEntity1 = new WorkoutEntity("Cardio", "Running", 500, 12000, 60, OffsetDateTime.now(), new HashSet<>(), member);
         workoutEntity1.setId(1L);
-        WorkoutEntity workoutEntity2 = new WorkoutEntity("Cardio","Cycling", 300, 12000, 45, OffsetDateTime.now(), new HashSet<>(), customer);
+        WorkoutEntity workoutEntity2 = new WorkoutEntity("Cardio", "Cycling", 300, 12000, 45, OffsetDateTime.now(), new HashSet<>(), member);
         workoutEntity2.setId(2L);
 
         List<WorkoutEntity> workoutList = new ArrayList<>();
         workoutList.add(workoutEntity1);
         workoutList.add(workoutEntity2);
-        when(workoutRepository.findAllWorkouts()).thenReturn(workoutList);
+        when(workoutRepository.findAll()).thenReturn(workoutList);
 
-        WorkoutDTO workoutDTO1 = new WorkoutDTO(1L, customer.getId(), "Cardio", "Running", new HashSet<>(), 12000, 500, 50, OffsetDateTime.now());
-        WorkoutDTO workoutDTO2 = new WorkoutDTO(2L, customer.getId(), "Cardio", "Cycling", new HashSet<>(), 12000, 600, 60, OffsetDateTime.now());
+        WorkoutDTO workoutDTO1 = new WorkoutDTO(1L, member.getId(), "Cardio", "Running", new HashSet<>(), 12000, 500, 50, OffsetDateTime.now());
+        WorkoutDTO workoutDTO2 = new WorkoutDTO(2L, member.getId(), "Cardio", "Cycling", new HashSet<>(), 12000, 600, 60, OffsetDateTime.now());
         List<WorkoutDTO> workouts = new ArrayList<>();
         workouts.add(workoutDTO1);
         workouts.add(workoutDTO2);
 
-        when(workoutMapper.convertWorkoutEntityListToWorkoutList(workoutList)).thenReturn(workouts);
+        when(workoutMapper.convertWorkoutEntityListToWorkoutList(anyList())).thenReturn(workouts);
 
         // Act
         List<WorkoutDTO> result = workoutService.getAllWorkouts();
@@ -83,18 +83,18 @@ public class WorkoutServiceTest {
         // Assert
         assertEquals(2, result.size());
         assertEquals(List.of(workoutDTO1, workoutDTO2), result);
-        verify(workoutRepository, times(1)).findAllWorkouts();
-        verify(workoutMapper, times(1)).convertWorkoutEntityListToWorkoutList(workoutList);
+        verify(workoutRepository, times(1)).findAll();
+        verify(workoutMapper, times(1)).convertWorkoutEntityListToWorkoutList(anyList());
     }
 
     @Test
     void getWorkoutSuccess() {
         // Arrange
         Long workoutId = 1L;
-        WorkoutEntity workoutEntity = new WorkoutEntity("Cardio","Running", 500, 12000, 60, OffsetDateTime.now(), null, customer);
-        WorkoutDTO expectedWorkout = new WorkoutDTO(workoutId, customer.getId(),"Cardio", "Running", new HashSet<>(), 12000, 60, null, OffsetDateTime.now());
+        WorkoutEntity workoutEntity = new WorkoutEntity("Cardio", "Running", 500, 12000, 60, OffsetDateTime.now(), null, member);
+        WorkoutDTO expectedWorkout = new WorkoutDTO(workoutId, member.getId(), "Cardio", "Running", new HashSet<>(), 12000, 60, null, OffsetDateTime.now());
 
-        when(workoutRepository.findWorkoutById(workoutId)).thenReturn(Optional.of(workoutEntity));
+        when(workoutRepository.findById(workoutId)).thenReturn(Optional.of(workoutEntity));
         when(workoutMapper.convertWorkoutEntityToWorkout(workoutEntity)).thenReturn(expectedWorkout);
 
         // Act
@@ -102,7 +102,7 @@ public class WorkoutServiceTest {
 
         // Assert
         assertEquals(expectedWorkout, result);
-        verify(workoutRepository, times(1)).findWorkoutById(workoutId);
+        verify(workoutRepository, times(1)).findById(workoutId);
         verify(workoutMapper, times(1)).convertWorkoutEntityToWorkout(workoutEntity);
     }
 
@@ -110,38 +110,32 @@ public class WorkoutServiceTest {
     void getWorkoutThrowsResourceNotFoundException() {
         // Arrange
         Long workoutId = 1L;
-        when(workoutRepository.findWorkoutById(workoutId)).thenReturn(Optional.empty());
+        when(workoutRepository.findById(workoutId)).thenReturn(Optional.empty());
 
         // Act and Assert
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> workoutService.getWorkout(workoutId));
 
         assertEquals("workout with id [1] not found", exception.getMessage());
-        verify(workoutRepository, times(1)).findWorkoutById(workoutId);
+        verify(workoutRepository, times(1)).findById(workoutId);
         verify(workoutMapper, times(0)).convertWorkoutEntityToWorkout(any(WorkoutEntity.class));
     }
 
     @Test
     void addWorkout() {
         // Arrange
-        WorkoutCreationRequest workoutCreationRequest = new WorkoutCreationRequest(customer.getId(), "Cardio", new HashSet<>(), "Swimming", 12000, 400, 60);
+        WorkoutCreationRequest workoutCreationRequest = new WorkoutCreationRequest(
+                member.getId(), "Cardio", new HashSet<>(), "Swimming", 12000, 400, 60
+        );
 
-        WorkoutEntity newWorkout = new WorkoutEntity();
-        newWorkout.setTitle(workoutCreationRequest.title());
-        newWorkout.setWorkoutType(workoutCreationRequest.workoutType());
-        newWorkout.setExercises(exerciseMapper.mapToExerciseEntities(workoutCreationRequest.exercises()));
-        newWorkout.setCalories(workoutCreationRequest.calories());
-        newWorkout.setDurationMinutes(workoutCreationRequest.durationMinutes());
-
-        Optional<CustomerEntity> cust = customerRepository.findCustomerById(customer.getId());
-        cust.ifPresent(newWorkout::setCustomer);
-
-        when(workoutRepository.save(any(WorkoutEntity.class))).thenReturn(newWorkout);
+        when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
+        when(workoutRepository.save(any(WorkoutEntity.class))).thenAnswer(inv -> inv.getArgument(0));
 
         // Act
         workoutService.addWorkout(workoutCreationRequest);
 
         // Assert
+        verify(memberRepository, times(1)).findById(member.getId());
         verify(workoutRepository, times(1)).save(any(WorkoutEntity.class));
     }
 

@@ -1,8 +1,8 @@
-package com.robinsonir.fittrack.data.service.customer;
+package com.robinsonir.fittrack.data.service.member;
 
 import com.robinsonir.fittrack.data.Gender;
 
-public record CustomerUpdateRequest(
+public record MemberUpdateRequest(
       String name,
       String email,
       Integer age,

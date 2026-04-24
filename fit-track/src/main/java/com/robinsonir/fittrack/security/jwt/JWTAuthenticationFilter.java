@@ -1,6 +1,6 @@
 package com.robinsonir.fittrack.security.jwt;
 
-import com.robinsonir.fittrack.data.service.customer.CustomerUserDetailService;
+import com.robinsonir.fittrack.data.service.member.MemberUserDetailService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -33,7 +33,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
 
     public JWTAuthenticationFilter(
             JwtTokenUtil jwtTokenUtil,
-            CustomerUserDetailService userDetailsService,
+            MemberUserDetailService userDetailsService,
             @Qualifier("handlerExceptionResolver")
             HandlerExceptionResolver handlerExceptionResolver) {
         this.jwtTokenUtil = jwtTokenUtil;
