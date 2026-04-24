@@ -20,8 +20,8 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Audited(withModifiedFlag = true)
-@AuditTable(value = "customer_audit", schema = "fit_tracker")
-@Table(schema = "fit_tracker", name = "customer")
+@AuditTable(value = "member_aud", schema = "fit_tracker")
+@Table(schema = "fit_tracker", name = "member")
 public class MemberEntity extends AbstractModifiedDateEntity implements UserDetails {
 
     @NotAudited

@@ -71,6 +71,7 @@ dependencies {
     // Database/Migration postgresql
     implementation("org.flywaydb:flyway-core")
     implementation("org.flywaydb:flyway-database-postgresql")
+    implementation("org.springframework.boot:spring-boot-flyway")
     runtimeOnly("org.postgresql:postgresql")
 
     // Tests

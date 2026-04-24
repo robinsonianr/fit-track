@@ -43,6 +43,6 @@ public class WorkoutEntity extends AbstractEntity {
     private Set<ExerciseEntity> exercises;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "customer_id", nullable = false)
+    @JoinColumn(name = "member_id", nullable = false)
     private MemberEntity member;
 }

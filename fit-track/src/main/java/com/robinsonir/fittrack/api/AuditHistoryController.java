@@ -1,7 +1,7 @@
 package com.robinsonir.fittrack.api;
 
 import com.robinsonir.fittrack.audit.AuditHistoryService;
-import com.robinsonir.fittrack.audit.WeightAuditHistoryDTO;
+import com.robinsonir.fittrack.audit.WeightTrendDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @Tag(name = "Audit History", description = "Audit History API")
@@ -28,11 +26,11 @@ public class AuditHistoryController {
     }
 
 
-    @Operation(summary = "Get customer weight audit history")
-    @ApiResponse(responseCode = "404", description = "Customer not found")
-    @GetMapping("{entityId}")
-    public ResponseEntity<List<WeightAuditHistoryDTO>> getCustomerWeightAuditHistory(
-            @Parameter(description = "entityId") @PathVariable final Long entityId) {
-        return ResponseEntity.ok(auditHistoryService.getCustomerWeightHistory(entityId));
+    @Operation(summary = "Get member weight trend")
+    @ApiResponse(responseCode = "404", description = "Member not found")
+    @GetMapping("weight/{memberId}")
+    public ResponseEntity<List<WeightTrendDTO>> getMemberWeightTrend(
+            @Parameter(description = "memberId") @PathVariable final Long memberId) {
+        return ResponseEntity.ok(auditHistoryService.getMemberWeightTrend(memberId));
     }
 }

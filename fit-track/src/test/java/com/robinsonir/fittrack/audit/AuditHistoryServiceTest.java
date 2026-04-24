@@ -35,17 +35,17 @@ class AuditHistoryServiceTest {
     }
 
     @Test
-    void testGetCustomerWeightAuditHistory() {
+    void testGetMemberWeightTrend() {
         Long entityId = 1L;
-        MemberEntity customer1 = new MemberEntity();
-        customer1.setWeight(70);
-        customer1.setLastModifiedDate(OffsetDateTime.parse("2024-01-01T10:00:00Z"));
+        MemberEntity member1 = new MemberEntity();
+        member1.setWeight(70);
+        member1.setLastModifiedDate(OffsetDateTime.parse("2024-01-01T10:00:00Z"));
 
-        MemberEntity customer2 = new MemberEntity();
-        customer2.setWeight(75);
-        customer2.setLastModifiedDate(OffsetDateTime.parse("2024-02-01T10:00:00Z"));
+        MemberEntity member2 = new MemberEntity();
+        member2.setWeight(75);
+        member2.setLastModifiedDate(OffsetDateTime.parse("2024-02-01T10:00:00Z"));
 
-        List<MemberEntity> mockResults = Arrays.asList(customer1, customer2);
+        List<MemberEntity> mockResults = Arrays.asList(member1, member2);
         AuditQueryCreator auditQueryCreator = Mockito.mock(AuditQueryCreator.class);
         AuditQuery auditQuery = Mockito.mock(AuditQuery.class);
 
@@ -55,11 +55,11 @@ class AuditHistoryServiceTest {
         when(auditQuery.add(any(AuditCriterion.class))).thenReturn(auditQuery);
         when(auditQuery.getResultList()).thenReturn(mockResults);
 
-        List<WeightAuditHistoryDTO> result = auditHistoryService.getCustomerWeightHistory(entityId);
+        List<WeightTrendDTO> result = auditHistoryService.getMemberWeightTrend(entityId);
 
-        List<WeightAuditHistoryDTO> expected = new ArrayList<>();
-        expected.add(new WeightAuditHistoryDTO(70, OffsetDateTime.parse("2024-01-01T10:00:00Z")));
-        expected.add(new WeightAuditHistoryDTO(75, OffsetDateTime.parse("2024-02-01T10:00:00Z")));
+        List<WeightTrendDTO> expected = new ArrayList<>();
+        expected.add(new WeightTrendDTO(70, OffsetDateTime.parse("2024-01-01T10:00:00Z")));
+        expected.add(new WeightTrendDTO(75, OffsetDateTime.parse("2024-02-01T10:00:00Z")));
 
         assertEquals(expected, result);
     }
