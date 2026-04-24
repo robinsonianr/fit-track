@@ -22,15 +22,6 @@ BEGIN
     END IF;
 
     IF EXISTS (
-        SELECT 1 FROM information_schema.table_constraints
-        WHERE table_schema = 'fit_tracker'
-          AND table_name = 'workout'
-          AND constraint_name = 'workout_customer_id_fkey'
-    ) THEN
-        ALTER TABLE fit_tracker.workout
-            RENAME CONSTRAINT workout_customer_id_fkey TO workout_member_id_fkey;
-    END IF;
-    IF EXISTS (
         SELECT 1 FROM information_schema.columns
         WHERE table_schema = 'fit_tracker'
           AND table_name = 'workout'
@@ -38,5 +29,15 @@ BEGIN
     ) THEN
         ALTER TABLE fit_tracker.workout
             RENAME COLUMN customer_id TO member_id;
+    END IF;
+
+    IF EXISTS (
+        SELECT 1 FROM information_schema.table_constraints
+        WHERE table_schema = 'fit_tracker'
+          AND table_name = 'workout'
+          AND constraint_name = 'workout_customer_id_fkey'
+    ) THEN
+        ALTER TABLE fit_tracker.workout
+            RENAME CONSTRAINT workout_customer_id_fkey TO workout_member_id_fkey;
     END IF;
 END $$;
