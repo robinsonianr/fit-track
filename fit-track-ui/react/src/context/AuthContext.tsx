@@ -1,13 +1,13 @@
 import {createContext, useContext, useEffect, useState} from "react";
 import {login as performLogin} from "../services/client";
 import jwtDecode from "jwt-decode";
-import {Customer} from "../types/index";
+import {AuthRequest, MemberDTO} from "../api/generated/models";
 
 
 
 
 type AuthContextType = {
-    customer: Customer | undefined;
+    member: MemberDTO | undefined;
     login: (formData: any) => Promise<void>;
     logOut: () => void;
     isCustomerAuthenticated: () => boolean;
@@ -18,17 +18,17 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const AuthProvider = ({children}: { children: any }) => {
-    const [customer, setCustomer] = useState<Customer | undefined>(undefined);
+    const [member, setMember] = useState<MemberDTO| undefined>();
 
     const setCustomerFromToken = () => {
         let token: any = localStorage.getItem("access_token");
         if (token) {
             token = jwtDecode(token);
-            const customer: Customer = {
+            const member: MemberDTO = {
                 email: token.sub,
                 roles: token.scopes
             };
-            setCustomer(customer);
+            setMember(member);
         }
     };
     useEffect(() => {
@@ -37,27 +37,27 @@ const AuthProvider = ({children}: { children: any }) => {
         }
     }, []);
 
-    const login = async (formData: any): Promise<void> => {
+    const login = async (authRequest: AuthRequest): Promise<void> => {
         try {
-            const response = await performLogin(formData);
+            const response = await performLogin(authRequest);
             const jwtToken = response.headers["authorization"];
             if (jwtToken !== undefined) {
                 localStorage.setItem("access_token", jwtToken);
             }
 
-            const customerId = response.data.customerId;
-            if (customerId !== undefined) {
-                localStorage.setItem("customerId", customerId);
+            const memberId = response.data.memberId;
+            if (memberId !== undefined) {
+                localStorage.setItem("memberId", memberId);
             }
 
             const decodedToken: any = jwtDecode(jwtToken);
 
-            const customer: Customer = {
-                id: customerId,
+            const member: MemberDTO = {
+                id: memberId,
                 username: decodedToken.sub,
                 roles: decodedToken.scopes
             };
-            setCustomer(customer);
+            setMember(member);
         } catch (error) {
             throw new Error("Failed to login, either email or password is incorrect.", { cause: error });
         }
@@ -65,8 +65,8 @@ const AuthProvider = ({children}: { children: any }) => {
 
     const logOut = () => {
         localStorage.removeItem("access_token");
-        localStorage.removeItem("customerId");
-        setCustomer(undefined);
+        localStorage.removeItem("memberId");
+        setMember(undefined);
     };
 
     const isCustomerAuthenticated = () => {
@@ -85,7 +85,7 @@ const AuthProvider = ({children}: { children: any }) => {
 
     return (
         <AuthContext.Provider value={{
-            customer,
+            member: member,
             login,
             logOut,
             isCustomerAuthenticated,

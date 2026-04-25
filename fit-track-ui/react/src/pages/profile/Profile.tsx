@@ -11,7 +11,7 @@ export const Profile = () => {
     const [workoutData, setWorkoutData] = useState<WorkoutDTO[]>([]);
     const defaultImg = "/assets/user.png";
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const id = Number.parseInt(localStorage.getItem("customerId")!);
+    const id = Number.parseInt(localStorage.getItem("memberId")!);
     const {getMember, updateMember, uploadMemberProfileImage} = getMemberApi();
     const {getAllWorkoutsByMemberId} = getWorkoutsApi();
 
@@ -47,12 +47,12 @@ export const Profile = () => {
         const fetchData = async () => {
             try {
                 const memberId = id;
-                const customerResp = await getMember(memberId);
+                const memberResp = await getMember(memberId);
                 const workoutsResp = await getAllWorkoutsByMemberId(memberId);
                 setWorkoutData(workoutsResp);
-                setMember(customerResp);
+                setMember(memberResp);
             } catch (error) {
-                console.error("Could not retrieve customer: ", error);
+                console.error("Could not retrieve member: ", error);
             }
         };
         fetchData();
@@ -105,7 +105,7 @@ export const Profile = () => {
                 setMember(response);
                 toast.success("Profile updated successfully!");
             } catch (error) {
-                console.error("Failed to update customer.", error);
+                console.error("Failed to update member.", error);
                 toast.error("Failed to update profile.");
             }
         }

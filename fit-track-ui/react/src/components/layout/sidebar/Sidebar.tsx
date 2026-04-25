@@ -1,8 +1,8 @@
 import { useState, forwardRef } from "react";
 import { useAuth } from "../../../context/AuthContext.tsx";
-import { useNavigate, useLocation } from "react-router-dom";
+import {useNavigate, useLocation} from "react-router-dom";
 import WorkoutModal from "../../common/modal/workout-modal/WorkoutModal.tsx";
-import { Customer } from "../../../types/index.ts";
+import { Customer } from "../../../types";
 import { cn } from "../../../utils/cn";
 import "./sidebar.css";
 
@@ -41,6 +41,11 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ customer, onC
         navigate("/logs");
         onClose?.();
     };
+
+    const goLogout = () => {
+        logOut()
+        navigate("/login")
+    }
 
     return (
         <div ref={ref} className="sidebar">
@@ -117,7 +122,7 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ customer, onC
             
             {/* Logout */}
             <div className="sidebar-footer">
-                <button onClick={logOut} className="logout-button">
+                <button onClick={goLogout} className="logout-button">
                     Logout
                 </button>
             </div>
