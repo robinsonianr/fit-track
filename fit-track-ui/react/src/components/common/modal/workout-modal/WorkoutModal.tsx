@@ -1,11 +1,16 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {addWorkout} from "../../../../services/client.ts";
-import {Customer, Exercise} from "../../../../types";
+import {Exercise} from "../../../../types";
 import ReactDOM from "react-dom";
 import {PREDEFINED_EXERCISES} from "../../../../constants/exercises.ts";
+import {MemberDTO} from "../../../../api/generated/models";
 
 
-export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onClose: any, customer: Customer | undefined}) => {
+export const WorkoutModal = ({isOpen, onClose, member}: {
+    isOpen: boolean,
+    onClose: any,
+    member: MemberDTO | undefined
+}) => {
     const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
     const [exerciseTitle, setExerciseTitle] = useState("");
     const [sets, setSets] = useState(0);
@@ -36,8 +41,8 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
         let weight = 0;
         selectedExercises.forEach(ex => {
             if (ex.equipment === "Bodyweight") {
-                if (customer?.weight) {
-                    weight += ex.sets * ex.reps * (ex.weightPerRep + customer?.weight);
+                if (member?.weight) {
+                    weight += ex.sets * ex.reps * (ex.weightPerRep + member?.weight);
                 } else {
                     weight += ex.sets * ex.reps * (ex.weightPerRep + 100);
                 }
@@ -81,23 +86,23 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
         if (!muscleGroups.includes("Legs")) {
             return "Upper Body Day";
         } else if (!muscleGroups.includes("Arms") && !muscleGroups.includes("Back")
-            && !muscleGroups.includes("Shoulders")&& !muscleGroups.includes("Chest")) {
+            && !muscleGroups.includes("Shoulders") && !muscleGroups.includes("Chest")) {
             return "Lower Body Day";
         } else {
             return "Full Body Day";
         }
     };
 
-    const handleSubmit = async (e:React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        if (customer?.id) {
+        if (member?.id) {
             try {
                 const inputs = new FormData(e.currentTarget);
                 const formData = Object.fromEntries(inputs.entries());
                 const workoutData = {
                     ...formData,
                     title: deriveTitle(selectedExercises),
-                    customer: {"id": customer.id},
+                    customer: {"id": member.id},
                     exercises: selectedExercises,
                     workoutDate: new Date().toISOString()
                 };
@@ -122,7 +127,8 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
         <div className={`fixed inset-0 z-[9999] flex items-center justify-center ${isOpen ? "open" : ""}`}>
             <div className="bg-black/50 absolute inset-0" onClick={handleClose}></div>
             <div className="bg-[#333] relative z-[10] w-175 h-185 content-center rounded-md flex-col p-4">
-                <span className=" absolute cursor-pointer text-[#888] top-1 right-3.5" onClick={handleClose}>&times;</span>
+                <span className=" absolute cursor-pointer text-[#888] top-1 right-3.5"
+                      onClick={handleClose}>&times;</span>
                 <h1 className="font-bold">Add Workout</h1>
                 <form className="text-white flex flex-col gap-2 text-sm p-2 mt-2 " onSubmit={handleSubmit}>
                     <div>
@@ -181,7 +187,8 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
                                 onChange={(e) => setExerciseTitle(e.target.value)}
                             >
                                 <option value="">Select Exercise</option>
-                                {filteredExercises.map(ex => <option key={ex.title} value={ex.title}>{ex.title}</option>)}
+                                {filteredExercises.map(ex => <option key={ex.title}
+                                                                     value={ex.title}>{ex.title}</option>)}
                             </select>
                         </div>
                     </div>
@@ -190,40 +197,61 @@ export const WorkoutModal = ({isOpen, onClose, customer}: {isOpen: boolean, onCl
                             <div className="flex flex-row gap-4 mt-2">
                                 <div>
                                     <label className="font-bold">Sets</label>
-                                    <input placeholder="Sets" type="number" onChange={(e) => setSets(parseInt(e.target.value))} className="text-sm rounded-md w-full p-2"/>
+                                    <input placeholder="Sets" type="number"
+                                           onChange={(e) => setSets(parseInt(e.target.value))}
+                                           className="text-sm rounded-md w-full p-2"/>
                                 </div>
                                 <div>
                                     <label className="font-bold">Reps</label>
-                                    <input placeholder="Reps" type="number" onChange={(e) => setReps(parseInt(e.target.value))} className="text-sm rounded-md w-full p-2"/>
+                                    <input placeholder="Reps" type="number"
+                                           onChange={(e) => setReps(parseInt(e.target.value))}
+                                           className="text-sm rounded-md w-full p-2"/>
                                 </div>
                                 <div>
                                     <label className="font-bold">Weight Per Rep (lbs)</label>
-                                    <input placeholder="Weight" type="number" onChange={(e) => setWeight(parseFloat(e.target.value))} className="text-sm rounded-md w-full p-2"/>
+                                    <input placeholder="Weight" type="number"
+                                           onChange={(e) => setWeight(parseFloat(e.target.value))}
+                                           className="text-sm rounded-md w-full p-2"/>
                                 </div>
                             </div>
-                            <button className="bg-[#3f76c0] mt-4 rounded-md text-white cursor-pointer hover:bg-[#355a8f] duration-300 h-10 w-30" onClick={() => addExercise(exerciseTitle, sets, reps, weight)} type="button">Add Exercise</button>
+                            <button
+                                className="bg-[#3f76c0] mt-4 rounded-md text-white cursor-pointer hover:bg-[#355a8f] duration-300 h-10 w-30"
+                                onClick={() => addExercise(exerciseTitle, sets, reps, weight)} type="button">Add
+                                Exercise
+                            </button>
                         </>
                     )}
-                    <div className="h-28 overflow-y-auto grid grid-cols-3 gap-4 border-gray-600 border-2 rounded-md p-2">
+                    <div
+                        className="h-28 overflow-y-auto grid grid-cols-3 gap-4 border-gray-600 border-2 rounded-md p-2">
                         {selectedExercises.map((exercise, index) => (
-                            <div className="group overflow-hidden h-10 w-full text-white bg-[#222] p-2 border-3 border-white rounded-md flex text-center items-center" key={index}>
-                                <span className="text-xs whitespace-nowrap group-hover:animate-marquee">{exercise.title} - {exercise.sets}x{exercise.reps} @ {exercise.weightPerRep} lbs</span>
+                            <div
+                                className="group overflow-hidden h-10 w-full text-white bg-[#222] p-2 border-3 border-white rounded-md flex text-center items-center"
+                                key={index}>
+                                <span
+                                    className="text-xs whitespace-nowrap group-hover:animate-marquee">{exercise.title} - {exercise.sets}x{exercise.reps} @ {exercise.weightPerRep} lbs</span>
                             </div>
                         ))}
                     </div>
                     <div>
                         <label className="font-bold">Volume (lbs)</label>
-                        <input className="rounded-md p-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" value={volume} type="number" name="volume" readOnly/>
+                        <input
+                            className="rounded-md p-2 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            value={volume} type="number" name="volume" readOnly/>
                     </div>
                     <div>
                         <label className="font-bold">Calories (kcal)</label>
-                        <input className="rounded-md p-2" placeholder="Calories" type="number" name="calories" required/>
+                        <input className="rounded-md p-2" placeholder="Calories" type="number" name="calories"
+                               required/>
                     </div>
                     <div>
                         <label className="font-bold">Workout Duration (min)</label>
-                        <input className="rounded-md p-2" placeholder="Duration" type="number" name="durationMinutes" required/>
+                        <input className="rounded-md p-2" placeholder="Duration" type="number" name="durationMinutes"
+                               required/>
                     </div>
-                    <button className="bg-[#3f76c0] mt-2 rounded-md text-white hover:bg-[#355a8f] duration-300 cursor-pointer h-9  w-30" type="submit">Submit</button>
+                    <button
+                        className="bg-[#3f76c0] mt-2 rounded-md text-white hover:bg-[#355a8f] duration-300 cursor-pointer h-9  w-30"
+                        type="submit">Submit
+                    </button>
                 </form>
             </div>
         </div>,

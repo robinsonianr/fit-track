@@ -1,9 +1,11 @@
 package com.robinsonir.fittrack.api;
 
+import com.robinsonir.fittrack.data.entity.member.MemberEntity;
 import com.robinsonir.fittrack.data.repository.member.MemberDTO;
 import com.robinsonir.fittrack.data.service.member.MemberRegistrationRequest;
 import com.robinsonir.fittrack.data.service.member.MemberService;
 import com.robinsonir.fittrack.data.service.member.MemberUpdateRequest;
+import com.robinsonir.fittrack.mappers.MemberMapper;
 import com.robinsonir.fittrack.messages.ApiMessage;
 import com.robinsonir.fittrack.messages.FitTrackMessageKeys;
 import com.robinsonir.fittrack.security.jwt.JwtTokenUtil;
@@ -14,6 +16,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,11 +30,13 @@ public class MemberController {
     private final MemberService memberService;
 
     private final JwtTokenUtil jwtUtil;
+    private final MemberMapper memberMapper;
 
     public MemberController(MemberService memberService,
-                            JwtTokenUtil jwtUtil) {
+                            JwtTokenUtil jwtUtil, MemberMapper memberMapper) {
         this.memberService = memberService;
         this.jwtUtil = jwtUtil;
+        this.memberMapper = memberMapper;
     }
 
     @GetMapping
@@ -92,5 +97,11 @@ public class MemberController {
     public byte[] getMemberProfileImage(
             @Parameter(description = "memberId") @PathVariable Long memberId) {
         return memberService.getProfilePicture(memberId);
+    }
+
+
+    @GetMapping("/me")
+    public MemberDTO me(@AuthenticationPrincipal MemberEntity principal) {
+        return memberMapper.memberEntityToMemberDTO(principal);
     }
 }

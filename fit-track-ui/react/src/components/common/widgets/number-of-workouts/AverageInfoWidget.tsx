@@ -1,10 +1,10 @@
 import {useEffect, useState} from "react";
-import {Workout} from "../../../../types/index.ts";
+import {WorkoutDTO} from "../../../../types/index.ts";
 import {isDateInSelectedWeek} from "../../../../utils/utilities.ts";
 import {getAllWorkoutsByCustomerId} from "../../../../services/client.ts";
 
 const AverageInfoWidget = ({weekDate}: { weekDate: string }) => {
-    const [workoutData, setWorkoutData] = useState<Workout[]>([]);
+    const [workoutData, setWorkoutData] = useState<WorkoutDTO[]>([]);
     const [avgVolume, setAvgVolume] = useState<number>(0);
     const [avgCalorie, setAvgCalorie] = useState<number>(0);
     const [avgDuration, setAvgDuration] = useState<number>(0);

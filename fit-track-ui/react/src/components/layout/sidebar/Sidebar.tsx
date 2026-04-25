@@ -1,18 +1,18 @@
 import { useState, forwardRef } from "react";
-import { useAuth } from "../../../context/AuthContext.tsx";
+import { useAuth } from "../../../context/AuthContext";
 import {useNavigate, useLocation} from "react-router-dom";
 import WorkoutModal from "../../common/modal/workout-modal/WorkoutModal.tsx";
-import { Customer } from "../../../types";
 import { cn } from "../../../utils/cn";
 import "./sidebar.css";
+import {MemberDTO} from "../../../api/generated/models";
 
 interface SidebarProps {
-    customer: Customer | undefined;
+    member: MemberDTO| undefined;
     collapsed?: boolean;
     onClose?: () => void;
 }
 
-export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ customer, onClose }, ref) => {
+export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ member, onClose }, ref) => {
     const { logOut } = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
@@ -49,7 +49,7 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ customer, onC
 
     return (
         <div ref={ref} className="sidebar">
-            <WorkoutModal isOpen={isModalOpen} onClose={closeModal} customer={customer} />
+            <WorkoutModal isOpen={isModalOpen} onClose={closeModal} member={member} />
             
             {/* Header with close button for mobile */}
             <div className="sidebar-header">

@@ -1,37 +1,29 @@
-import {Outlet, useLocation} from "react-router-dom";
+import {Outlet, useLocation, useOutletContext} from "react-router-dom";
 import { useMediaQuery } from "@uidotdev/usehooks";
-import { useRef, useState, useEffect } from "react";
-import { Customer } from "../types/index.ts";
-import { getCustomer } from "../services/client";
+import { useRef, useState} from "react";
 
 import { Sidebar } from "../components/layout/sidebar/Sidebar";
 import Header from "../components/layout/header/Header";
 
 import { cn } from "../utils/cn";
 import "./layout.css";
+import {useAuth} from "../context/AuthContext.tsx";
+import {MemberDTO} from "../api/generated/models";
+
+
+export type LayoutContext = {member: MemberDTO}
+export const currentMember = () => useOutletContext<LayoutContext>().member
 
 const Layout = () => {
+    const {member} = useAuth();
     const isLargeScreen = useMediaQuery("(min-width: 1024px)");
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [customer, setCustomer] = useState<Customer | undefined>(undefined);
     const location = useLocation();
-
     const sidebarRef = useRef(null);
 
-    // Fetch customer data for sidebar
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const id = localStorage.getItem("customerId");
-                const response = await getCustomer(id);
-                setCustomer(response.data);
-            } catch (error) {
-                console.error("Could not retrieve customer: ", error);
-            }
-        };
-
-        fetchData();
-    }, []);
+    if (!member) {
+        return <div>Loading...</div>
+    }
 
     const getHeaderTitle = () :string  =>  {
         const currentPage = location.pathname.split("/")[1];
@@ -70,7 +62,7 @@ const Layout = () => {
                 <Sidebar 
                     ref={sidebarRef} 
                     collapsed={false} 
-                    customer={customer}
+                    member={member}
                     onClose={() => setSidebarOpen(false)}
                 />
             </div>
@@ -83,11 +75,11 @@ const Layout = () => {
                 <Header 
                     collapsed={false}
                     setCollapsed={() => setSidebarOpen(!sidebarOpen)}
-                    name={customer?.name}
+                    member={member}
                     title={getHeaderTitle()}
                 />
                 <div className="content-area">
-                    <Outlet context={{ customer }} />
+                    <Outlet context={{ member } satisfies LayoutContext} />
                 </div>
             </div>
         </div>

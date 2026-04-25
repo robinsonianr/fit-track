@@ -35,14 +35,6 @@ export const customInstance = <T>(config:
 
 export const buildProfileImage = (id: number) => `${import.meta.env.VITE_API_BASE_URL}/api/v1/members/${id}/profile-image`;
 
-export const getCustomer = async (id: any) => {
-    try {
-        return await axiosInstance.get(`/api/v1/customers/${id}`);
-    } catch (e) {
-        throw e;
-    }
-};
-
 export const getAllWorkoutsByCustomerId = async (id: any) => {
     try {
         return await axiosInstance.get(`/api/v1/workouts/log/${id}`);
@@ -51,21 +43,7 @@ export const getAllWorkoutsByCustomerId = async (id: any) => {
     }
 };
 
-export const login = async (formData: any) => {
-    try {
-        return await axiosInstance.post("/api/v1/auth/login", formData);
-    } catch (e) {
-        throw e;
-    }
-};
 
-export const updateCustomer = async (id: any, update: any) => {
-    try {
-        return await axiosInstance.put(`/api/v1/customers/update/${id}`, update);
-    } catch (e) {
-        throw e;
-    }
-};
 export const createCustomer = async (formData: any) => {
     try {
         return await axiosInstance.post("/api/v1/customers", formData);
@@ -98,14 +76,3 @@ export const getCustomerWeightHistory= async (entityId: any) => {
     }
 };
 
-export const uploadCustomerProfileImage = async (id: any, formData: any) => {
-    try {
-
-        return axiosInstance.put(`/api/v1/customers/${id}/profile-image`, formData);
-    } catch (e) {
-        throw e;
-    }
-
-};
-
-export const getCustomerProfileImage = (id: any) => `${import.meta.env.VITE_API_BASE_URL}/api/v1/members/${id}/profile-image`;

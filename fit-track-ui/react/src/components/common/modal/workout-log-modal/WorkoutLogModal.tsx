@@ -1,8 +1,8 @@
-import {Workout} from "../../../../types";
 import ReactDOM from "react-dom";
 import {deleteWorkout} from "../../../../services/client.ts";
+import {WorkoutDTO} from "../../../../api/generated/models";
 
-export const WorkoutLogModal = ({isOpen, onClose, workout}: { isOpen: boolean, onClose: any, workout: Workout }) => {
+export const WorkoutLogModal = ({isOpen, onClose, workout}: { isOpen: boolean, onClose: any, workout: WorkoutDTO }) => {
     let date;
     if (workout) {
         date = new Date(workout.workoutDate);

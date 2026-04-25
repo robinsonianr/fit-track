@@ -16,7 +16,7 @@ export interface Customer {
 }
 
 
-export interface Workout {
+export interface WorkoutDTO {
     id?: number;
     title?: string;
     customerId?: string;

@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {Workout} from "../../../../types/index.ts";
+import {WorkoutDTO} from "../../../../types/index.ts";
 import * as echarts from "echarts";
 import {getWeekOf, isDateInSelectedWeek, sortWorkoutsAsc} from "../../../../utils/utilities.ts";
 import {getAllWorkoutsByCustomerId} from "../../../../services/client.ts";
@@ -8,7 +8,7 @@ const DurationWidget = ({weekDate}: { weekDate: string }) => {
     const chartRef = useRef<HTMLDivElement>(null);
     const [durationData, setDurationData] = useState<number[]>([]);
     const [weekOf, setWeekOf] = useState<string[]>([]);
-    const [workoutData, setWorkoutData] = useState<Workout[]>([]);
+    const [workoutData, setWorkoutData] = useState<WorkoutDTO[]>([]);
     const hasAddedHeader = useRef(false);
     const chartInstance = useRef<any>(null);
 

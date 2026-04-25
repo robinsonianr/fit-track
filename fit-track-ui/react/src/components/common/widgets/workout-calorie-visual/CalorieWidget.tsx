@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from "react";
-import {Workout} from "../../../../types/index.ts";
+import {WorkoutDTO} from "../../../../types/index.ts";
 import * as echarts from "echarts";
 import {getWeekOf, isDateInSelectedWeek, sortWorkoutsAsc} from "../../../../utils/utilities.ts";
 import {getAllWorkoutsByCustomerId} from "../../../../services/client.ts";
@@ -10,7 +10,7 @@ const CalorieWidget = ({weekDate}: { weekDate: string }) => {
     const [caloricData, setCaloricData] = useState<number[]>([]);
     const [weekOf, setWeekOf] = useState<string[]>([]);
     const hasAddedHeader = useRef(false);
-    const [workoutData, setWorkoutData] = useState<Workout[]>([]);
+    const [workoutData, setWorkoutData] = useState<WorkoutDTO[]>([]);
 
     useEffect(() => {
         const fetchWorkoutData = async () => {
