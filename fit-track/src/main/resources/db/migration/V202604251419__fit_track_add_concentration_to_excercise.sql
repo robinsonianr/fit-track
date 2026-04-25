@@ -3,7 +3,7 @@ ALTER TABLE fit_tracker.exercises
 
 UPDATE fit_tracker.exercises
     SET concentration = muscle_group
-    WHERE concentration is NULL;
+    WHERE concentration IS NULL;
 
 ALTER TABLE fit_tracker.exercises
     ALTER COLUMN concentration SET NOT NULL;

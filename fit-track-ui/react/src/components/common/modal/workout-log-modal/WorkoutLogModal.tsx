@@ -21,7 +21,7 @@ export const WorkoutLogModal = ({isOpen, onClose, workout}: { isOpen: boolean, o
             <div className="bg-black/50 absolute inset-0" onClick={onClose}></div>
             <div className="bg-[#333] relative z-[10] w-125 h-95 content-center rounded-md flex-col p-4">
                 <span className="text-white cursor-pointer text-2xl absolute top-4 right-4"
-                      onClick={onClose}>&times;</span>
+                    onClick={onClose}>&times;</span>
                 <h2 className="text-2xl font-bold mb-2">Workout: {date?.toDateString()}</h2>
                 <div className="text-white">
                     <p><b>Name:</b> {workout.title}</p>
@@ -44,7 +44,7 @@ export const WorkoutLogModal = ({isOpen, onClose, workout}: { isOpen: boolean, o
                     ))}
                 </div>
                 <button className="bg-red-700 rounded-md p-2 mt-2 cursor-pointer"
-                        onClick={() => removeWorkout(workout.id)}>Delete
+                    onClick={() => removeWorkout(workout.id)}>Delete
                 </button>
             </div>
         </div>,

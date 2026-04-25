@@ -29,7 +29,7 @@ export const SignUp = () => {
             password: data.get("password") as string,
             age: Number(data.get("age")),
             gender: data.get("gender") as Gender,
-        }
+        };
 
         await registerMember(memberRegistrationRequest).then(() => {
             navigate("/login");

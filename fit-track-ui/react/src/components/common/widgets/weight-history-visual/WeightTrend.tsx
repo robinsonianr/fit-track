@@ -12,7 +12,7 @@ const WeightTrend = () => {
     const hasAddedHeader = useRef(false);
     const [monthSpan, setMonthSpan] = useState("one-month");
     const [weightHistory, setWeightHistory] = useState<WeightTrendDTO[]>([]);
-    const {getMemberWeightTrend} = getAuditHistory()
+    const {getMemberWeightTrend} = getAuditHistory();
 
     useEffect(() => {
         const fetchWeightData = async () => {
