@@ -160,9 +160,9 @@ export const Dashboard = () => {
                         </div>
                         <div className="widget-icon-container widget-icon-purple">
                             <svg className="widget-icon icon-purple" fill="none" stroke="currentColor"
-                                 viewBox="0 0 24 24">
+                                viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                      d="M9 6v6m0 0v6m0-6h6m-6 0H9"/>
+                                    d="M9 6v6m0 0v6m0-6h6m-6 0H9"/>
                             </svg>
                         </div>
                     </div>
@@ -179,9 +179,9 @@ export const Dashboard = () => {
                         </div>
                         <div className="widget-icon-container widget-icon-orange">
                             <svg className="widget-icon icon-orange" fill="none" stroke="currentColor"
-                                 viewBox="0 0 24 24">
+                                viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                      d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
+                                    d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
                             </svg>
                         </div>
                     </div>
@@ -198,9 +198,9 @@ export const Dashboard = () => {
                         </div>
                         <div className="widget-icon-container widget-icon-blue">
                             <svg className="widget-icon icon-blue" fill="none" stroke="currentColor"
-                                 viewBox="0 0 24 24">
+                                viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                             </svg>
                         </div>
                     </div>
@@ -219,9 +219,9 @@ export const Dashboard = () => {
                         </div>
                         <div className="widget-icon-container widget-icon-green">
                             <svg className="widget-icon icon-green" fill="none" stroke="currentColor"
-                                 viewBox="0 0 24 24">
+                                viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                      d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
+                                    d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
                             </svg>
                         </div>
                     </div>
@@ -237,7 +237,7 @@ export const Dashboard = () => {
                         <div className="empty-state-icon">
                             <svg className="empty-state-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                      d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
                             </svg>
                         </div>
                         <p className="empty-state-text">No workout data yet</p>
@@ -255,7 +255,7 @@ export const Dashboard = () => {
                         <div className="empty-state-icon">
                             <svg className="empty-state-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                      d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
+                                    d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
                             </svg>
                         </div>
                         <p className="empty-state-text">No weight data yet</p>
@@ -306,7 +306,7 @@ export const Dashboard = () => {
                         <div className="recent-workouts-empty-icon">
                             <svg className="empty-state-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                      d="M9 6v6m0 0v6m0-6h6m-6 0H9"/>
+                                    d="M9 6v6m0 0v6m0-6h6m-6 0H9"/>
                             </svg>
                         </div>
                         <p className="recent-workouts-empty-text">No recent workouts</p>

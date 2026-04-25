@@ -25,7 +25,7 @@ export const Profile = () => {
             }
         };
         fetchData();
-    }, [member])
+    }, [member]);
 
 
     const profile = {
@@ -122,7 +122,7 @@ export const Profile = () => {
                     <div className="flex flex-col items-center">
                         <div className="w-24 h-24 mb-4 relative">
                             <img className="rounded-[50%] object-cover w-20 h-20 z-1"
-                                 src={pfp} alt="pfp"/>
+                                src={pfp} alt="pfp"/>
                             <input
                                 type="file"
                                 ref={fileInputRef}
@@ -162,38 +162,38 @@ export const Profile = () => {
                                 <div className="space-y-2">
                                     <label htmlFor="firstName">First Name</label>
                                     <input name="firstName" type="text" defaultValue={member.name?.split(" ")[0]}
-                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="lastName">Last Name</label>
                                     <input name="lastName" type="text" defaultValue={member.name?.split(" ")[1]}
-                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="age">Age</label>
                                     <input name="age" type="text" defaultValue={healthInfo.age}
-                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="weight">Weight (lbs)</label>
                                     <input name="weight" type="text" defaultValue={healthInfo.weight}
-                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="height">Height (inches)</label>
                                     <input name="height" type="number" defaultValue={healthInfo.height}
-                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="bodyFat">Body Fat%</label>
                                     <input name="bodyFat" type="number" defaultValue={healthInfo.bodyFat}
-                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="gender">Gender</label>
                                     {member && (
                                         <select name="gender" defaultValue={healthInfo.gender}
-                                                className="border-2 border-gray-600 rounded-md p-2 w-full">
+                                            className="border-2 border-gray-600 rounded-md p-2 w-full">
                                             <option value="">
                                                 Select Gender
                                             </option>
@@ -207,7 +207,7 @@ export const Profile = () => {
                                     <label htmlFor="activity">Fitness Experience</label>
                                     {member && (
                                         <select name="activity" defaultValue={healthInfo.activity}
-                                                className="border-2 border-gray-600 rounded-md p-2 w-full">
+                                            className="border-2 border-gray-600 rounded-md p-2 w-full">
                                             <option value="">
                                                 Select Activity Experience
                                             </option>
@@ -223,7 +223,7 @@ export const Profile = () => {
                                 <div className="space-y-2">
                                     <label htmlFor="email">Email</label>
                                     <input name="email" type="text" defaultValue={member.email}
-                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                             </div>
                             <button

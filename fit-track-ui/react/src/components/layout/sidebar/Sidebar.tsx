@@ -43,9 +43,9 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ member, onClo
     };
 
     const goLogout = () => {
-        logOut()
-        navigate("/login")
-    }
+        logOut();
+        navigate("/login");
+    };
 
     return (
         <div ref={ref} className="sidebar">

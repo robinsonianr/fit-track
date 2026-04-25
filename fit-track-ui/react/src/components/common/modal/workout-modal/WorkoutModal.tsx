@@ -128,7 +128,7 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
             <div className="bg-black/50 absolute inset-0" onClick={handleClose}></div>
             <div className="bg-[#333] relative z-[10] w-175 h-185 content-center rounded-md flex-col p-4">
                 <span className=" absolute cursor-pointer text-[#888] top-1 right-3.5"
-                      onClick={handleClose}>&times;</span>
+                    onClick={handleClose}>&times;</span>
                 <h1 className="font-bold">Add Workout</h1>
                 <form className="text-white flex flex-col gap-2 text-sm p-2 mt-2 " onSubmit={handleSubmit}>
                     <div>
@@ -188,7 +188,7 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
                             >
                                 <option value="">Select Exercise</option>
                                 {filteredExercises.map(ex => <option key={ex.title}
-                                                                     value={ex.title}>{ex.title}</option>)}
+                                    value={ex.title}>{ex.title}</option>)}
                             </select>
                         </div>
                     </div>
@@ -198,20 +198,20 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
                                 <div>
                                     <label className="font-bold">Sets</label>
                                     <input placeholder="Sets" type="number"
-                                           onChange={(e) => setSets(parseInt(e.target.value))}
-                                           className="text-sm rounded-md w-full p-2"/>
+                                        onChange={(e) => setSets(parseInt(e.target.value))}
+                                        className="text-sm rounded-md w-full p-2"/>
                                 </div>
                                 <div>
                                     <label className="font-bold">Reps</label>
                                     <input placeholder="Reps" type="number"
-                                           onChange={(e) => setReps(parseInt(e.target.value))}
-                                           className="text-sm rounded-md w-full p-2"/>
+                                        onChange={(e) => setReps(parseInt(e.target.value))}
+                                        className="text-sm rounded-md w-full p-2"/>
                                 </div>
                                 <div>
                                     <label className="font-bold">Weight Per Rep (lbs)</label>
                                     <input placeholder="Weight" type="number"
-                                           onChange={(e) => setWeight(parseFloat(e.target.value))}
-                                           className="text-sm rounded-md w-full p-2"/>
+                                        onChange={(e) => setWeight(parseFloat(e.target.value))}
+                                        className="text-sm rounded-md w-full p-2"/>
                                 </div>
                             </div>
                             <button
@@ -241,12 +241,12 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
                     <div>
                         <label className="font-bold">Calories (kcal)</label>
                         <input className="rounded-md p-2" placeholder="Calories" type="number" name="calories"
-                               required/>
+                            required/>
                     </div>
                     <div>
                         <label className="font-bold">Workout Duration (min)</label>
                         <input className="rounded-md p-2" placeholder="Duration" type="number" name="durationMinutes"
-                               required/>
+                            required/>
                     </div>
                     <button
                         className="bg-[#3f76c0] mt-2 rounded-md text-white hover:bg-[#355a8f] duration-300 cursor-pointer h-9  w-30"

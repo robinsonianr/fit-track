@@ -17,7 +17,7 @@ export const Login = () => {
         const authRequest = {
             email: data.get("email") as string,
             password: data.get("password") as string,
-        }
+        };
 
         try {
             await login(authRequest);
@@ -53,15 +53,15 @@ export const Login = () => {
                         <div className="space-y-2 col-span-2">
                             <label className="mb-4" htmlFor="email">Email</label>
                             <input name="email" type="email"
-                                   className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                         </div>
                         <div className="space-y-2">
                             <label htmlFor="password">Password</label>
                             <input name="password" type="password" autoComplete="current-password"
-                                   className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                         </div>
                         <button type="submit"
-                                className="w-full h-12 bg-[#3f76c0] hover:bg-[#355a8f] duration-300 mt-2 rounded-md cursor-pointer">Login
+                            className="w-full h-12 bg-[#3f76c0] hover:bg-[#355a8f] duration-300 mt-2 rounded-md cursor-pointer">Login
                         </button>
                     </form>
                     {loginError && (

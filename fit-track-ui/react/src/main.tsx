@@ -17,18 +17,18 @@ root.render(
             <AuthProvider>
                 <RouterProvider router={router}/>
                 <Toaster richColors position="top-center"
-                         expand                    // don't collapse
-                         closeButton               // adds an X to
-                         duration={4000}           // default 4s
-                         toastOptions={{
-                             style: {
-                                 padding: "16px 20px",
-                                 fontSize: "1rem",
-                                 minWidth: "360px",    // default ~
-                                 minHeight: "64px",
-                             },
-                             className: "font-medium",
-                         }}
+                    expand                    // don't collapse
+                    closeButton               // adds an X to
+                    duration={4000}           // default 4s
+                    toastOptions={{
+                        style: {
+                            padding: "16px 20px",
+                            fontSize: "1rem",
+                            minWidth: "360px",    // default ~
+                            minHeight: "64px",
+                        },
+                        className: "font-medium",
+                    }}
                 />
             </AuthProvider>
         </ThemeProvider>

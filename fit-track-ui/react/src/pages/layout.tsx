@@ -12,7 +12,7 @@ import {MemberDTO} from "../api/generated/models";
 
 
 export type LayoutContext = {member: MemberDTO}
-export const currentMember = () => useOutletContext<LayoutContext>().member
+export const currentMember = () => useOutletContext<LayoutContext>().member;
 
 const Layout = () => {
     const {member} = useAuth();
@@ -22,7 +22,7 @@ const Layout = () => {
     const sidebarRef = useRef(null);
 
     if (!member) {
-        return <div>Loading...</div>
+        return <div>Loading...</div>;
     }
 
     const getHeaderTitle = () :string  =>  {
