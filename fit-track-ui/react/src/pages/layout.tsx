@@ -12,7 +12,7 @@ import {MemberDTO} from "../api/generated/models";
 
 
 export type LayoutContext = {member: MemberDTO}
-export const currentMember = () => useOutletContext<LayoutContext>().member;
+export const authenticatedMember = () => useOutletContext<LayoutContext>().member;
 
 const Layout = () => {
     const {member} = useAuth();

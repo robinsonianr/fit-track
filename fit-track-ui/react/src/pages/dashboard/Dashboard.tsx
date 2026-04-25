@@ -14,10 +14,10 @@ import {isDateInThisWeek, sortWorkoutsAsc} from "../../utils/utilities.ts";
 import "./dashboard.css";
 import {WorkoutDTO} from "../../api/generated/models";
 import {getWorkoutsApi} from "../../api/generated/endpoints/workouts-api/workouts-api.ts";
-import {currentMember} from "../layout.tsx";
+import {authenticatedMember} from "../layout.tsx";
 
 export const Dashboard = () => {
-    const member = currentMember();
+    const member = authenticatedMember();
     const {getAllWorkoutsByMemberId} = getWorkoutsApi();
     const [workouts, setWorkouts] = useState<WorkoutDTO[]>([]);
 

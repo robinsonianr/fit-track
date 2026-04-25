@@ -1,21 +1,22 @@
 import React, {useEffect, useRef, useState} from "react";
-import {getCustomerWeightHistory} from "../../../../services/client.ts";
 import * as echarts from "echarts";
 import moment from "moment";
+import {WeightTrendDTO} from "../../../../api/generated/models";
+import {getAuditHistory} from "../../../../api/generated/endpoints/audit-history/audit-history.ts";
+import {authenticatedMember} from "../../../../pages/layout.tsx";
 
-const WeightHistory = () => {
+const WeightTrend = () => {
+    const member = authenticatedMember();
     const chartInstance = useRef<any>(null);
     const chartRef = useRef<HTMLDivElement>(null);
     const hasAddedHeader = useRef(false);
     const [monthSpan, setMonthSpan] = useState("one-month");
-    const [weightHistory, setWeightHistory] = useState<[string, any][]>([]);
+    const [weightHistory, setWeightHistory] = useState<WeightTrendDTO[]>([]);
+    const {getMemberWeightTrend} = getAuditHistory()
 
     useEffect(() => {
         const fetchWeightData = async () => {
-            const customerEntityId = localStorage.getItem("customerId");
-            const res = await getCustomerWeightHistory(customerEntityId);
-            setWeightHistory(Object.entries(res.data));
-
+            getMemberWeightTrend(member.id).then(setWeightHistory);
         };
 
         fetchWeightData();
@@ -59,29 +60,29 @@ const WeightHistory = () => {
         return data;
     };
 
-    const getWeightData = (weights: [string, any][], span: string) => {
+    const getWeightData = (weights: WeightTrendDTO[], span: string) => {
         const spanData = getMonthData(span);
         const data: any[] = [];
         let date;
         let j = 0;
 
-        data.push([spanData[0], weights[j][0]]);
+        data.push([spanData[0], weights[0].weight]);
         for (let i = 1; i < spanData.length - 1; i++) {
             if (j >= weights.length) {
                 data.push([spanData[i], null]);
             } else {
-                date = weights[j][1].toString();
+                date = weights[j].date;
                 const newDate = moment(date).format("YYYY-MM-D");
 
                 if (newDate === spanData[i]) {
-                    data.push([spanData[i], weights[j][0]]);
+                    data.push([spanData[i], weights[j].weight]);
                     j++;
                 } else {
                     data.push([spanData[i], null]);
                 }
             }
         }
-        data.push([spanData[spanData.length - 1], weights[weights.length - 1][0]]);
+        data.push([spanData[spanData.length - 1], weights[weights.length - 1].weight]);
 
 
         return data;
@@ -168,4 +169,4 @@ const WeightHistory = () => {
     );
 };
 
-export default WeightHistory;
+export default WeightTrend;

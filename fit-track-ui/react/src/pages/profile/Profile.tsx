@@ -4,11 +4,11 @@ import {Gender, MemberUpdateRequest, WorkoutDTO} from "../../api/generated/model
 import {getWorkoutsApi} from "../../api/generated/endpoints/workouts-api/workouts-api.ts";
 import {buildProfileImage} from "../../services/client.ts";
 import {toast} from "sonner";
-import {currentMember} from "../layout.tsx";
+import {authenticatedMember} from "../layout.tsx";
 
 
 export const Profile = () => {
-    const member = currentMember();
+    const member = authenticatedMember();
     const [workoutData, setWorkoutData] = useState<WorkoutDTO[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const {updateMember, uploadMemberProfileImage} = getMemberApi();

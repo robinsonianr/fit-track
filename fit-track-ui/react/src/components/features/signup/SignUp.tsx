@@ -1,9 +1,11 @@
 import React from "react";
 import {useNavigate} from "react-router-dom";
-import {createCustomer} from "../../../services/client";
+import {getMemberApi} from "../../../api/generated/endpoints/member-api/member-api.ts";
+import {Gender} from "../../../api/generated/models";
 
 export const SignUp = () => {
     const navigate = useNavigate();
+    const {registerMember} = getMemberApi();
 
     const generateAgeOptions = () => {
         const options = [];
@@ -21,9 +23,15 @@ export const SignUp = () => {
         e.preventDefault();
 
         const data = new FormData(e.currentTarget);
-        const formData = Object.fromEntries(data.entries());
+        const memberRegistrationRequest = {
+            name: data.get("name") as string,
+            email: data.get("email") as string,
+            password: data.get("password") as string,
+            age: Number(data.get("age")),
+            gender: data.get("gender") as Gender,
+        }
 
-        await createCustomer(formData).then(() => {
+        await registerMember(memberRegistrationRequest).then(() => {
             navigate("/login");
         });
     };

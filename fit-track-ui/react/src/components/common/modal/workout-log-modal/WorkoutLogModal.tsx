@@ -1,12 +1,13 @@
 import ReactDOM from "react-dom";
-import {deleteWorkout} from "../../../../services/client.ts";
 import {WorkoutDTO} from "../../../../api/generated/models";
+import {getWorkoutsApi} from "../../../../api/generated/endpoints/workouts-api/workouts-api.ts";
 
 export const WorkoutLogModal = ({isOpen, onClose, workout}: { isOpen: boolean, onClose: any, workout: WorkoutDTO }) => {
     let date;
     if (workout) {
         date = new Date(workout.workoutDate);
     }
+    const {deleteWorkout} = getWorkoutsApi();
 
     const removeWorkout = async (id: any) => {
         await deleteWorkout(id);
@@ -19,7 +20,8 @@ export const WorkoutLogModal = ({isOpen, onClose, workout}: { isOpen: boolean, o
         <div className={`fixed inset-0 z-[9999] flex items-center justify-center ${isOpen ? "block" : "hidden"}`}>
             <div className="bg-black/50 absolute inset-0" onClick={onClose}></div>
             <div className="bg-[#333] relative z-[10] w-125 h-95 content-center rounded-md flex-col p-4">
-                <span className="text-white cursor-pointer text-2xl absolute top-4 right-4" onClick={onClose}>&times;</span>
+                <span className="text-white cursor-pointer text-2xl absolute top-4 right-4"
+                      onClick={onClose}>&times;</span>
                 <h2 className="text-2xl font-bold mb-2">Workout: {date?.toDateString()}</h2>
                 <div className="text-white">
                     <p><b>Name:</b> {workout.title}</p>
@@ -30,14 +32,20 @@ export const WorkoutLogModal = ({isOpen, onClose, workout}: { isOpen: boolean, o
                         &nbsp;{workout.durationMinutes! % 60} minute(s)</p>
                 </div>
                 <label className="font-bold">Exercises</label>
-                <div className="max-h-28 overflow-y-auto grid grid-cols-3 gap-4 border-gray-600 border-2 rounded-md p-2">
+                <div
+                    className="max-h-28 overflow-y-auto grid grid-cols-3 gap-4 border-gray-600 border-2 rounded-md p-2">
                     {workout.exercises?.map((exercise, index) => (
-                        <div className="group overflow-hidden h-10 w-full text-white bg-[#222] p-2 border-3 border-white rounded-md flex text-center items-center" key={index}>
-                            <span className="text-xs whitespace-nowrap group-hover:animate-marquee">{exercise.title} - {exercise.sets}x{exercise.reps} @ {exercise.weightPerRep} lbs</span>
+                        <div
+                            className="group overflow-hidden h-10 w-full text-white bg-[#222] p-2 border-3 border-white rounded-md flex text-center items-center"
+                            key={index}>
+                            <span
+                                className="text-xs whitespace-nowrap group-hover:animate-marquee">{exercise.title} - {exercise.sets}x{exercise.reps} @ {exercise.weightPerRep} lbs</span>
                         </div>
                     ))}
                 </div>
-                <button className="bg-red-700 rounded-md p-2 mt-2 cursor-pointer" onClick={() => removeWorkout(workout.id)}>Delete</button>
+                <button className="bg-red-700 rounded-md p-2 mt-2 cursor-pointer"
+                        onClick={() => removeWorkout(workout.id)}>Delete
+                </button>
             </div>
         </div>,
         document.body

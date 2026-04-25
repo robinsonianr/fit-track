@@ -1,5 +1,4 @@
-import axios, { AxiosRequestConfig } from
-    "axios";
+import axios, {AxiosRequestConfig} from "axios";
 
 
 const axiosInstance = axios.create({
@@ -30,7 +29,7 @@ axiosInstance.interceptors.request.use(
 
 export const customInstance = <T>(config:
                                   AxiosRequestConfig): Promise<T> => {
-    return axiosInstance(config).then(({ data }) => data);
+    return axiosInstance(config).then(({data}) => data);
 };
 
 export const buildProfileImage = (id: number) => `${import.meta.env.VITE_API_BASE_URL}/api/v1/members/${id}/profile-image`;
@@ -42,37 +41,3 @@ export const getAllWorkoutsByCustomerId = async (id: any) => {
         throw e;
     }
 };
-
-
-export const createCustomer = async (formData: any) => {
-    try {
-        return await axiosInstance.post("/api/v1/customers", formData);
-    } catch (e) {
-        throw e;
-    }
-};
-
-export const addWorkout = async (formData: any) => {
-    try {
-        return await axiosInstance.post("/api/v1/workouts", formData);
-    } catch (e) {
-        throw e;
-    }
-};
-
-export const deleteWorkout = async (id: any) => {
-    try {
-        return await axiosInstance.delete(`/api/v1/workouts/${id}`);
-    } catch (e) {
-        throw e;
-    }
-};
-
-export const getCustomerWeightHistory= async (entityId: any) => {
-    try {
-        return await axiosInstance.get(`/api/v1/audit/${entityId}`);
-    } catch (e) {
-        throw e;
-    }
-};
-

@@ -1,9 +1,8 @@
 import React, {useEffect, useMemo, useState} from "react";
-import {addWorkout} from "../../../../services/client.ts";
-import {Exercise} from "../../../../types";
 import ReactDOM from "react-dom";
 import {PREDEFINED_EXERCISES} from "../../../../constants/exercises.ts";
-import {MemberDTO} from "../../../../api/generated/models";
+import {ExerciseDTO, MemberDTO} from "../../../../api/generated/models";
+import {getWorkoutsApi} from "../../../../api/generated/endpoints/workouts-api/workouts-api.ts";
 
 
 export const WorkoutModal = ({isOpen, onClose, member}: {
@@ -11,7 +10,7 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
     onClose: any,
     member: MemberDTO | undefined
 }) => {
-    const [selectedExercises, setSelectedExercises] = useState<Exercise[]>([]);
+    const [selectedExercises, setSelectedExercises] = useState<ExerciseDTO[]>([]);
     const [exerciseTitle, setExerciseTitle] = useState("");
     const [sets, setSets] = useState(0);
     const [reps, setReps] = useState(0);
@@ -19,6 +18,7 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
     const [volume, setVolume] = useState(0);
     const [selectedMuscleGroup, setSelectedMuscleGroup] = useState("");
     const [selectedConcentration, setSelectedConcentration] = useState("");
+    const {createWorkout} = getWorkoutsApi();
 
     const muscleGroups = useMemo(() => {
         return [...new Set(PREDEFINED_EXERCISES.map(ex => ex.muscleGroup))];
@@ -57,7 +57,7 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
     const addExercise = (selectedTitle: string, sets: number, reps: number, weight: number) => {
         const predefined = PREDEFINED_EXERCISES.find(ex => ex.title === selectedTitle);
         if (!predefined) return;
-        const newExercise: Exercise = {
+        const newExercise: ExerciseDTO = {
             title: predefined.title,
             description: predefined.description,
             muscleGroup: predefined.muscleGroup,
@@ -77,7 +77,7 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
         setVolume(0);
     };
 
-    const deriveTitle = (exercises: Exercise[]) => {
+    const deriveTitle = (exercises: ExerciseDTO[]) => {
         const muscleGroups = exercises.map(ex => ex.muscleGroup);
         if (muscleGroups.length < 1) {
             return "Non-Valid Workout";
@@ -98,15 +98,17 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
         if (member?.id) {
             try {
                 const inputs = new FormData(e.currentTarget);
-                const formData = Object.fromEntries(inputs.entries());
-                const workoutData = {
-                    ...formData,
+
+                const workoutCreationRequest = {
+                    memberId: member.id,
                     title: deriveTitle(selectedExercises),
-                    customer: {"id": member.id},
                     exercises: selectedExercises,
-                    workoutDate: new Date().toISOString()
+                    workoutType: inputs.get("workoutType") as string,
+                    volume: Number(inputs.get("volume")),
+                    calories: Number(inputs.get("calories")),
+                    durationMinutes: Number(inputs.get("durationMinutes"))
                 };
-                await addWorkout(workoutData);
+                await createWorkout(workoutCreationRequest);
                 onClose();
 
                 setTimeout(() => {

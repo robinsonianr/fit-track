@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from "react";
 import {WorkoutDTO} from "../../../api/generated/models";
 import WorkoutLogModal from "../../common/modal/workout-log-modal/WorkoutLogModal.tsx";
-import {currentMember} from "../../../pages/layout.tsx";
+import {authenticatedMember} from "../../../pages/layout.tsx";
 import {getWorkoutsApi} from "../../../api/generated/endpoints/workouts-api/workouts-api.ts";
 
 const Logs = () => {
-    const member = currentMember();
+    const member = authenticatedMember();
     const {getAllWorkoutsByMemberId} = getWorkoutsApi();
     const [workoutData, setWorkoutData] = useState<WorkoutDTO[]>([]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
