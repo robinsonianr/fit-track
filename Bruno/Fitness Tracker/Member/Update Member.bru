@@ -1,13 +1,17 @@
 meta {
-  name: Update Customer
+  name: Update Member
   type: http
   seq: 4
 }
 
-put {
-  url: {{baseUrl}}:8080/api/v1/customers/update/{{id}}
+patch {
+  url: {{baseUrl}}:8080/api/v1/members/:memberId
   body: json
   auth: bearer
+}
+
+params:path {
+  memberId: 1
 }
 
 auth:bearer {
@@ -16,8 +20,4 @@ auth:bearer {
 
 body:json {
   {"name":"Ian Robinson","email":"ianrrob2@aol.com","age":"24","gender":"Male","weight":"185","height":"71","weightGoal":"175","activity":"Advanced","bodyFat":"23"}
-}
-
-vars:pre-request {
-  id: 1
 }

@@ -1,11 +1,11 @@
 meta {
-  name: Add Customer
+  name: Add Member
   type: http
   seq: 3
 }
 
 post {
-  url: {{baseUrl}}:8080/api/v1/customers
+  url: {{baseUrl}}:8080/api/v1/Members
   body: json
   auth: none
 }
@@ -16,6 +16,6 @@ body:json {
       "email":"lilisaiah01@gmail.com",
       "password":"Test1234",
       "age":"21",
-      "gender":"MALE"
+      "gender":"Male"
   }
 }
