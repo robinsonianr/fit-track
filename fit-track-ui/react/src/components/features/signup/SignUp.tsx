@@ -63,28 +63,28 @@ export const SignUp = () => {
                             <div className="space-y-2">
                                 <label htmlFor="name">Full Name</label>
                                 <input name="name" type="text"
-                                       className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                    className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div className="space-y-2">
                                 <label htmlFor="email">Email</label>
                                 <input name="email" type="email"
-                                       className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                    className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                             </div>
                             <div className="space-y-2">
                                 <label htmlFor="password">Password</label>
                                 <input name="password" type="password" minLength={6}
-                                       className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                    className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label htmlFor="age">Age</label>
                                 <select className="border-2 border-gray-600 rounded-md p-2 w-full" name="age"
-                                        aria-label="Select age"
-                                        title="Select age"
-                                        required>
+                                    aria-label="Select age"
+                                    title="Select age"
+                                    required>
                                     <option value="">Select age</option>
                                     {generateAgeOptions()}
                                 </select>
@@ -92,8 +92,8 @@ export const SignUp = () => {
                             <div className="space-y-2">
                                 <label htmlFor="gender">Gender</label>
                                 <select className="border-2 border-gray-600 rounded-md p-2 w-full" name="gender"
-                                        title="Select gender"
-                                        required>
+                                    title="Select gender"
+                                    required>
                                     <option value="">Select gender</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
@@ -102,7 +102,7 @@ export const SignUp = () => {
                             </div>
                         </div>
                         <button type="submit"
-                                className="w-full h-12 bg-[#3f76c0] hover:bg-[#355a8f] duration-300 mt-2 rounded-md cursor-pointer">Sign
+                            className="w-full h-12 bg-[#3f76c0] hover:bg-[#355a8f] duration-300 mt-2 rounded-md cursor-pointer">Sign
                             Up
                         </button>
                     </form>
