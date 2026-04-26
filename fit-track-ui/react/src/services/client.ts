@@ -27,17 +27,8 @@ axiosInstance.interceptors.request.use(
     }
 );
 
-export const customInstance = <T>(config:
-                                  AxiosRequestConfig): Promise<T> => {
+export const customInstance = async <T>(config: AxiosRequestConfig): Promise<T> => {
     return axiosInstance(config).then(({data}) => data);
 };
 
 export const buildProfileImage = (id: number) => `${import.meta.env.VITE_API_BASE_URL}/api/v1/members/${id}/profile-image`;
-
-export const getAllWorkoutsByCustomerId = async (id: any) => {
-    try {
-        return await axiosInstance.get(`/api/v1/workouts/log/${id}`);
-    } catch (e) {
-        throw e;
-    }
-};
