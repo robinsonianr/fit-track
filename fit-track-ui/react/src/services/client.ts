@@ -1,5 +1,4 @@
-import axios, { AxiosRequestConfig } from
-    "axios";
+import axios, {AxiosRequestConfig} from "axios";
 
 
 const axiosInstance = axios.create({
@@ -28,84 +27,8 @@ axiosInstance.interceptors.request.use(
     }
 );
 
-export const customInstance = <T>(config:
-                                  AxiosRequestConfig): Promise<T> => {
-    return axiosInstance(config).then(({ data }) => data);
+export const customInstance = async <T>(config: AxiosRequestConfig): Promise<T> => {
+    return axiosInstance(config).then(({data}) => data);
 };
 
 export const buildProfileImage = (id: number) => `${import.meta.env.VITE_API_BASE_URL}/api/v1/members/${id}/profile-image`;
-
-export const getCustomer = async (id: any) => {
-    try {
-        return await axiosInstance.get(`/api/v1/customers/${id}`);
-    } catch (e) {
-        throw e;
-    }
-};
-
-export const getAllWorkoutsByCustomerId = async (id: any) => {
-    try {
-        return await axiosInstance.get(`/api/v1/workouts/log/${id}`);
-    } catch (e) {
-        throw e;
-    }
-};
-
-export const login = async (formData: any) => {
-    try {
-        return await axiosInstance.post("/api/v1/auth/login", formData);
-    } catch (e) {
-        throw e;
-    }
-};
-
-export const updateCustomer = async (id: any, update: any) => {
-    try {
-        return await axiosInstance.put(`/api/v1/customers/update/${id}`, update);
-    } catch (e) {
-        throw e;
-    }
-};
-export const createCustomer = async (formData: any) => {
-    try {
-        return await axiosInstance.post("/api/v1/customers", formData);
-    } catch (e) {
-        throw e;
-    }
-};
-
-export const addWorkout = async (formData: any) => {
-    try {
-        return await axiosInstance.post("/api/v1/workouts", formData);
-    } catch (e) {
-        throw e;
-    }
-};
-
-export const deleteWorkout = async (id: any) => {
-    try {
-        return await axiosInstance.delete(`/api/v1/workouts/${id}`);
-    } catch (e) {
-        throw e;
-    }
-};
-
-export const getCustomerWeightHistory= async (entityId: any) => {
-    try {
-        return await axiosInstance.get(`/api/v1/audit/${entityId}`);
-    } catch (e) {
-        throw e;
-    }
-};
-
-export const uploadCustomerProfileImage = async (id: any, formData: any) => {
-    try {
-
-        return axiosInstance.put(`/api/v1/customers/${id}/profile-image`, formData);
-    } catch (e) {
-        throw e;
-    }
-
-};
-
-export const getCustomerProfileImage = (id: any) => `${import.meta.env.VITE_API_BASE_URL}/api/v1/members/${id}/profile-image`;

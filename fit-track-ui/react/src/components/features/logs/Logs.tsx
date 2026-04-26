@@ -1,21 +1,22 @@
 import React, {useEffect, useState} from "react";
-import {getAllWorkoutsByCustomerId} from "../../../services/client.ts";
-import {Workout} from "../../../types";
+import {WorkoutDTO} from "../../../api/generated/models";
 import WorkoutLogModal from "../../common/modal/workout-log-modal/WorkoutLogModal.tsx";
+import {authenticatedMember} from "../../../pages/layout.tsx";
+import {getWorkoutsApi} from "../../../api/generated/endpoints/workouts-api/workouts-api.ts";
 
 const Logs = () => {
-    const [workoutData, setWorkoutData] = useState<Workout[]>([]);
+    const member = authenticatedMember();
+    const {getAllWorkoutsByMemberId} = getWorkoutsApi();
+    const [workoutData, setWorkoutData] = useState<WorkoutDTO[]>([]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
-    const [selectedWorkout, setSelectedWorkout] = useState<Workout>();
+    const [selectedWorkout, setSelectedWorkout] = useState<WorkoutDTO>();
     const [hoverDay, setHoverDay] = useState<number | null>(null);
 
     // Fetch customer data when component mounts
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const id = localStorage.getItem("customerId");
-                const response= await getAllWorkoutsByCustomerId(id);
-                setWorkoutData(response.data);
+                getAllWorkoutsByMemberId(member.id).then(setWorkoutData);
             } catch (error) {
                 console.error("Could not retrieve customer: ", error);
             }

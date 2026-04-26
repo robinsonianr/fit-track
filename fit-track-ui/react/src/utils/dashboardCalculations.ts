@@ -1,5 +1,4 @@
-import { Workout } from "../types";
-
+import {WorkoutDTO} from "../api/generated/models";
 /**
  * Gets the start of the current week (Monday at 00:00:00)
  * Weeks run Monday-Sunday
@@ -45,7 +44,7 @@ export const isDateInCurrentWeek = (date: Date | string): boolean => {
 /**
  * Filters workout to only include current week
  */
-export const filterWorkoutsThisWeek = (workouts: Workout[]): Workout[] => {
+export const filterWorkoutsThisWeek = (workouts: WorkoutDTO[]): WorkoutDTO[] => {
     if (!workouts || workouts.length === 0) return [];
 
     return workouts.filter(workout => 
@@ -57,7 +56,7 @@ export const filterWorkoutsThisWeek = (workouts: Workout[]): Workout[] => {
  * Calculates total calories burned from workouts
  * Handles null / undefined values safely 
  */
-export const calculateTotalCalories = (workouts: Workout[]): number => {
+export const calculateTotalCalories = (workouts: WorkoutDTO[]): number => {
     if (!workouts || workouts.length === 0) return 0;
 
     return workouts.reduce((total, workout) => {
@@ -69,7 +68,7 @@ export const calculateTotalCalories = (workouts: Workout[]): number => {
 /**
  * Calculates total active minutes from workouts
  */
-export const calculateTotalMinutes = (workouts: Workout[]): number => {
+export const calculateTotalMinutes = (workouts: WorkoutDTO[]): number => {
     if (!workouts || workouts.length === 0) return 0;
 
     return workouts.reduce((total, workout) => {
@@ -83,7 +82,7 @@ export const calculateTotalMinutes = (workouts: Workout[]): number => {
  * Only count workouts that have volume (typically strength training)
  * If volume is not provided, calculates it from exercises (sets * reps * weightPerRep)
  */
-export const calculateTotalVolume = (workouts: Workout[]): number => {
+export const calculateTotalVolume = (workouts: WorkoutDTO[]): number => {
     if (!workouts || workouts.length === 0) return 0;
 
     return workouts.reduce((total, workout) => {
@@ -98,7 +97,7 @@ export const calculateTotalVolume = (workouts: Workout[]): number => {
                 const sets = exercise.sets ?? 0;
                 const reps = exercise.reps ?? 0;
                 const weightPerRep = exercise.weightPerRep ?? 0;
-                const multiplier = exercise.dumbbells ? 2 : 1;
+                const multiplier = exercise.equipment == "dumbbells" ? 2 : 1;
                 return exerciseTotal + (sets * reps * weightPerRep * multiplier);
             }, 0);
             return total + workoutVolume;
@@ -120,8 +119,8 @@ export const formatNumber = (nums: number): string => {
  * Returns formatted string like "+12%" or "-5%"
  */
 export const calculateVolumeChange = (
-    currentWeekWorkouts: Workout[],
-    allWorkouts: Workout[]
+    currentWeekWorkouts: WorkoutDTO[],
+    allWorkouts: WorkoutDTO[]
 ): string => {
     // Get last week's date range
     const lastWeekStart = new Date(getWeekStart());

@@ -1,35 +1,50 @@
 import React, {useEffect, useRef, useState} from "react";
 import {getMemberApi} from "../../api/generated/endpoints/member-api/member-api.ts";
-import {MemberDTO, MemberUpdateRequest, Gender, WorkoutDTO} from "../../api/generated/models";
+import {Gender, MemberUpdateRequest, WorkoutDTO} from "../../api/generated/models";
 import {getWorkoutsApi} from "../../api/generated/endpoints/workouts-api/workouts-api.ts";
 import {buildProfileImage} from "../../services/client.ts";
 import {toast} from "sonner";
+import {authenticatedMember} from "../layout.tsx";
 
 
 export const Profile = () => {
-    const [member, setMember] = useState<MemberDTO>();
+    const member = authenticatedMember();
     const [workoutData, setWorkoutData] = useState<WorkoutDTO[]>([]);
-    const defaultImg = "/assets/user.png";
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const id = Number.parseInt(localStorage.getItem("customerId")!);
-    const {getMember, updateMember, uploadMemberProfileImage} = getMemberApi();
+    const {updateMember, uploadMemberProfileImage} = getMemberApi();
     const {getAllWorkoutsByMemberId} = getWorkoutsApi();
 
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                if (member) {
+                    getAllWorkoutsByMemberId(member.id).then(setWorkoutData);
+                }
+            } catch (error) {
+                console.error("Could not retrieve member: ", error);
+            }
+        };
+        fetchData();
+    }, [member]);
+
+    if (!member) {
+        return <div>Loading...</div>;
+    }
 
     const profile = {
-        name: member?.name,
-        email: member?.email,
-        memberSince: member?.memberSince
+        name: member.name,
+        email: member.email,
+        memberSince: member.memberSince
     };
 
     const healthInfo = {
-        age: member?.age,
-        gender: member?.gender,
-        weight: member?.weight,
-        height: member?.height,
-        weightGoal: member?.weightGoal,
-        activity: member?.activity,
-        bodyFat: member?.bodyFat
+        age: member.age,
+        gender: member.gender,
+        weight: member.weight,
+        height: member.height,
+        weightGoal: member.weightGoal,
+        activity: member.activity,
+        bodyFat: member.bodyFat
     };
 
 
@@ -40,23 +55,8 @@ export const Profile = () => {
     ];
     const month = new Date(profileMember!).getMonth();
     const memberDate = monthNames[month] + " " + new Date(profileMember!).getFullYear();
-    const pfp = member?.profileImageId ? buildProfileImage(id) : defaultImg;
-
-
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const memberId = id;
-                const customerResp = await getMember(memberId);
-                const workoutsResp = await getAllWorkoutsByMemberId(memberId);
-                setWorkoutData(workoutsResp);
-                setMember(customerResp);
-            } catch (error) {
-                console.error("Could not retrieve customer: ", error);
-            }
-        };
-        fetchData();
-    }, [id]);
+    const defaultImg = "/assets/user.png";
+    const pfp = member.profileImageId ? buildProfileImage(member.id) : defaultImg;
 
 
     const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,8 +69,10 @@ export const Profile = () => {
 
     const uploadPFP = async (file: File) => {
         try {
-            const msg = await uploadMemberProfileImage(id, {file});
-            toast.success(msg.message);
+            if (member.id) {
+                const msg = await uploadMemberProfileImage(member.id, {file});
+                toast.success(msg.message);
+            }
         } catch (error) {
             console.error("File upload failed", error);
         }
@@ -99,13 +101,12 @@ export const Profile = () => {
             bodyFat: Number(formData.get("bodyFat")) || undefined
         };
 
-        if (member?.id) {
+        if (member.id) {
             try {
-                const response = await updateMember(member?.id, update);
-                setMember(response);
+                await updateMember(member.id, update);
                 toast.success("Profile updated successfully!");
             } catch (error) {
-                console.error("Failed to update customer.", error);
+                console.error("Failed to update member.", error);
                 toast.error("Failed to update profile.");
             }
         }
@@ -137,7 +138,7 @@ export const Profile = () => {
                                 onClick={handleButtonClick}>✎
                             </button>
                         </div>
-                        <h2 className="text-2xl text-black dark:text-white mb-2 font-bold">{member?.name}</h2>
+                        <h2 className="text-2xl text-black dark:text-white mb-2 font-bold">{member.name}</h2>
                         <p className="text-xl text-black dark:text-gray-400 mb-2">Fitness
                             Experience: {healthInfo.activity}</p>
                         <div className="grid grid-cols-2 gap-4 w-full text-center p-6">
@@ -163,12 +164,12 @@ export const Profile = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div className="space-y-2">
                                     <label htmlFor="firstName">First Name</label>
-                                    <input name="firstName" type="text" defaultValue={member?.name?.split(" ")[0]}
+                                    <input name="firstName" type="text" defaultValue={member.name?.split(" ")[0]}
                                         className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="lastName">Last Name</label>
-                                    <input name="lastName" type="text" defaultValue={member?.name?.split(" ")[1]}
+                                    <input name="lastName" type="text" defaultValue={member.name?.split(" ")[1]}
                                         className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
@@ -224,7 +225,7 @@ export const Profile = () => {
                             <div className="space-y-4 w-full">
                                 <div className="space-y-2">
                                     <label htmlFor="email">Email</label>
-                                    <input name="email" type="text" defaultValue={member?.email}
+                                    <input name="email" type="text" defaultValue={member.email}
                                         className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                             </div>

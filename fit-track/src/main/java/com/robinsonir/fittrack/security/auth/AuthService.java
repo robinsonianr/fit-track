@@ -28,8 +28,8 @@ public class AuthService {
                         request.password()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         MemberEntity principal = (MemberEntity) authentication.getPrincipal();
-        MemberDTO customer = memberMapper.memberEntityToMemberDTO(principal);
-        var token = jwtUtil.generateToken(customer.username(), customer.roles());
-        return new AuthResponse(token, customer.id());
+        MemberDTO member = memberMapper.memberEntityToMemberDTO(principal);
+        var token = jwtUtil.generateToken(member.username(), member.roles());
+        return new AuthResponse(token, member);
     }
 }

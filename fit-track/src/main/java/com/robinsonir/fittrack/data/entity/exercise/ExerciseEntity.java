@@ -30,4 +30,7 @@ public class ExerciseEntity extends AbstractEntity {
 
     @Column(name = "weight_per_rep", nullable = false)
     private Integer weightPerRep;
+
+    @Column(name = "concentration", nullable = false)
+    private String concentration;
 }

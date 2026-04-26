@@ -1,50 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
-import { getCustomerProfileImage } from "../../../services/client.ts";
-import axios from "axios";
+import {buildProfileImage} from "../../../services/client.ts";
 import { ThemeToggle } from "../../ui/theme-toggle";
 import "./header.css";
+import {MemberDTO} from "../../../api/generated/models";
 
 interface HeaderProps {
     collapsed: boolean;
     setCollapsed: (collapsed: boolean) => void;
-    name?: string;
+    member: MemberDTO;
     title: string;
 }
 
-const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed, name, title}) => {
+const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed, member, title}) => {
     const navigate = useNavigate();
     const defaultImg = "/assets/user.png";
-    const [pfp, setPfp] = useState<string | undefined>(undefined);
-
-    const fetchPfp = async () => {
-        try {
-            const id = localStorage.getItem("customerId")!;
-            const res = getCustomerProfileImage(id);
-            const isImage = await checkImageUrl(res);
-
-            if (isImage) {
-                setPfp(res);
-            }
-        } catch (error) {
-            console.error("Could not retrieve customer profile image: ", error);
-        }
-    };
-
-    const checkImageUrl = async (url: string): Promise<boolean> => {
-        try {
-            const response = await axios.get(url);
-            const contentType = response.headers["content-type"];
-            return contentType && contentType.startsWith("image/");
-        } catch (error) {
-            console.error("Error checking image URL:", error);
-            return false;
-        }
-    };
-
-    useEffect(() => {
-        fetchPfp();
-    }, []);
+    const pfp = member.profileImageId ? buildProfileImage(member.id) : defaultImg;
 
     const handleProfileClick = () => {
         navigate("/profile");
@@ -81,12 +52,12 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed, name, title}) 
                     className="profile-group"
                     onClick={handleProfileClick}
                 >
-                    <img 
-                        src={pfp != undefined ? pfp : defaultImg} 
-                        alt="profile"
-                        className="profile-image"
+                    <img
+                        src={pfp}
+                        alt="pfp"
+                        className="rounded-[50%] object-cover w-8 h-8 z-1"
                     />
-                    <span className="profile-name">{name || "User"}</span>
+                    <span className="profile-name">{member.name || "User"}</span>
                 </div>
             </div>
         </header>

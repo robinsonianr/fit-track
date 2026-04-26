@@ -1,4 +1,4 @@
-import {Workout} from "../types";
+import { WorkoutDTO } from "../api/generated/models";
 
 export function isDateInThisWeek(date: Date){
     const todayObj = new Date();
@@ -42,13 +42,13 @@ export function isDateInSelectedWeek(date: Date, selectedWeek: Date){
     // Check if the input date is within the current week
     return date >= firstDayOfWeek && date <= lastDayOfWeek;
 }
-export function sortWorkouts(workouts: Workout[]): Workout[] {
+export function sortWorkouts(workouts: WorkoutDTO[]): WorkoutDTO[] {
     return workouts.sort((a, b) => {
         return new Date(b.workoutDate).getTime() - new Date(a.workoutDate).getTime();
     });
 }
 
-export function sortWorkoutsAsc(workouts: Workout[]): Workout[] {
+export function sortWorkoutsAsc(workouts: WorkoutDTO[]): WorkoutDTO[] {
     return workouts.sort((a, b) => {
         return new Date(a.workoutDate).getTime() - new Date(b.workoutDate).getTime();
     });
