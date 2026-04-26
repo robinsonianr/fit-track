@@ -1,11 +1,13 @@
-import React from "react";
+import React, {useState} from "react";
 import {useNavigate} from "react-router-dom";
-import {getMemberApi} from "../../../api/generated/endpoints/member-api/member-api.ts";
 import {Gender} from "../../../api/generated/models";
+import {useAuth} from "../../../context/AuthContext.tsx";
 
 export const SignUp = () => {
     const navigate = useNavigate();
-    const {registerMember} = getMemberApi();
+    const {register} = useAuth();
+
+    const [signUpError, setSignUpError] = useState<string | null>(null);
 
     const generateAgeOptions = () => {
         const options = [];
@@ -21,6 +23,7 @@ export const SignUp = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        setSignUpError(null);
 
         const data = new FormData(e.currentTarget);
         const memberRegistrationRequest = {
@@ -31,9 +34,13 @@ export const SignUp = () => {
             gender: data.get("gender") as Gender,
         };
 
-        await registerMember(memberRegistrationRequest).then(() => {
-            navigate("/login");
-        });
+        try {
+            await register(memberRegistrationRequest);
+            navigate("/dashboard");
+        } catch (error) {
+            console.error(error);
+            setSignUpError("Registration failed: Email may already be in use.");
+        }
     };
 
 
@@ -48,32 +55,36 @@ export const SignUp = () => {
                         Fit Track
                     </div>
                 </div>
-                <div className=" bg-white dark:bg-[#333] border border-gray-400 dark:border-gray-600 flex flex-col rounded-lg justify-center items-center w-150 h-150">
+                <div
+                    className=" bg-white dark:bg-[#333] border border-gray-400 dark:border-gray-600 flex flex-col rounded-lg justify-center items-center w-150 h-150">
                     <h2 className="mb-5 text-3xl font-bold">Create Your Account</h2>
                     <form className="space-y-4 mb-2" onSubmit={handleSubmit}>
                         <div className="grid grid-cols-1 gap-3">
                             <div className="space-y-2">
                                 <label htmlFor="name">Full Name</label>
-                                <input name="name" type="text" className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                <input name="name" type="text"
+                                       className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                             <div className="space-y-2">
                                 <label htmlFor="email">Email</label>
-                                <input name="email" type="email" className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                <input name="email" type="email"
+                                       className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                             </div>
                             <div className="space-y-2">
                                 <label htmlFor="password">Password</label>
-                                <input name="password" type="password" minLength={6} className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                <input name="password" type="password" minLength={6}
+                                       className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                             </div>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
                                 <label htmlFor="age">Age</label>
                                 <select className="border-2 border-gray-600 rounded-md p-2 w-full" name="age"
-                                    aria-label="Select age"
-                                    title="Select age"
-                                    required>
+                                        aria-label="Select age"
+                                        title="Select age"
+                                        required>
                                     <option value="">Select age</option>
                                     {generateAgeOptions()}
                                 </select>
@@ -81,8 +92,8 @@ export const SignUp = () => {
                             <div className="space-y-2">
                                 <label htmlFor="gender">Gender</label>
                                 <select className="border-2 border-gray-600 rounded-md p-2 w-full" name="gender"
-                                    title="Select gender"
-                                    required>
+                                        title="Select gender"
+                                        required>
                                     <option value="">Select gender</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
@@ -90,8 +101,14 @@ export const SignUp = () => {
                                 </select>
                             </div>
                         </div>
-                        <button type="submit" className="w-full h-12 bg-[#3f76c0] hover:bg-[#355a8f] duration-300 mt-2 rounded-md cursor-pointer">Sign Up</button>
+                        <button type="submit"
+                                className="w-full h-12 bg-[#3f76c0] hover:bg-[#355a8f] duration-300 mt-2 rounded-md cursor-pointer">Sign
+                            Up
+                        </button>
                     </form>
+                    {signUpError && (
+                        <div className="text-red-700 text-sm">{signUpError}</div>
+                    )}
                     <a href="/login">Already have an account? Login</a>
                 </div>
             </div>

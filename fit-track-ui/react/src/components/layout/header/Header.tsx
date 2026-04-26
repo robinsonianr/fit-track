@@ -15,7 +15,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed, member, title}) => {
     const navigate = useNavigate();
     const defaultImg = "/assets/user.png";
-    const pfp = member != null ? buildProfileImage(member.id) : defaultImg;
+    const pfp = member.profileImageId ? buildProfileImage(member.id) : defaultImg;
 
     const handleProfileClick = () => {
         navigate("/profile");
@@ -52,10 +52,10 @@ const Header: React.FC<HeaderProps> = ({ collapsed, setCollapsed, member, title}
                     className="profile-group"
                     onClick={handleProfileClick}
                 >
-                    <img 
+                    <img
                         src={pfp}
-                        alt="profile"
-                        className="profile-image"
+                        alt="pfp"
+                        className="rounded-[50%] object-cover w-8 h-8 z-1"
                     />
                     <span className="profile-name">{member.name || "User"}</span>
                 </div>

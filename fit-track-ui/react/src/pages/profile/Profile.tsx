@@ -27,6 +27,9 @@ export const Profile = () => {
         fetchData();
     }, [member]);
 
+    if (!member) {
+        return <div>Loading...</div>;
+    }
 
     const profile = {
         name: member.name,

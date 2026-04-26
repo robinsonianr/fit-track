@@ -1,6 +1,6 @@
-import {createContext, useContext, useEffect, useState} from "react";
-import jwtDecode from "jwt-decode";
-import {AuthRequest, MemberDTO} from "../api/generated/models";
+import {createContext, useContext, useEffect, useMemo, useState} from "react";
+import jwtDecode, {JwtPayload} from "jwt-decode";
+import {AuthRequest, MemberDTO, MemberRegistrationRequest} from "../api/generated/models";
 import {getMemberApi} from "../api/generated/endpoints/member-api/member-api.ts";
 import {getAuthApi} from "../api/generated/endpoints/auth-api/auth-api.ts";
 
@@ -8,6 +8,7 @@ import {getAuthApi} from "../api/generated/endpoints/auth-api/auth-api.ts";
 type AuthContextType = {
     member: MemberDTO | undefined;
     login: (authRequest: AuthRequest) => Promise<void>;
+    register: (req: MemberRegistrationRequest) => Promise<void>;
     logOut: () => void;
     isMemberAuthenticated: () => boolean;
 };
@@ -16,15 +17,16 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const AuthProvider = ({children}: { children: any }) => {
-    const {me: fetchMe} = getMemberApi();
+    const {me: fetchMe} = useMemo(() => getMemberApi(), []);
+    const {registerMember} = useMemo(() => getMemberApi(), []);
     const {login: performLogin} = getAuthApi();
     const [member, setMember] = useState<MemberDTO | undefined>();
 
     useEffect(() => {
-        if (localStorage.getItem("access_token")) {
+        if (localStorage.getItem("access_token") && isMemberAuthenticated()) {
             fetchMe().then(setMember).catch(logOut);
         }
-    }, []);
+    }, [fetchMe]);
 
 
     const login = async (authRequest: AuthRequest): Promise<void> => {
@@ -41,6 +43,19 @@ const AuthProvider = ({children}: { children: any }) => {
         }
     };
 
+    const register = async (req: MemberRegistrationRequest): Promise<void> => {
+        try {
+            const response = await registerMember(req);
+            const jwtToken = response.jwtToken;
+            if (jwtToken !== undefined) {
+                localStorage.setItem("access_token", jwtToken);
+            }
+            setMember(response.member);
+        } catch (error) {
+            throw new Error("Failed to register:" + error, {cause: error});
+        }
+    };
+
     const logOut = () => {
         localStorage.removeItem("access_token");
         setMember(undefined);
@@ -52,7 +67,10 @@ const AuthProvider = ({children}: { children: any }) => {
         if (!token) {
             return false;
         }
-        const decodeToken: any = jwtDecode(token);
+        const decodeToken = jwtDecode<JwtPayload>(token);
+        if (!decodeToken.exp) {
+            return false;
+        }
         const expiration = decodeToken.exp;
         if (Date.now() > expiration * 1000) {
             logOut();
@@ -65,6 +83,7 @@ const AuthProvider = ({children}: { children: any }) => {
         <AuthContext.Provider value={{
             member: member,
             login: login,
+            register: register,
             logOut,
             isMemberAuthenticated,
         }}>
