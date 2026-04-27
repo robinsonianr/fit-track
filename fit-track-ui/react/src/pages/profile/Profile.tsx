@@ -75,6 +75,7 @@ export const Profile = () => {
             }
         } catch (error) {
             console.error("File upload failed", error);
+            toast.error("Failed to upload profile image.");
         }
     };
 

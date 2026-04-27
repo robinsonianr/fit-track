@@ -1,17 +1,17 @@
 import {Outlet, useLocation, useOutletContext} from "react-router-dom";
-import { useMediaQuery } from "@uidotdev/usehooks";
-import { useRef, useState} from "react";
+import {useMediaQuery} from "@uidotdev/usehooks";
+import {useRef, useState} from "react";
 
-import { Sidebar } from "../components/layout/sidebar/Sidebar";
+import Sidebar from "../components/layout/sidebar/Sidebar";
 import Header from "../components/layout/header/Header";
 
-import { cn } from "../utils/cn";
+import {cn} from "../utils/cn";
 import "./layout.css";
 import {useAuth} from "../context/AuthContext.tsx";
 import {MemberDTO} from "../api/generated/models";
 
 
-export type LayoutContext = {member: MemberDTO}
+export type LayoutContext = { member: MemberDTO }
 export const authenticatedMember = () => useOutletContext<LayoutContext>().member;
 
 const Layout = () => {
@@ -25,7 +25,7 @@ const Layout = () => {
         return <div>Loading...</div>;
     }
 
-    const getHeaderTitle = () :string  =>  {
+    const getHeaderTitle = (): string => {
         const currentPage = location.pathname.split("/")[1];
 
         switch (currentPage) {
@@ -51,39 +51,39 @@ const Layout = () => {
         <div className="layout-container">
             {/* Mobile overlay */}
             {sidebarOpen && !isLargeScreen && (
-                <div className="mobile-overlay" onClick={handleOverlayClick} />
+                <div className="mobile-overlay" onClick={handleOverlayClick}/>
             )}
-            
+
             {/* Sidebar - hidden on mobile, visible on large screens */}
             <div className={cn(
                 "sidebar-container",
                 isLargeScreen ? "sidebar-visible" : sidebarOpen ? "sidebar-visible" : "sidebar-hidden"
             )}>
-                <Sidebar 
-                    ref={sidebarRef} 
-                    collapsed={false} 
+                <Sidebar
+                    ref={sidebarRef}
+                    collapsed={false}
                     member={member}
                     onClose={() => setSidebarOpen(false)}
                 />
             </div>
-            
+
             {/* Main content area */}
             <div className={cn(
                 "main-content",
                 isLargeScreen ? "main-content-desktop" : "main-content-mobile"
             )}>
-                <Header 
+                <Header
                     collapsed={false}
                     setCollapsed={() => setSidebarOpen(!sidebarOpen)}
                     member={member}
                     title={getHeaderTitle()}
                 />
                 <div className="content-area">
-                    <Outlet context={{ member } satisfies LayoutContext} />
+                    <Outlet context={{member} satisfies LayoutContext}/>
                 </div>
             </div>
         </div>
     );
 };
- 
+
 export default Layout;

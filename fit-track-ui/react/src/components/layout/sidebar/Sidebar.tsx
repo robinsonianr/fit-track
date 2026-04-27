@@ -1,19 +1,19 @@
-import { useState, forwardRef } from "react";
-import { useAuth } from "../../../context/AuthContext";
-import {useNavigate, useLocation} from "react-router-dom";
+import {forwardRef, useState} from "react";
+import {useAuth} from "../../../context/AuthContext";
+import {useLocation, useNavigate} from "react-router-dom";
 import WorkoutModal from "../../common/modal/workout-modal/WorkoutModal.tsx";
-import { cn } from "../../../utils/cn";
+import {cn} from "../../../utils/cn";
 import "./sidebar.css";
 import {MemberDTO} from "../../../api/generated/models";
 
 interface SidebarProps {
-    member: MemberDTO| undefined;
+    member: MemberDTO | undefined;
     collapsed?: boolean;
     onClose?: () => void;
 }
 
-export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ member, onClose }, ref) => {
-    const { logOut } = useAuth();
+const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({member, onClose}, ref) => {
+    const {logOut} = useAuth();
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -42,24 +42,19 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ member, onClo
         onClose?.();
     };
 
-    const goLogout = () => {
-        logOut();
-        navigate("/login");
-    };
-
     return (
         <div ref={ref} className="sidebar">
-            <WorkoutModal isOpen={isModalOpen} onClose={closeModal} member={member} />
-            
+            <WorkoutModal isOpen={isModalOpen} onClose={closeModal} member={member}/>
+
             {/* Header with close button for mobile */}
             <div className="sidebar-header">
                 <div className="brand-group" onClick={goDash}>
                     <img src="/assets/weight.png" alt="Gym Icon" className="brand-icon"/>
                     <span className="brand-title">FitTrack</span>
                 </div>
-                
+
                 {/* Close button for mobile */}
-                <button 
+                <button
                     onClick={onClose}
                     className="close-button"
                     aria-label="Close sidebar"
@@ -70,12 +65,12 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ member, onClo
                     </svg>
                 </button>
             </div>
-            
+
             {/* Navigation */}
             <div className="sidebar-nav">
                 <ul className="nav-list">
                     <li>
-                        <button 
+                        <button
                             onClick={goDash}
                             className={cn(
                                 "nav-item",
@@ -87,7 +82,7 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ member, onClo
                         </button>
                     </li>
                     <li>
-                        <button 
+                        <button
                             onClick={goLogs}
                             className={cn(
                                 "nav-item",
@@ -99,7 +94,7 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ member, onClo
                         </button>
                     </li>
                     <li>
-                        <button 
+                        <button
                             onClick={goProfile}
                             className={cn(
                                 "nav-item",
@@ -112,17 +107,17 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ member, onClo
                     </li>
                 </ul>
             </div>
-            
+
             {/* Add workout button */}
             <div className="sidebar-footer">
                 <button onClick={openModal} className="add-workout-button">
                     + Add Workout
                 </button>
             </div>
-            
+
             {/* Logout */}
             <div className="sidebar-footer">
-                <button onClick={goLogout} className="logout-button">
+                <button onClick={logOut} className="logout-button">
                     Logout
                 </button>
             </div>
@@ -133,4 +128,3 @@ export const Sidebar = forwardRef<HTMLDivElement, SidebarProps>(({ member, onClo
 Sidebar.displayName = "Sidebar";
 
 export default Sidebar;
-
