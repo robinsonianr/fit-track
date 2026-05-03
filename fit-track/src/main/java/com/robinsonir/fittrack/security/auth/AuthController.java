@@ -4,8 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,11 +23,8 @@ public class AuthController {
     @ApiResponse(responseCode = "400", description = "Invalid request")
     @Operation(security = {}, summary = "Login")
     @PostMapping("login")
-    public ResponseEntity<AuthResponse> login(
+    public AuthResponse login(
             @Parameter(description = "request") @RequestBody AuthRequest request) {
-        AuthResponse response = authService.login(request);
-        return ResponseEntity.ok()
-                .header(HttpHeaders.AUTHORIZATION, response.jwtToken())
-                .body(response);
+        return authService.login(request);
     }
 }

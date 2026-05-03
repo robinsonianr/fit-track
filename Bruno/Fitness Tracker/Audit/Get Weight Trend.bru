@@ -1,13 +1,17 @@
 meta {
-  name: Audit History
+  name: Get Weight Trend
   type: http
   seq: 1
 }
 
 get {
-  url: {{baseUrl}}:8080/api/v1/audit/{{entityId}}
+  url: {{baseUrl}}:8080/api/v1/audit/weight/:memberId
   body: none
   auth: bearer
+}
+
+params:path {
+  memberId: 1
 }
 
 auth:bearer {

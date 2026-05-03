@@ -10,7 +10,6 @@ COPY openapi/api.json /app/openapi/api.json
 COPY fit-track-ui/react ./
 
 RUN echo "VITE_API_BASE_URL=${api_base_url}" > .env
-RUN npm run api:gen
 
 EXPOSE 5173
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \

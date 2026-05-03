@@ -1,23 +1,24 @@
 package com.robinsonir.fittrack.api;
 
+import com.robinsonir.fittrack.data.entity.member.MemberEntity;
 import com.robinsonir.fittrack.data.repository.member.MemberDTO;
 import com.robinsonir.fittrack.data.service.member.MemberRegistrationRequest;
 import com.robinsonir.fittrack.data.service.member.MemberService;
 import com.robinsonir.fittrack.data.service.member.MemberUpdateRequest;
+import com.robinsonir.fittrack.mappers.MemberMapper;
 import com.robinsonir.fittrack.messages.ApiMessage;
 import com.robinsonir.fittrack.messages.FitTrackMessageKeys;
+import com.robinsonir.fittrack.security.auth.AuthResponse;
 import com.robinsonir.fittrack.security.jwt.JwtTokenUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -27,11 +28,18 @@ public class MemberController {
     private final MemberService memberService;
 
     private final JwtTokenUtil jwtUtil;
+    private final MemberMapper memberMapper;
 
     public MemberController(MemberService memberService,
-                            JwtTokenUtil jwtUtil) {
+                            JwtTokenUtil jwtUtil, MemberMapper memberMapper) {
         this.memberService = memberService;
         this.jwtUtil = jwtUtil;
+        this.memberMapper = memberMapper;
+    }
+
+    @GetMapping("/me")
+    public MemberDTO me(@AuthenticationPrincipal MemberEntity principal) {
+        return memberMapper.memberEntityToMemberDTO(principal);
     }
 
     @GetMapping
@@ -51,14 +59,11 @@ public class MemberController {
     @ApiResponse(responseCode = "409", description = "Member already exists")
     @Operation(security = {}, summary = "Register a new member")
     @PostMapping
-    public ResponseEntity<MemberDTO> registerMember(
+    public AuthResponse registerMember(
             @Parameter(description = "request") @RequestBody MemberRegistrationRequest request) {
         MemberDTO created = memberService.addMember(request);
-        URI location = URI.create("/api/v1/members/" + created.id());
         String jwtToken = jwtUtil.generateToken(request.email(), created.roles());
-        return ResponseEntity.created(location)
-                .header(HttpHeaders.AUTHORIZATION, jwtToken)
-                .body(created);
+        return new AuthResponse(jwtToken, created);
     }
 
 

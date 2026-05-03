@@ -5,9 +5,13 @@ meta {
 }
 
 put {
-  url: {{baseUrl}}:8080/api/v1/customers/{{id}}/profile-image
+  url: {{baseUrl}}:8080/api/v1/members/:memberId/profile-image
   body: multipartForm
   auth: bearer
+}
+
+params:path {
+  memberId: 1
 }
 
 auth:bearer {
@@ -16,8 +20,4 @@ auth:bearer {
 
 body:multipart-form {
   file: @file(C:\Users\ianrr\Postman\files\pfp_test.jpg)
-}
-
-vars:pre-request {
-  id: 2
 }

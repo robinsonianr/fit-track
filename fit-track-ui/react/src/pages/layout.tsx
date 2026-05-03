@@ -1,39 +1,31 @@
-import {Outlet, useLocation} from "react-router-dom";
-import { useMediaQuery } from "@uidotdev/usehooks";
-import { useRef, useState, useEffect } from "react";
-import { Customer } from "../types/index.ts";
-import { getCustomer } from "../services/client";
+import {Outlet, useLocation, useOutletContext} from "react-router-dom";
+import {useMediaQuery} from "@uidotdev/usehooks";
+import {useRef, useState} from "react";
 
-import { Sidebar } from "../components/layout/sidebar/Sidebar";
+import Sidebar from "../components/layout/sidebar/Sidebar";
 import Header from "../components/layout/header/Header";
 
-import { cn } from "../utils/cn";
+import {cn} from "../utils/cn";
 import "./layout.css";
+import {useAuth} from "../context/AuthContext.tsx";
+import {MemberDTO} from "../api/generated/models";
+
+
+export type LayoutContext = { member: MemberDTO }
+export const authenticatedMember = () => useOutletContext<LayoutContext>().member;
 
 const Layout = () => {
+    const {member} = useAuth();
     const isLargeScreen = useMediaQuery("(min-width: 1024px)");
     const [sidebarOpen, setSidebarOpen] = useState(false);
-    const [customer, setCustomer] = useState<Customer | undefined>(undefined);
     const location = useLocation();
-
     const sidebarRef = useRef(null);
 
-    // Fetch customer data for sidebar
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const id = localStorage.getItem("customerId");
-                const response = await getCustomer(id);
-                setCustomer(response.data);
-            } catch (error) {
-                console.error("Could not retrieve customer: ", error);
-            }
-        };
+    if (!member) {
+        return <div>Loading...</div>;
+    }
 
-        fetchData();
-    }, []);
-
-    const getHeaderTitle = () :string  =>  {
+    const getHeaderTitle = (): string => {
         const currentPage = location.pathname.split("/")[1];
 
         switch (currentPage) {
@@ -59,39 +51,39 @@ const Layout = () => {
         <div className="layout-container">
             {/* Mobile overlay */}
             {sidebarOpen && !isLargeScreen && (
-                <div className="mobile-overlay" onClick={handleOverlayClick} />
+                <div className="mobile-overlay" onClick={handleOverlayClick}/>
             )}
-            
+
             {/* Sidebar - hidden on mobile, visible on large screens */}
             <div className={cn(
                 "sidebar-container",
                 isLargeScreen ? "sidebar-visible" : sidebarOpen ? "sidebar-visible" : "sidebar-hidden"
             )}>
-                <Sidebar 
-                    ref={sidebarRef} 
-                    collapsed={false} 
-                    customer={customer}
+                <Sidebar
+                    ref={sidebarRef}
+                    collapsed={false}
+                    member={member}
                     onClose={() => setSidebarOpen(false)}
                 />
             </div>
-            
+
             {/* Main content area */}
             <div className={cn(
                 "main-content",
                 isLargeScreen ? "main-content-desktop" : "main-content-mobile"
             )}>
-                <Header 
+                <Header
                     collapsed={false}
                     setCollapsed={() => setSidebarOpen(!sidebarOpen)}
-                    name={customer?.name}
+                    member={member}
                     title={getHeaderTitle()}
                 />
                 <div className="content-area">
-                    <Outlet context={{ customer }} />
+                    <Outlet context={{member} satisfies LayoutContext}/>
                 </div>
             </div>
         </div>
     );
 };
- 
+
 export default Layout;

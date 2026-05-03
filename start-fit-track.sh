@@ -9,9 +9,10 @@ export DB_CONTAINER="fit-db"
 basename=$(basename "$SCRIPT_DIR")
 
 
-cd "$SCRIPT_DIR"
-./gradlew build --build-cache -x test
+./gradlew exportOpenApiSpec build --build-cache -x test
+cd fit-track-ui/react && npm run api:gen
 
+cd "$SCRIPT_DIR"
 docker compose -f "$COMPOSE_FILE" \
 	up --build -d
 

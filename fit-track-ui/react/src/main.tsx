@@ -5,8 +5,8 @@ import {RouterProvider} from "react-router-dom";
 
 import {router} from "./App";
 import AuthProvider from "./context/AuthContext";
-import { ThemeProvider } from "./context/theme-context";
-import { Toaster } from "sonner";
+import {ThemeProvider} from "./context/theme-context";
+import {Toaster} from "sonner";
 
 const root = ReactDOM.createRoot(
     document.getElementById("root") as HTMLElement

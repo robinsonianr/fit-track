@@ -1,0 +1,21 @@
+meta {
+  name: Add Member
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}:8080/api/v1/Members
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+      "name":"Test Acc",
+      "email":"test123@gmail.com",
+      "password":"Test123",
+      "age":"21",
+      "gender":"Male"
+  }
+}
