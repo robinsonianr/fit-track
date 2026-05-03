@@ -12,13 +12,13 @@ const Logs = () => {
     const [selectedWorkout, setSelectedWorkout] = useState<WorkoutDTO>();
     const [hoverDay, setHoverDay] = useState<number | null>(null);
 
-    // Fetch customer data when component mounts
+    // Fetch member data when component mounts
     useEffect(() => {
         const fetchData = async () => {
             try {
                 getAllWorkoutsByMemberId(member.id).then(setWorkoutData);
             } catch (error) {
-                console.error("Could not retrieve customer: ", error);
+                console.error("Could not retrieve member: ", error);
             }
         };
 
