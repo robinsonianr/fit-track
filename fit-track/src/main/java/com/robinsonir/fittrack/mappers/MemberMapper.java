@@ -25,7 +25,7 @@ public interface MemberMapper {
     @Mapping(target = "name", source = "name")
     @Mapping(target = "email", source = "email")
     @Mapping(target = "password", source = "password")
-    @Mapping(target = "age", source = "age")
+    @Mapping(target = "dateOfBirth", source = "dateOfBirth")
     @Mapping(target = "gender", source = "gender")
     @Mapping(target = "memberSince", ignore = true)
     MemberEntity registrationRequestToEntity(MemberRegistrationRequest registrationRequest);

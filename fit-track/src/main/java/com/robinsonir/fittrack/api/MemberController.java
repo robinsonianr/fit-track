@@ -53,7 +53,7 @@ public class MemberController {
     @GetMapping("{memberId}")
     public MemberDTO getMember(
             @Parameter(description = "memberId", required = true) @PathVariable final Long memberId) {
-        return memberService.getMember(memberId);
+        return memberService.getMemberById(memberId);
     }
 
     @ApiResponse(responseCode = "409", description = "Member already exists")

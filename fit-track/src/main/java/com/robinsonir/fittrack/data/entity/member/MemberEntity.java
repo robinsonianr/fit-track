@@ -12,8 +12,10 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 
 @Data
@@ -31,8 +33,8 @@ public class MemberEntity extends AbstractModifiedDateEntity implements UserDeta
     @Column(name = "email", nullable = false)
     private String email;
 
-    @Column(name = "age", nullable = false)
-    private Integer age;
+    @Column(name = "date_of_birth", nullable = false)
+    private LocalDate dateOfBirth;
 
     @Column(name = "gender", nullable = false)
     @Enumerated(EnumType.STRING)

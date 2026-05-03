@@ -53,7 +53,7 @@ public class MemberService {
     }
 
 
-    public MemberDTO getMember(Long id) {
+    public MemberDTO getMemberById(Long id) {
         MemberEntity memberEntity = memberRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "member with id [%s] not found".formatted(id)
@@ -141,8 +141,8 @@ public class MemberService {
 
         if (updateRequest.name() != null)
             memberEntity.setName(updateRequest.name());
-        if (updateRequest.age() != null)
-            memberEntity.setAge(updateRequest.age());
+        if (updateRequest.dateOfBirth() != null)
+            memberEntity.setDateOfBirth(updateRequest.dateOfBirth());
         if (updateRequest.gender() != null)
             memberEntity.setGender(updateRequest.gender());
         if (updateRequest.weight() != null)

@@ -3,6 +3,8 @@ package com.robinsonir.fittrack.data.service.member;
 import com.robinsonir.fittrack.data.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.LocalDate;
+
 @Schema(name = "MemberRegistrationRequest")
 public record MemberRegistrationRequest(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
@@ -12,7 +14,7 @@ public record MemberRegistrationRequest(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         String password,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-        Integer age,
+        LocalDate dateOfBirth,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         Gender gender
 ) {

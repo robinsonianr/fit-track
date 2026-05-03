@@ -19,6 +19,7 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,38 +60,39 @@ public class MemberServiceTest {
     }
 
     @Test
-    void testGetMember() {
+    void testGetMemberById() {
         // Arrange
         Long memberId = 1L;
+        LocalDate dateOfBirth = LocalDate.of(1995, 1, 1);
         MemberEntity memberEntity = new MemberEntity();
         memberEntity.setId(memberId);
         memberEntity.setName("John Doe");
         memberEntity.setEmail("john.doe@example.com");
         memberEntity.setPassword("password123");
-        memberEntity.setAge(30);
+        memberEntity.setDateOfBirth(dateOfBirth);
         memberEntity.setGender(Gender.MALE);
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(memberEntity));
 
         // Act
-        MemberDTO member = memberTest.getMember(memberId);
+        MemberDTO member = memberTest.getMemberById(memberId);
 
         // Assert
         assertEquals(memberId, member.id());
         assertEquals("John Doe", member.name());
         assertEquals("john.doe@example.com", member.email());
-        assertEquals(30, member.age());
+        assertEquals(dateOfBirth, member.dateOfBirth());
         assertEquals(Gender.MALE, member.gender());
     }
 
     @Test
-    void testGetMemberNotFound() {
+    void testGetMemberByIdNotFound() {
         // Arrange
         Long memberId = 99L;
         when(memberRepository.findById(memberId)).thenReturn(Optional.empty());
 
         // Act & Assert
-        assertThatThrownBy(() -> memberTest.getMember(memberId))
+        assertThatThrownBy(() -> memberTest.getMemberById(memberId))
                 .isInstanceOf(ResourceNotFoundException.class)
                 .hasMessage("member with id [99] not found");
     }
@@ -98,11 +100,12 @@ public class MemberServiceTest {
     @Test
     void addMember() {
         // Arrange
+        LocalDate dateOfBirth = LocalDate.of(1995, 1, 1);
         MemberRegistrationRequest registrationRequest = new MemberRegistrationRequest(
                 "John Doe",
                 "johndoe@example.com",
                 "password123",
-                30,
+                dateOfBirth,
                 Gender.MALE
         );
 
@@ -118,7 +121,7 @@ public class MemberServiceTest {
                         member.getName().equals(registrationRequest.name()) &&
                                 member.getEmail().equals(registrationRequest.email()) &&
                                 member.getPassword().equals("hashedPassword") &&
-                                member.getAge().equals(registrationRequest.age()) &&
+                                member.getDateOfBirth().equals(registrationRequest.dateOfBirth()) &&
                                 member.getGender().equals(registrationRequest.gender())
                 )
         );
@@ -126,7 +129,7 @@ public class MemberServiceTest {
         // Assert — returned DTO reflects the registered member
         assertThat(result.name()).isEqualTo("John Doe");
         assertThat(result.email()).isEqualTo("johndoe@example.com");
-        assertThat(result.age()).isEqualTo(30);
+        assertThat(result.dateOfBirth()).isEqualTo(dateOfBirth);
         assertThat(result.gender()).isEqualTo(Gender.MALE);
     }
 
@@ -137,7 +140,7 @@ public class MemberServiceTest {
                 "John Doe",
                 "johndoe@example.com",
                 "password123",
-                30,
+                LocalDate.of(1995, 1, 1),
                 Gender.MALE
         );
         when(memberRepository.existsByEmail(registrationRequest.email())).thenReturn(true);
@@ -159,13 +162,14 @@ public class MemberServiceTest {
         existingMember.setName("John Doe");
         existingMember.setEmail("john.doe@example.com");
         existingMember.setPassword("hashedPassword");
-        existingMember.setAge(30);
+        existingMember.setDateOfBirth(LocalDate.of(1995, 1, 1));
         existingMember.setGender(Gender.MALE);
 
+        LocalDate updatedDob = LocalDate.of(1997, 6, 15);
         MemberUpdateRequest updateRequest = new MemberUpdateRequest(
                 "Jane Doe",
                 "jane@example.com",
-                28,
+                updatedDob,
                 Gender.FEMALE,
                 65,
                 170,
@@ -183,7 +187,7 @@ public class MemberServiceTest {
         // Assert — returned DTO reflects the updates
         assertThat(result.name()).isEqualTo("Jane Doe");
         assertThat(result.email()).isEqualTo("jane@example.com");
-        assertThat(result.age()).isEqualTo(28);
+        assertThat(result.dateOfBirth()).isEqualTo(updatedDob);
         assertThat(result.gender()).isEqualTo(Gender.FEMALE);
         assertThat(result.weight()).isEqualTo(65);
         assertThat(result.height()).isEqualTo(170);
@@ -200,11 +204,12 @@ public class MemberServiceTest {
     void testUpdateMemberPartialOnlyUpdatesNonNullFields() {
         // Arrange
         Long memberId = 1L;
+        LocalDate originalDob = LocalDate.of(1995, 1, 1);
         MemberEntity existingMember = new MemberEntity();
         existingMember.setId(memberId);
         existingMember.setName("John Doe");
         existingMember.setEmail("john.doe@example.com");
-        existingMember.setAge(30);
+        existingMember.setDateOfBirth(originalDob);
         existingMember.setGender(Gender.MALE);
         existingMember.setWeight(80);
         existingMember.setActivity("Running");
@@ -212,7 +217,7 @@ public class MemberServiceTest {
         MemberUpdateRequest partialRequest = new MemberUpdateRequest(
                 null,      // name — unchanged
                 null,      // email — unchanged
-                null,      // age — unchanged
+                null,      // dateOfBirth — unchanged
                 null,      // gender — unchanged
                 75,        // weight — updated
                 null,      // height — unchanged
@@ -229,7 +234,7 @@ public class MemberServiceTest {
         // Assert — only weight and weightGoal changed; rest preserved
         assertThat(result.name()).isEqualTo("John Doe");
         assertThat(result.email()).isEqualTo("john.doe@example.com");
-        assertThat(result.age()).isEqualTo(30);
+        assertThat(result.dateOfBirth()).isEqualTo(originalDob);
         assertThat(result.gender()).isEqualTo(Gender.MALE);
         assertThat(result.weight()).isEqualTo(75);
         assertThat(result.weightGoal()).isEqualTo(70);
@@ -333,7 +338,7 @@ public class MemberServiceTest {
         testMemberEntity.setName("John Doe");
         testMemberEntity.setEmail("john.doe@example.com");
         testMemberEntity.setPassword("hashedPassword");
-        testMemberEntity.setAge(30);
+        testMemberEntity.setDateOfBirth(LocalDate.of(1995, 1, 1));
         testMemberEntity.setGender(Gender.MALE);
         testMemberEntity.setProfileImageId(profileImageId);
 
@@ -369,7 +374,7 @@ public class MemberServiceTest {
         testMemberEntity.setName("John Doe");
         testMemberEntity.setEmail("john.doe@example.com");
         testMemberEntity.setPassword("hashedPassword");
-        testMemberEntity.setAge(30);
+        testMemberEntity.setDateOfBirth(LocalDate.of(1995, 1, 1));
         testMemberEntity.setGender(Gender.MALE);
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(testMemberEntity));

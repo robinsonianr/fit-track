@@ -1,5 +1,5 @@
 meta {
-  name: Login
+  name: Login and Get Token
   type: http
   seq: 2
 }
@@ -18,5 +18,5 @@ body:json {
 }
 
 script:post-response {
-  bru.setEnvVar("authToken", res.getBody().jwtToken)
+  bru.setEnvVar("bearerToken", res.getBody().jwtToken)
 }
