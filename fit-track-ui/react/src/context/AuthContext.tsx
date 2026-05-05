@@ -11,6 +11,7 @@ type AuthContextType = {
     register: (req: MemberRegistrationRequest) => Promise<void>;
     logOut: () => void;
     isMemberAuthenticated: () => boolean;
+    refreshMember: () => Promise<void>;
 };
 
 
@@ -22,9 +23,14 @@ const AuthProvider = ({children}: { children: any }) => {
     const {login: performLogin} = getAuthApi();
     const [member, setMember] = useState<MemberDTO | undefined>();
 
+    const refreshMember = async (): Promise<void> => {
+        const fresh = await fetchMe();
+        setMember(fresh);
+    };
+
     useEffect(() => {
         if (localStorage.getItem("access_token") && isMemberAuthenticated()) {
-            fetchMe().then(setMember).catch(logOut);
+            refreshMember().catch(logOut);
         }
     }, [fetchMe]);
 
@@ -86,6 +92,7 @@ const AuthProvider = ({children}: { children: any }) => {
             register: register,
             logOut,
             isMemberAuthenticated,
+            refreshMember,
         }}>
             {children}
         </AuthContext.Provider>

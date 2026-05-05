@@ -5,14 +5,19 @@ import {getWorkoutsApi} from "../../api/generated/endpoints/workouts-api/workout
 import {buildProfileImage} from "../../services/client.ts";
 import {toast} from "sonner";
 import {authenticatedMember} from "../layout.tsx";
+import {useAuth} from "../../context/AuthContext.tsx";
 
 
 export const Profile = () => {
     const member = authenticatedMember();
+    const {refreshMember} = useAuth();
     const [workoutData, setWorkoutData] = useState<WorkoutDTO[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const dobInputRef = useRef<HTMLInputElement>(null);
     const {updateMember, uploadMemberProfileImage} = getMemberApi();
     const {getAllWorkoutsByMemberId} = getWorkoutsApi();
+    const [isEditable, setIsEditable] = useState(false);
+    const [pendingDob, setPendingDob] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -31,6 +36,16 @@ export const Profile = () => {
         return <div>Loading...</div>;
     }
 
+    const calculateAge = (dateOfBirth: string) => {
+        const today = new Date();
+        const birthDate = new Date(dateOfBirth);
+        let age = today.getFullYear() - birthDate.getFullYear();
+        const monthDifference = today.getMonth() - birthDate.getMonth();
+        if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+            age--;
+        }
+        return age;
+    }
     const profile = {
         name: member.name,
         email: member.email,
@@ -38,7 +53,7 @@ export const Profile = () => {
     };
 
     const healthInfo = {
-        age: member.age,
+        age: calculateAge(member.dateOfBirth),
         gender: member.gender,
         weight: member.weight,
         height: member.height,
@@ -85,15 +100,31 @@ export const Profile = () => {
         }
     };
 
+    const saveDob = async (dateOfBirth: string) => {
+        if (!member.id) return;
+        try {
+            await updateMember(member.id, {dateOfBirth});
+            toast.success("Date of Birth updated successfully!");
+            setPendingDob(null);
+            await refreshMember();
+        } catch (error) {
+            console.error("Failed to update member.", error);
+            toast.error("Failed to update date of birth.");
+        }
+    }
+
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+        if (!isEditable) {
+            setIsEditable(true);
+            return;
+        }
         const formData = new FormData(e.currentTarget);
         formData.append("name", formData.get("firstName") + " " + formData.get("lastName"));
 
         const update: MemberUpdateRequest = {
             name: String(formData.get("name")),
             email: formData.get("email") as string,
-            age: Number(formData.get("age")) || undefined,
             gender: formData.get("gender") as Gender,
             weight: Number(formData.get("weight")) || undefined,
             height: Number(formData.get("height")) || undefined,
@@ -106,6 +137,7 @@ export const Profile = () => {
             try {
                 await updateMember(member.id, update);
                 toast.success("Profile updated successfully!");
+                setIsEditable(false);
             } catch (error) {
                 console.error("Failed to update member.", error);
                 toast.error("Failed to update profile.");
@@ -126,7 +158,7 @@ export const Profile = () => {
                     <div className="flex flex-col items-center">
                         <div className="w-24 h-24 mb-4 relative">
                             <img className="rounded-[50%] object-cover w-20 h-20 z-1"
-                                src={pfp} alt="pfp"/>
+                                 src={pfp} alt="pfp"/>
                             <input
                                 type="file"
                                 ref={fileInputRef}
@@ -166,38 +198,66 @@ export const Profile = () => {
                                 <div className="space-y-2">
                                     <label htmlFor="firstName">First Name</label>
                                     <input name="firstName" type="text" defaultValue={member.name?.split(" ")[0]}
-                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                           disabled={!isEditable}
+                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="lastName">Last Name</label>
                                     <input name="lastName" type="text" defaultValue={member.name?.split(" ")[1]}
-                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                           disabled={!isEditable}
+                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="age">Age</label>
-                                    <input name="age" type="text" defaultValue={healthInfo.age}
-                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                    <input name="age" type="text" value={healthInfo.age} disabled={true} readOnly
+                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                    <input ref={dobInputRef} type="date" name="dateOfBirth"
+                                           defaultValue={member.dateOfBirth}
+                                           max={new Date().toISOString().slice(0, 10)} min="1900-01-01"
+                                           onChange={(e) => setPendingDob(e.currentTarget.value)}
+                                           className="absolute opacity-0 pointer-events-none w-0 h-0"/>
+                                    <button type="button"
+                                            onClick={() => dobInputRef.current?.showPicker()}
+                                            className="bg-[#3f76c0] hover:bg-[#355a8f] duration-300 mt-1 p-2 rounded-md cursor-pointer">
+                                        Edit Date of Birth
+                                    </button>
+                                    {pendingDob && pendingDob !== member.dateOfBirth && (
+                                        <div className="mt-2 flex gap-2 items-center">
+                                            <span className="text-sm">New: {pendingDob}</span>
+                                            <button type="button" onClick={() => saveDob(pendingDob)}
+                                                    className="bg-[#3f76c0] hover:bg-[#355a8f] duration-300 p-1 px-2 rounded-md cursor-pointer text-sm">
+                                                Save
+                                            </button>
+                                            <button type="button" onClick={() => setPendingDob(null)}
+                                                    className="bg-gray-500 hover:bg-gray-600 duration-300 p-1 px-2 rounded-md cursor-pointer text-sm">
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="weight">Weight (lbs)</label>
                                     <input name="weight" type="text" defaultValue={healthInfo.weight}
-                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                           disabled={!isEditable}
+                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="height">Height (inches)</label>
                                     <input name="height" type="number" defaultValue={healthInfo.height}
-                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                           disabled={!isEditable}
+                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="bodyFat">Body Fat%</label>
                                     <input name="bodyFat" type="number" defaultValue={healthInfo.bodyFat}
-                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                           disabled={!isEditable}
+                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                                 <div className="space-y-2">
                                     <label htmlFor="gender">Gender</label>
                                     {member && (
-                                        <select name="gender" defaultValue={healthInfo.gender}
-                                            className="border-2 border-gray-600 rounded-md p-2 w-full">
+                                        <select name="gender" defaultValue={healthInfo.gender} disabled={!isEditable}
+                                                className="border-2 border-gray-600 rounded-md p-2 w-full">
                                             <option value="">
                                                 Select Gender
                                             </option>
@@ -211,7 +271,8 @@ export const Profile = () => {
                                     <label htmlFor="activity">Fitness Experience</label>
                                     {member && (
                                         <select name="activity" defaultValue={healthInfo.activity}
-                                            className="border-2 border-gray-600 rounded-md p-2 w-full">
+                                                disabled={!isEditable}
+                                                className="border-2 border-gray-600 rounded-md p-2 w-full">
                                             <option value="">
                                                 Select Activity Experience
                                             </option>
@@ -227,13 +288,22 @@ export const Profile = () => {
                                 <div className="space-y-2">
                                     <label htmlFor="email">Email</label>
                                     <input name="email" type="text" defaultValue={member.email}
-                                        className="border-2 border-gray-600 rounded-md p-2 w-full"/>
+                                           disabled={!isEditable}
+                                           className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                 </div>
                             </div>
-                            <button
-                                className="w-full h-12 bg-[#3f76c0] hover:bg-[#355a8f] duration-300 mt-2 rounded-md cursor-pointer">Save
-                                Changes
-                            </button>
+                            <div className="flex flex-col md:flex-row gap-4 justify-between items-center">
+                                <button
+                                    className="w-full h-12 bg-[#3f76c0] hover:bg-[#355a8f] duration-300 mt-2 rounded-md cursor-pointer">
+                                    {isEditable ? "Save Changes" : "Edit Health Information"}
+                                </button>
+                                {isEditable && (
+                                    <button className="w-full h-12 bg-[#3f76c0] hover:bg-[#355a8f] duration-300 mt-2 rounded-md cursor-pointer"
+                                    onClick={() => setIsEditable(false)}>
+                                        Cancel
+                                    </button>
+                                )}
+                            </div>
                         </form>
                     </div>
                 </div>

@@ -38,7 +38,7 @@ public class JwtTokenUtil {
                 .subject(subject)
                 .issuer("fittrack")
                 .issuedAt(Date.from(Instant.now()))
-                .expiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
+                .expiration(Date.from(Instant.now().plus(15, ChronoUnit.MINUTES)))
                 .signWith(getSigningKey())
                 .compact();
     }
