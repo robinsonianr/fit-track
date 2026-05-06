@@ -18,19 +18,33 @@ type AuthContextType = {
 const AuthContext = createContext<AuthContextType | null>(null);
 
 const AuthProvider = ({children}: { children: any }) => {
-    const {me: fetchMe} = useMemo(() => getMemberApi(), []);
-    const {registerMember} = useMemo(() => getMemberApi(), []);
+    const {me: fetchMe, registerMember} = useMemo(() => getMemberApi(), []);
     const {login: performLogin} = getAuthApi();
     const [member, setMember] = useState<MemberDTO | undefined>();
 
     const refreshMember = async (): Promise<void> => {
-        const fresh = await fetchMe();
-        setMember(fresh);
+        const freshMember = await fetchMe();
+        setMember(freshMember);
     };
 
     useEffect(() => {
-        if (localStorage.getItem("access_token") && isMemberAuthenticated()) {
-            refreshMember().catch(logOut);
+        const token = localStorage.getItem("access_token");
+        if (!token) return;
+
+        try {
+            const decoded = jwtDecode<JwtPayload>(token);
+            if (!decoded.exp || Date.now() > decoded.exp * 1000) return;
+
+            fetchMe()
+                .then(setMember)
+                .catch(() => {
+                    localStorage.removeItem("access_token");
+                    setMember(undefined);
+                    window.location.href = "/login";
+                });
+        } catch {
+            localStorage.removeItem("access_token");
+            window.location.href = "/login";
         }
     }, [fetchMe]);
 
@@ -78,11 +92,7 @@ const AuthProvider = ({children}: { children: any }) => {
             return false;
         }
         const expiration = decodeToken.exp;
-        if (Date.now() > expiration * 1000) {
-            logOut();
-            return false;
-        }
-        return true;
+        return Date.now() <= expiration * 1000;
     };
 
     return (

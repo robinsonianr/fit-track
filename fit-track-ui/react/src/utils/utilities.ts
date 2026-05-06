@@ -53,3 +53,16 @@ export function sortWorkoutsAsc(workouts: WorkoutDTO[]): WorkoutDTO[] {
         return new Date(a.workoutDate).getTime() - new Date(b.workoutDate).getTime();
     });
 }
+
+export function calculateAge(dateOfBirth: string){
+    if (!dateOfBirth) return 0;
+    const [year, month, day] = dateOfBirth.split("-").map(Number);
+    const birthDate = new Date(year, month - 1, day);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDifference = today.getMonth() - birthDate.getMonth();
+    if (monthDifference < 0 || (monthDifference === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+}
