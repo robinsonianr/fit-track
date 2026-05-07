@@ -3,8 +3,8 @@ ALTER TABLE fit_tracker.member
     ADD COLUMN date_of_birth DATE NOT NULL DEFAULT '1900-01-01';
 
 
-ALTER  TABLE fit_tracker.member_aud
+ALTER TABLE fit_tracker.member_aud
     DROP COLUMN age,
     DROP COLUMN age_mod,
-    ADD COLUMN date_of_birth DATE,
+    ADD COLUMN date_of_birth DATE NOT NULL DEFAULT '1900-01-01',
     ADD COLUMN date_of_birth_mod BOOLEAN;

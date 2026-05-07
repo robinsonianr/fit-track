@@ -204,7 +204,7 @@ export const Profile = () => {
                                     <input name="age" type="text" value={healthInfo.age} disabled={true} readOnly
                                         className="border-2 border-gray-600 rounded-md p-2 w-full"/>
                                     <input ref={dobInputRef} type="date" name="dateOfBirth"
-                                        defaultValue={member.dateOfBirth}
+                                        defaultValue={member.dateOfBirth || ""}
                                         max={new Date().toISOString().slice(0, 10)} min="1900-01-01"
                                         onChange={(e) => setPendingDob(e.currentTarget.value)}
                                         className="absolute opacity-0 pointer-events-none w-0 h-0"/>
