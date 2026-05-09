@@ -26,7 +26,7 @@ class MemberMapperTest {
     }
 
     @Test
-    void memberEntityToMemberDTO_mapsAllFields() {
+    void memberEntityToMemberDTOMapsAllFields() {
         OffsetDateTime memberSince = OffsetDateTime.parse("2025-01-15T10:00:00Z");
         OffsetDateTime lastModified = OffsetDateTime.parse("2026-04-01T12:30:00Z");
         LocalDate dateOfBirth = LocalDate.of(1995, 6, 20);
@@ -65,7 +65,7 @@ class MemberMapperTest {
     }
 
     @Test
-    void memberEntityToMemberDTO_derivesUsernameFromEmail() {
+    void memberEntityToMemberDTODerivesUsernameFromEmail() {
         MemberEntity entity = new MemberEntity();
         entity.setEmail("user@example.com");
 
@@ -75,7 +75,7 @@ class MemberMapperTest {
     }
 
     @Test
-    void memberEntityToMemberDTO_populatesRolesFromAuthorities() {
+    void memberEntityToMemberDTOPopulatesRolesFromAuthorities() {
         MemberEntity entity = new MemberEntity();
         entity.setEmail("user@example.com");
 
@@ -85,7 +85,7 @@ class MemberMapperTest {
     }
 
     @Test
-    void memberEntityToMemberDTO_leavesOptionalFieldsNullWhenUnset() {
+    void memberEntityToMemberDTOLeavesOptionalFieldsNullWhenUnset() {
         MemberEntity entity = new MemberEntity();
         entity.setId(1L);
         entity.setEmail("user@example.com");
@@ -103,12 +103,12 @@ class MemberMapperTest {
     }
 
     @Test
-    void memberEntityToMemberDTO_returnsNullForNullInput() {
+    void memberEntityToMemberDTOReturnsNullForNullInput() {
         assertThat(mapper.memberEntityToMemberDTO(null)).isNull();
     }
 
     @Test
-    void memberEntityListToMemberDTOList_mapsEachElementInOrder() {
+    void memberEntityListToMemberDTOListMapsEachElementInOrder() {
         MemberEntity first = new MemberEntity();
         first.setId(1L);
         first.setName("Alice");
@@ -129,17 +129,17 @@ class MemberMapperTest {
     }
 
     @Test
-    void memberEntityListToMemberDTOList_returnsEmptyListForEmptyInput() {
+    void memberEntityListToMemberDTOListReturnsEmptyListForEmptyInput() {
         assertThat(mapper.memberEntityListToMemberDTOList(List.of())).isEmpty();
     }
 
     @Test
-    void memberEntityListToMemberDTOList_returnsNullForNullInput() {
+    void memberEntityListToMemberDTOListReturnsNullForNullInput() {
         assertThat(mapper.memberEntityListToMemberDTOList(null)).isNull();
     }
 
     @Test
-    void registrationRequestToEntity_copiesRequestFields() {
+    void registrationRequestToEntityCopiesRequestFields() {
         LocalDate dateOfBirth = LocalDate.of(2000, 3, 15);
         MemberRegistrationRequest request = new MemberRegistrationRequest(
                 "John Doe",
@@ -159,7 +159,7 @@ class MemberMapperTest {
     }
 
     @Test
-    void registrationRequestToEntity_doesNotPopulateNonRequestFields() {
+    void registrationRequestToEntityDoesNotPopulateNonRequestFields() {
         MemberRegistrationRequest request = new MemberRegistrationRequest(
                 "John Doe",
                 "john@example.com",
@@ -182,22 +182,22 @@ class MemberMapperTest {
     }
 
     @Test
-    void registrationRequestToEntity_returnsNullForNullInput() {
+    void registrationRequestToEntityReturnsNullForNullInput() {
         assertThat(mapper.registrationRequestToEntity(null)).isNull();
     }
 
     @Test
-    void mapAuthorities_returnsEmptyListForNullInput() {
+    void mapAuthoritiesReturnsEmptyListForNullInput() {
         assertThat(mapper.mapAuthorities(null)).isEmpty();
     }
 
     @Test
-    void mapAuthorities_returnsEmptyListForEmptyCollection() {
+    void mapAuthoritiesReturnsEmptyListForEmptyCollection() {
         assertThat(mapper.mapAuthorities(List.<GrantedAuthority>of())).isEmpty();
     }
 
     @Test
-    void mapAuthorities_extractsAuthorityStrings() {
+    void mapAuthoritiesExtractsAuthorityStrings() {
         List<GrantedAuthority> authorities = List.of(
                 new SimpleGrantedAuthority("ROLE_USER"),
                 new SimpleGrantedAuthority("ROLE_ADMIN")
