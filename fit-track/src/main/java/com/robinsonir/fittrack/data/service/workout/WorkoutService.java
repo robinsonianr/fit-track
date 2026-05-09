@@ -8,6 +8,8 @@ import com.robinsonir.fittrack.data.repository.workout.WorkoutRepository;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
 import com.robinsonir.fittrack.mappers.ExerciseMapper;
 import com.robinsonir.fittrack.mappers.WorkoutMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,14 +22,16 @@ public class WorkoutService {
 
     private final WorkoutMapper workoutMapper;
     private final ExerciseMapper exerciseMapper;
-
     private final WorkoutRepository workoutRepository;
     private final MemberRepository memberRepository;
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkoutService.class);
 
     @Autowired
-    public WorkoutService(WorkoutMapper workoutMapper,
-                          WorkoutRepository workoutRepository, ExerciseMapper exerciseMapper,
-                          MemberRepository memberRepository) {
+    public WorkoutService(final WorkoutMapper workoutMapper,
+                          final WorkoutRepository workoutRepository, 
+                          final ExerciseMapper exerciseMapper,
+                          final MemberRepository memberRepository) {
         this.workoutMapper = workoutMapper;
         this.workoutRepository = workoutRepository;
         this.memberRepository = memberRepository;
@@ -43,7 +47,7 @@ public class WorkoutService {
     public WorkoutDTO getWorkout(Long id) {
         WorkoutEntity workoutEntity = workoutRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "workout with id [%s] not found".formatted(id)
+                        "workout with ID: [%s] not found".formatted(id)
                 ));
         return workoutMapper.convertWorkoutEntityToWorkout(workoutEntity);
     }
@@ -68,13 +72,14 @@ public class WorkoutService {
         Optional<MemberEntity> memberEntity = memberRepository.findById(workoutCreationRequest.memberId());
         memberEntity.ifPresent(newWorkout::setMember);
         workoutRepository.save(newWorkout);
+        LOGGER.info("Workout created successfully");
         return workoutMapper.convertWorkoutEntityToWorkout(newWorkout);
     }
 
     public void checkIfWorkoutExistsOrThrow(Long id) {
         if (!workoutRepository.existsById(id)) {
             throw new ResourceNotFoundException(
-                    "workout with id [%s] not found".formatted(id)
+                    "workout with ID: [%s] not found".formatted(id)
             );
         }
     }
@@ -83,5 +88,6 @@ public class WorkoutService {
     public void deleteWorkout(Long id) {
         checkIfWorkoutExistsOrThrow(id);
         workoutRepository.deleteById(id);
+        LOGGER.info("Workout deleted successfully");
     }
 }

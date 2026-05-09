@@ -117,7 +117,7 @@ public class WorkoutServiceTest {
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> workoutService.getWorkout(workoutId));
 
-        assertEquals("workout with id [1] not found", exception.getMessage());
+        assertEquals("workout with ID: [1] not found", exception.getMessage());
         verify(workoutRepository, times(1)).findById(workoutId);
         verify(workoutMapper, times(0)).convertWorkoutEntityToWorkout(any(WorkoutEntity.class));
     }
@@ -126,7 +126,7 @@ public class WorkoutServiceTest {
     void addWorkout() {
         // Arrange
         WorkoutCreationRequest workoutCreationRequest = new WorkoutCreationRequest(
-                member.getId(), "Cardio", new HashSet<>(), "Swimming", 12000, 400, 60
+                member.getId(), "Swimming", new HashSet<>(), "Cardio", 12000, 400, 60
         );
 
         when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
@@ -161,7 +161,7 @@ public class WorkoutServiceTest {
         ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
                 () -> workoutService.checkIfWorkoutExistsOrThrow(workoutId));
 
-        assertEquals("workout with id [1] not found", exception.getMessage());
+        assertEquals("workout with ID: [1] not found", exception.getMessage());
         verify(workoutRepository, times(1)).existsById(workoutId);
     }
 }

@@ -11,6 +11,8 @@ import com.robinsonir.fittrack.s3.S3Service;
 import jakarta.transaction.Transactional;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -30,7 +32,6 @@ public class MemberService {
 
     private final MemberMapper memberMapper;
     private final PasswordEncoder passwordEncoder;
-
     private final S3Service s3Service;
     private final MemberRepository memberRepository;
 
@@ -38,10 +39,12 @@ public class MemberService {
     @Value("${s3.bucket.name}")
     private String s3Bucket;
 
-    public MemberService(MemberMapper memberMapper,
-                         PasswordEncoder passwordEncoder,
-                         S3Service s3Service,
-                         MemberRepository memberRepository) {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MemberService.class);
+
+    public MemberService(final MemberMapper memberMapper,
+                         final PasswordEncoder passwordEncoder,
+                         final S3Service s3Service,
+                         final MemberRepository memberRepository) {
         this.memberMapper = memberMapper;
         this.passwordEncoder = passwordEncoder;
         this.s3Service = s3Service;
@@ -56,8 +59,9 @@ public class MemberService {
     public MemberDTO getMemberById(Long id) {
         MemberEntity memberEntity = memberRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "member with id [%s] not found".formatted(id)
-                ));
+                            "member with ID: [%s] not found".formatted(id)
+                    )
+                );
         return memberMapper.memberEntityToMemberDTO(memberEntity);
     }
 
@@ -81,6 +85,7 @@ public class MemberService {
 
         try {
             memberRepository.save(memberEntity);
+            LOGGER.info("Created member with email [{}] and ID: [{}]", memberEntity.getEmail(), memberEntity.getId());
         } finally {
             SecurityContextHolder.clearContext();
         }
@@ -93,6 +98,7 @@ public class MemberService {
 
         memberRepository.updateProfileImageId(profileImageId, memberId);
         try {
+            LOGGER.info("Uploading profile image for member with ID: [{}]", memberId);
             s3Service.putObject(
                     s3Bucket,
                     profileImageKey(memberId, profileImageId),
@@ -107,13 +113,13 @@ public class MemberService {
     public byte[] getProfilePicture(Long memberId) {
         MemberEntity memberEntity = memberRepository.findById(memberId)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "member with id [%s] not found".formatted(memberId)
+                        "member with ID: [%s] not found".formatted(memberId)
                 ));
 
 
         if (StringUtils.isBlank(memberEntity.getProfileImageId())) {
             throw new ResourceNotFoundException(
-                    "member with id [%s] profile image not found".formatted(memberId));
+                    "member with ID: [%s] profile image not found".formatted(memberId));
         }
 
         return s3Service.getObject(
@@ -126,7 +132,7 @@ public class MemberService {
     public MemberDTO updateMember(Long id, MemberUpdateRequest updateRequest) {
         MemberEntity memberEntity = memberRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException(
-                        "member with id [%s] not found".formatted(id)
+                        "member with ID: [%s] not found".formatted(id)
                 ));
 
         if (updateRequest.email() != null &&
@@ -151,10 +157,11 @@ public class MemberService {
             memberEntity.setHeight(updateRequest.height());
         if (updateRequest.weightGoal() != null)
             memberEntity.setWeightGoal(updateRequest.weightGoal());
-        if (updateRequest.activity() != null)
-            memberEntity.setActivity(updateRequest.activity());
+        if (updateRequest.fitness() != null)
+            memberEntity.setFitness(updateRequest.fitness());
         if (updateRequest.bodyFat() != null)
             memberEntity.setBodyFat(updateRequest.bodyFat());
+        LOGGER.info("Updating member with ID: [{}] and email [{}]", id, memberEntity.getEmail());
 
         return memberMapper.memberEntityToMemberDTO(memberEntity);
     }
