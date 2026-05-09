@@ -85,7 +85,7 @@ public class MemberService {
 
         try {
             memberRepository.save(memberEntity);
-            LOGGER.info("Created member with email [{}] and ID: [{}]", memberEntity.getEmail(), memberEntity.getId());
+            LOGGER.info("Created member with ID: [{}]", memberEntity.getId());
         } finally {
             SecurityContextHolder.clearContext();
         }
@@ -161,7 +161,7 @@ public class MemberService {
             memberEntity.setFitness(updateRequest.fitness());
         if (updateRequest.bodyFat() != null)
             memberEntity.setBodyFat(updateRequest.bodyFat());
-        LOGGER.info("Updating member with ID: [{}] and email [{}]", id, memberEntity.getEmail());
+        LOGGER.info("Updating member with ID: [{}]", id);
 
         return memberMapper.memberEntityToMemberDTO(memberEntity);
     }

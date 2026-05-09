@@ -260,17 +260,17 @@ export const Profile = () => {
                                     )}
                                 </div>
                                 <div className="space-y-2">
-                                    <label htmlFor="activity">Fitness Experience</label>
+                                    <label htmlFor="fitness">Fitness Experience</label>
                                     {member && (
-                                        <select name="activity" defaultValue={healthInfo.fitness}
+                                        <select name="fitness" defaultValue={healthInfo.fitness}
                                             disabled={!isEditable}
                                             className="border-2 border-gray-600 rounded-md p-2 w-full">
                                             <option value="">
                                                 Select Fitness Experience
                                             </option>
-                                            <option value="Advanced">Advanced</option>
-                                            <option value="Intermediate">Intermediate</option>
-                                            <option value="Beginner">Beginner</option>
+                                            <option value={Fitness.Advanced}>Advanced</option>
+                                            <option value={Fitness.Intermediate}>Intermediate</option>
+                                            <option value={Fitness.Beginner}>Beginner</option>
                                         </select>
                                     )}
                                 </div>
