@@ -3,6 +3,7 @@ package com.robinsonir.fittrack.data.repository.member;
 import com.robinsonir.fittrack.data.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -17,7 +18,7 @@ public record MemberDTO(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         Gender gender,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-        Integer age,
+        LocalDate dateOfBirth,
         Integer weight,
         Integer height,
         Integer weightGoal,

@@ -5,7 +5,7 @@ meta {
 }
 
 post {
-  url: {{baseUrl}}:8080/api/v1/Members
+  url: {{baseUrl}}:8080/api/v1/members
   body: json
   auth: none
 }
@@ -15,7 +15,7 @@ body:json {
       "name":"Test Acc",
       "email":"test123@gmail.com",
       "password":"Test123",
-      "age":"21",
-      "gender":"Male"
+      "dateOfBirth":"1999-01-01",
+      "gender":"Forbidden"
   }
 }

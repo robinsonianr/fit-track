@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,7 +24,7 @@ public class MemberRepositoryTest {
         member.setName("John Doe");
         member.setEmail("john.doe@example.com");
         member.setPassword("password123");
-        member.setAge(30);
+        member.setDateOfBirth(LocalDate.of(1995, 1, 1));
         member.setGender(Gender.MALE);
 
         MemberEntity savedMember = memberRepository.save(member);
@@ -40,7 +41,7 @@ public class MemberRepositoryTest {
         member.setName("Jane Doe");
         member.setEmail("jane.doe@example.com");
         member.setPassword("securePass");
-        member.setAge(28);
+        member.setDateOfBirth(LocalDate.of(1997, 6, 15));
         member.setGender(Gender.FEMALE);
 
         memberRepository.save(member);
@@ -52,17 +53,17 @@ public class MemberRepositoryTest {
     }
 
     @Test
-    void testFindMemberByEmail() {
+    void testFindByEmail() {
         MemberEntity member = new MemberEntity();
         member.setName("Jane Doe");
         member.setEmail("jane.doe@example.com");
         member.setPassword("securePass");
-        member.setAge(28);
+        member.setDateOfBirth(LocalDate.of(1997, 6, 15));
         member.setGender(Gender.FEMALE);
 
         memberRepository.save(member);
 
-        Optional<MemberEntity> foundMember = memberRepository.findMemberByEmail(member.getEmail());
+        Optional<MemberEntity> foundMember = memberRepository.findByEmail(member.getEmail());
 
         assertTrue(foundMember.isPresent());
         assertEquals("jane.doe@example.com", foundMember.get().getEmail());
@@ -74,7 +75,7 @@ public class MemberRepositoryTest {
         member.setName("Alice Johnson");
         member.setEmail("alice.johnson@example.com");
         member.setPassword("alicePass");
-        member.setAge(29);
+        member.setDateOfBirth(LocalDate.of(1996, 3, 10));
         member.setGender(Gender.FEMALE);
 
         memberRepository.save(member);
@@ -92,7 +93,7 @@ public class MemberRepositoryTest {
         member.setName("Daniel Craig");
         member.setEmail("daniel.craig@example.com");
         member.setPassword("bond007");
-        member.setAge(50);
+        member.setDateOfBirth(LocalDate.of(1975, 4, 12));
         member.setGender(Gender.MALE);
 
         memberRepository.save(member);

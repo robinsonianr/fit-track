@@ -16,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -52,7 +53,7 @@ public class WorkoutServiceTest {
         member.setName("John Doe");
         member.setEmail("john.doe@example.com");
         member.setPassword("password");
-        member.setAge(30);
+        member.setDateOfBirth(LocalDate.of(1995, 1, 1));
         member.setGender(Gender.MALE);
     }
 

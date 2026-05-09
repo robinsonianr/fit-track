@@ -3,23 +3,13 @@ import {useNavigate} from "react-router-dom";
 import {Gender} from "../../../api/generated/models";
 import {useAuth} from "../../../context/AuthContext.tsx";
 
+const todayISO = () => new Date().toISOString().slice(0, 10);
+
 export const SignUp = () => {
     const navigate = useNavigate();
     const {register} = useAuth();
 
     const [signUpError, setSignUpError] = useState<string | null>(null);
-
-    const generateAgeOptions = () => {
-        const options = [];
-        for (let age = 18; age <= 80; age++) {
-            options.push(
-                <option key={age} value={age}>
-                    {age}
-                </option>
-            );
-        }
-        return options;
-    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -30,8 +20,8 @@ export const SignUp = () => {
             name: data.get("name") as string,
             email: data.get("email") as string,
             password: data.get("password") as string,
-            age: Number(data.get("age")),
-            gender: data.get("gender") as Gender,
+            dateOfBirth: data.get("dateOfBirth") as string,
+            gender: data.get("gender") as Gender
         };
 
         try {
@@ -80,14 +70,9 @@ export const SignUp = () => {
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div className="space-y-2">
-                                <label htmlFor="age">Age</label>
-                                <select className="border-2 border-gray-600 rounded-md p-2 w-full" name="age"
-                                    aria-label="Select age"
-                                    title="Select age"
-                                    required>
-                                    <option value="">Select age</option>
-                                    {generateAgeOptions()}
-                                </select>
+                                <label htmlFor="age">Date of Birth</label>
+                                <input className="border-2 border-gray-600 rounded-md p-2 mt-3 w-full" name="dateOfBirth"
+                                    type="date" max={todayISO()} min="1900-01-01" required/>
                             </div>
                             <div className="space-y-2">
                                 <label htmlFor="gender">Gender</label>

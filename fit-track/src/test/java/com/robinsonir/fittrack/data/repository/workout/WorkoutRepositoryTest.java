@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.HashSet;
 import java.util.List;
@@ -33,7 +34,7 @@ public class WorkoutRepositoryTest {
         member.setName("John Doe");
         member.setEmail("john.doe@example.com");
         member.setPassword("password123");
-        member.setAge(30);
+        member.setDateOfBirth(LocalDate.of(1995, 1, 1));
         member.setGender(Gender.MALE);
 
         memberRepository.save(member);
@@ -64,7 +65,7 @@ public class WorkoutRepositoryTest {
         member.setName("Jane Doe");
         member.setEmail("jane.doe@example.com");
         member.setPassword("securePass");
-        member.setAge(28);
+        member.setDateOfBirth(LocalDate.of(1997, 6, 15));
         member.setGender(Gender.FEMALE);
 
         memberRepository.save(member);
@@ -94,7 +95,7 @@ public class WorkoutRepositoryTest {
         member1.setName("Bob Smith");
         member1.setEmail("bob.smith@example.com");
         member1.setPassword("bobPass");
-        member1.setAge(35);
+        member1.setDateOfBirth(LocalDate.of(1990, 4, 20));
         member1.setGender(Gender.MALE);
 
         memberRepository.save(member1);
@@ -103,7 +104,7 @@ public class WorkoutRepositoryTest {
         member2.setName("Alice Johnson");
         member2.setEmail("alice.johnson@example.com");
         member2.setPassword("alicePass");
-        member2.setAge(29);
+        member2.setDateOfBirth(LocalDate.of(1996, 3, 10));
         member2.setGender(Gender.FEMALE);
         memberRepository.save(member2);
 
@@ -141,7 +142,7 @@ public class WorkoutRepositoryTest {
         member.setName("Chris Evans");
         member.setEmail("chris.evans@example.com");
         member.setPassword("captain123");
-        member.setAge(40);
+        member.setDateOfBirth(LocalDate.of(1985, 7, 1));
         member.setGender(Gender.MALE);
         memberRepository.save(member);
 
@@ -164,7 +165,7 @@ public class WorkoutRepositoryTest {
         newMember.setName("Mark Ruffalo");
         newMember.setEmail("mark.ruffalo@example.com");
         newMember.setPassword("hulk123");
-        newMember.setAge(53);
+        newMember.setDateOfBirth(LocalDate.of(1972, 11, 22));
         newMember.setGender(Gender.MALE);
         memberRepository.save(newMember);
 
@@ -179,7 +180,7 @@ public class WorkoutRepositoryTest {
         member.setName("John Doe");
         member.setEmail("johndoe@example.com");
         member.setPassword("password");
-        member.setAge(30);
+        member.setDateOfBirth(LocalDate.of(1995, 1, 1));
         member.setGender(Gender.MALE);
 
         // Create some workouts for the member

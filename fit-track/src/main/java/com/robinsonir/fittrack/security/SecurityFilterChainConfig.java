@@ -53,7 +53,8 @@ public class SecurityFilterChainConfig {
                         "/api/v1/members"
                 )
                 .permitAll()
-                .requestMatchers("/swagger-ui/**",
+                .requestMatchers(
+                        "/swagger-ui/**",
                         "/actuator/**",
                         "/swagger-ui.html",
                         "/v3/api-docs/**",
