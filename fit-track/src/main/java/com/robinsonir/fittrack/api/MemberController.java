@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -49,7 +50,7 @@ public class MemberController {
 
     @ApiResponse(responseCode = "401", description = "Unauthorized")
     @ApiResponse(responseCode = "404", description = "Member not found")
-    @Operation(security = {}, summary = "Get member by ID")
+    @Operation(summary = "Get member by ID")
     @GetMapping("{memberId}")
     public MemberDTO getMember(
             @Parameter(description = "memberId", required = true) @PathVariable final Long memberId) {
@@ -60,7 +61,7 @@ public class MemberController {
     @Operation(security = {}, summary = "Register a new member")
     @PostMapping
     public AuthResponse registerMember(
-            @Parameter(description = "request") @RequestBody MemberRegistrationRequest request) {
+            @Parameter(description = "request") @Valid @RequestBody MemberRegistrationRequest request) {
         MemberDTO created = memberService.addMember(request);
         String jwtToken = jwtUtil.generateToken(request.email(), created.roles());
         return new AuthResponse(jwtToken, created);
@@ -72,7 +73,7 @@ public class MemberController {
     @PatchMapping("{memberId}")
     public MemberDTO updateMember(
             @Parameter(description = "memberId") @PathVariable final Long memberId,
-            @Parameter(description = "updateRequest") @RequestBody MemberUpdateRequest updateRequest) {
+            @Parameter(description = "updateRequest") @Valid @RequestBody MemberUpdateRequest updateRequest) {
         return memberService.updateMember(memberId, updateRequest);
     }
 

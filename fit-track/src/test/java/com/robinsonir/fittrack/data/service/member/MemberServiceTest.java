@@ -1,5 +1,6 @@
 package com.robinsonir.fittrack.data.service.member;
 
+import com.robinsonir.fittrack.data.Fitness;
 import com.robinsonir.fittrack.data.Gender;
 import com.robinsonir.fittrack.data.entity.member.MemberEntity;
 import com.robinsonir.fittrack.data.repository.member.MemberDTO;
@@ -7,7 +8,6 @@ import com.robinsonir.fittrack.data.repository.member.MemberRepository;
 import com.robinsonir.fittrack.exception.DuplicateResourceException;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
 import com.robinsonir.fittrack.mappers.MemberMapper;
-import com.robinsonir.fittrack.mappers.MemberMapperImpl;
 import com.robinsonir.fittrack.s3.S3Service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +20,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -31,7 +32,8 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 public class MemberServiceTest {
 
-    private MemberMapper memberMapper = new MemberMapperImpl();
+    @Mock
+    private MemberMapper memberMapper;
 
     @Mock
     private MemberRepository memberRepository;
@@ -73,6 +75,8 @@ public class MemberServiceTest {
         memberEntity.setGender(Gender.MALE);
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(memberEntity));
+        when(memberMapper.memberEntityToMemberDTO(memberEntity))
+                .thenAnswer(inv -> toDto(inv.getArgument(0)));
 
         // Act
         MemberDTO member = memberTest.getMemberById(memberId);
@@ -94,7 +98,7 @@ public class MemberServiceTest {
         // Act & Assert
         assertThatThrownBy(() -> memberTest.getMemberById(memberId))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("member with id [99] not found");
+                .hasMessage("member with ID: [99] not found");
     }
 
     @Test
@@ -110,17 +114,21 @@ public class MemberServiceTest {
         );
 
         when(memberRepository.existsByEmail(registrationRequest.email())).thenReturn(false);
-        when(passwordEncoder.encode(registrationRequest.password())).thenReturn("hashedPassword");
+        when(memberMapper.registrationRequestToEntity(registrationRequest))
+                .thenAnswer(inv -> entityFromRequest(inv.getArgument(0)));
+        when(memberMapper.memberEntityToMemberDTO(any(MemberEntity.class)))
+                .thenAnswer(inv -> toDto(inv.getArgument(0)));
 
         // Act
         MemberDTO result = memberTest.addMember(registrationRequest);
+
+        verify(passwordEncoder).encode("password123");
 
         // Assert — repository was called with the mapped entity
         verify(memberRepository).save(
                 argThat(member ->
                         member.getName().equals(registrationRequest.name()) &&
                                 member.getEmail().equals(registrationRequest.email()) &&
-                                member.getPassword().equals("hashedPassword") &&
                                 member.getDateOfBirth().equals(registrationRequest.dateOfBirth()) &&
                                 member.getGender().equals(registrationRequest.gender())
                 )
@@ -174,12 +182,14 @@ public class MemberServiceTest {
                 65,
                 170,
                 60,
-                "Cycling",
+                Fitness.BEGINNER,
                 18
         );
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
         when(memberRepository.existsByEmail(updateRequest.email())).thenReturn(false);
+        when(memberMapper.memberEntityToMemberDTO(existingMember))
+                .thenAnswer(inv -> toDto(inv.getArgument(0)));
 
         // Act
         MemberDTO result = memberTest.updateMember(memberId, updateRequest);
@@ -192,7 +202,7 @@ public class MemberServiceTest {
         assertThat(result.weight()).isEqualTo(65);
         assertThat(result.height()).isEqualTo(170);
         assertThat(result.weightGoal()).isEqualTo(60);
-        assertThat(result.activity()).isEqualTo("Cycling");
+        assertThat(result.fitness()).isEqualTo(Fitness.BEGINNER);
         assertThat(result.bodyFat()).isEqualTo(18);
 
         // Assert — dirty tracking applied to managed entity; no explicit save call
@@ -212,7 +222,7 @@ public class MemberServiceTest {
         existingMember.setDateOfBirth(originalDob);
         existingMember.setGender(Gender.MALE);
         existingMember.setWeight(80);
-        existingMember.setActivity("Running");
+        existingMember.setFitness(Fitness.BEGINNER);
 
         MemberUpdateRequest partialRequest = new MemberUpdateRequest(
                 null,      // name — unchanged
@@ -222,11 +232,13 @@ public class MemberServiceTest {
                 75,        // weight — updated
                 null,      // height — unchanged
                 70,        // weightGoal — updated
-                null,      // activity — unchanged
+                null,      // fitness — unchanged
                 null       // bodyFat — unchanged
         );
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
+        when(memberMapper.memberEntityToMemberDTO(existingMember))
+                .thenAnswer(inv -> toDto(inv.getArgument(0)));
 
         // Act
         MemberDTO result = memberTest.updateMember(memberId, partialRequest);
@@ -238,7 +250,7 @@ public class MemberServiceTest {
         assertThat(result.gender()).isEqualTo(Gender.MALE);
         assertThat(result.weight()).isEqualTo(75);
         assertThat(result.weightGoal()).isEqualTo(70);
-        assertThat(result.activity()).isEqualTo("Running");
+        assertThat(result.fitness()).isEqualTo(Fitness.BEGINNER);
     }
 
     @Test
@@ -253,7 +265,7 @@ public class MemberServiceTest {
         // Act & Assert
         assertThatThrownBy(() -> memberTest.updateMember(memberId, updateRequest))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("member with id [99] not found");
+                .hasMessage("member with ID: [99] not found");
     }
 
     @Test
@@ -362,7 +374,7 @@ public class MemberServiceTest {
         // Act & Assert
         assertThatThrownBy(() -> memberTest.getProfilePicture(memberId))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("member with id [1] not found");
+                .hasMessage("member with ID: [1] not found");
     }
 
     @Test
@@ -382,6 +394,36 @@ public class MemberServiceTest {
         // Act & Assert
         assertThatThrownBy(() -> memberTest.getProfilePicture(memberId))
                 .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessage("member with id [1] profile image not found");
+                .hasMessage("member with ID: [1] profile image not found");
+    }
+
+    private static MemberDTO toDto(MemberEntity entity) {
+        return new MemberDTO(
+                entity.getId(),
+                entity.getName(),
+                entity.getEmail(),
+                entity.getGender(),
+                entity.getDateOfBirth(),
+                entity.getWeight(),
+                entity.getHeight(),
+                entity.getWeightGoal(),
+                entity.getFitness(),
+                entity.getBodyFat(),
+                entity.getMemberSince(),
+                List.of("ROLE_USER"),
+                entity.getEmail(),
+                entity.getProfileImageId(),
+                entity.getLastModifiedDate()
+        );
+    }
+
+    private static MemberEntity entityFromRequest(MemberRegistrationRequest request) {
+        MemberEntity entity = new MemberEntity();
+        entity.setName(request.name());
+        entity.setEmail(request.email());
+        entity.setPassword(request.password());
+        entity.setDateOfBirth(request.dateOfBirth());
+        entity.setGender(request.gender());
+        return entity;
     }
 }

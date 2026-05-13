@@ -1,5 +1,6 @@
 package com.robinsonir.fittrack.data.repository.member;
 
+import com.robinsonir.fittrack.data.Fitness;
 import com.robinsonir.fittrack.data.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -22,7 +23,7 @@ public record MemberDTO(
         Integer weight,
         Integer height,
         Integer weightGoal,
-        String activity,
+        Fitness fitness,
         Integer bodyFat,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         OffsetDateTime memberSince,

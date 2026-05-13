@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {getMemberApi} from "../../api/generated/endpoints/member-api/member-api.ts";
-import {Gender, MemberUpdateRequest, WorkoutDTO} from "../../api/generated/models";
+import {Fitness, Gender, MemberUpdateRequest, WorkoutDTO} from "../../api/generated/models";
 import {getWorkoutsApi} from "../../api/generated/endpoints/workouts-api/workouts-api.ts";
 import {buildProfileImage} from "../../services/client.ts";
 import {toast} from "sonner";
@@ -50,7 +50,7 @@ export const Profile = () => {
         weight: member.weight,
         height: member.height,
         weightGoal: member.weightGoal,
-        activity: member.activity,
+        fitness: member.fitness,
         bodyFat: member.bodyFat
     };
 
@@ -121,7 +121,7 @@ export const Profile = () => {
             weight: Number(formData.get("weight")) || undefined,
             height: Number(formData.get("height")) || undefined,
             weightGoal: Number(formData.get("weightGoal")) || undefined,
-            activity: String(formData.get("activity")) || undefined,
+            fitness: formData.get("fitness") as Fitness || undefined,
             bodyFat: Number(formData.get("bodyFat")) || undefined
         };
 
@@ -165,7 +165,7 @@ export const Profile = () => {
                         </div>
                         <h2 className="text-2xl text-black dark:text-white mb-2 font-bold">{member.name}</h2>
                         <p className="text-xl text-black dark:text-gray-400 mb-2">Fitness
-                            Experience: {healthInfo.activity}</p>
+                            Experience: {healthInfo.fitness}</p>
                         <div className="grid grid-cols-2 gap-4 w-full text-center p-6">
                             <div className="bg-[#222] rounded-md p-3 text-white">
                                 <p className="text-lg font-bold text-black dark:text-white">Member Since</p>
@@ -260,18 +260,17 @@ export const Profile = () => {
                                     )}
                                 </div>
                                 <div className="space-y-2">
-                                    <label htmlFor="activity">Fitness Experience</label>
+                                    <label htmlFor="fitness">Fitness Experience</label>
                                     {member && (
-                                        <select name="activity" defaultValue={healthInfo.activity}
+                                        <select name="fitness" defaultValue={healthInfo.fitness}
                                             disabled={!isEditable}
                                             className="border-2 border-gray-600 rounded-md p-2 w-full">
                                             <option value="">
-                                                Select Activity Experience
+                                                Select Fitness Experience
                                             </option>
-                                            <option value="Advanced">Advanced</option>
-                                            <option value="Intermediate">Intermediate</option>
-                                            <option value="Beginner">Beginner</option>
-                                            <option value="Sedentary">Sedentary</option>
+                                            <option value={Fitness.Advanced}>Advanced</option>
+                                            <option value={Fitness.Intermediate}>Intermediate</option>
+                                            <option value={Fitness.Beginner}>Beginner</option>
                                         </select>
                                     )}
                                 </div>

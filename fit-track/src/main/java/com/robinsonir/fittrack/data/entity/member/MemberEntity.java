@@ -1,13 +1,16 @@
 package com.robinsonir.fittrack.data.entity.member;
 
+import com.robinsonir.fittrack.data.Fitness;
 import com.robinsonir.fittrack.data.Gender;
 import com.robinsonir.fittrack.data.entity.AbstractModifiedDateEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 import org.hibernate.envers.AuditTable;
 import org.hibernate.envers.Audited;
 import org.hibernate.envers.NotAudited;
+import org.jspecify.annotations.NonNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,7 +18,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 
 @Data
@@ -40,6 +42,7 @@ public class MemberEntity extends AbstractModifiedDateEntity implements UserDeta
     @Enumerated(EnumType.STRING)
     private Gender gender;
 
+    @ToString.Exclude
     @Column(name = "password", nullable = false)
     @NotAudited
     private String password;
@@ -56,8 +59,9 @@ public class MemberEntity extends AbstractModifiedDateEntity implements UserDeta
     @Column(name = "weight_goal")
     private Integer weightGoal;
 
-    @Column(name = "activity")
-    private String activity;
+    @Column(name = "fitness")
+    @Enumerated(EnumType.STRING)
+    private Fitness fitness;
 
     @Column(name = "body_fat")
     private Integer bodyFat;
@@ -67,7 +71,7 @@ public class MemberEntity extends AbstractModifiedDateEntity implements UserDeta
     private OffsetDateTime memberSince;
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
+    public @NonNull Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
@@ -77,26 +81,7 @@ public class MemberEntity extends AbstractModifiedDateEntity implements UserDeta
     }
 
     @Override
-    public String getUsername() {
+    public @NonNull String getUsername() {
         return email;
-    }
-
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
     }
 }

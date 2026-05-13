@@ -1,20 +1,23 @@
 package com.robinsonir.fittrack.data.service.member;
 
+import com.robinsonir.fittrack.data.Fitness;
 import com.robinsonir.fittrack.data.Gender;
-import jakarta.validation.constraints.PastOrPresent;
+import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Past;
 
 import java.time.LocalDate;
 
+@Schema(name = "MemberUpdateRequest")
 public record MemberUpdateRequest(
-      String name,
-      String email,
-      @PastOrPresent(message = "Date of birth must be in the past")
-      LocalDate dateOfBirth,
-      Gender gender,
-      Integer weight,
-      Integer height,
-      Integer weightGoal,
-      String activity,
-      Integer bodyFat
+        String name,
+        String email,
+        @Past(message = "Date of birth must be in the past")
+        LocalDate dateOfBirth,
+        Gender gender,
+        Integer weight,
+        Integer height,
+        Integer weightGoal,
+        Fitness fitness,
+        Integer bodyFat
 ) {
 }

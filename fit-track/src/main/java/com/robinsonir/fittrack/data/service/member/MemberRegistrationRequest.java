@@ -2,7 +2,7 @@ package com.robinsonir.fittrack.data.service.member;
 
 import com.robinsonir.fittrack.data.Gender;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.PastOrPresent;
+import jakarta.validation.constraints.Past;
 
 import java.time.LocalDate;
 
@@ -14,7 +14,7 @@ public record MemberRegistrationRequest(
         String email,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         String password,
-        @PastOrPresent(message = "Date of birth must be in the past")
+        @Past(message = "Date of birth must be in the past")
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         LocalDate dateOfBirth,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
