@@ -27,4 +27,10 @@ public class AuthController {
             @Parameter(description = "request") @RequestBody AuthRequest request) {
         return authService.login(request);
     }
+
+    @Operation(security = {}, summary = "Refresh token")
+    @PostMapping("refresh")
+    public RefreshResponse refresh(@Parameter(description = "request") @RequestBody RefreshRequest request) {
+        return authService.refreshToken(request.refreshToken());
+    }
 }
