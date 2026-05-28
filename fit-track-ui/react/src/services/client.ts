@@ -1,20 +1,59 @@
 import axios, {AxiosRequestConfig} from "axios";
+import jwtDecode, {JwtPayload} from "jwt-decode";
 
 
 const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL,
 });
-axiosInstance.interceptors.request.use(
-    (config) => {
-        const accessToken = localStorage.getItem("access_token");
 
+let refreshPromise: Promise<string | null> | null = null;
+
+export const refreshAccessToken = async (): Promise<string | null> => {
+    const refreshToken = localStorage.getItem("refresh_token");
+    if (!refreshToken) return null;
+
+    try {
+        const decoded = jwtDecode<JwtPayload>(refreshToken);
+        if (!decoded.exp || Date.now() > decoded.exp * 1000) return null;
+
+        const {data} = await axios.post(
+            `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/refresh`,
+            {refreshToken},
+            {headers: {"Content-Type": "application/json"}}
+        );
+
+        if (data.accessToken) {
+            localStorage.setItem("access_token", data.accessToken);
+            return data.accessToken;
+        }
+    } catch {
+        return null;
+    }
+    return null;
+};
+
+axiosInstance.interceptors.request.use(
+    async (config) => {
         if (config.data && config.data instanceof FormData) {
-            // If the request contains FormData, don't set the 'Content-Type', 
-            // the browser will handle it automatically
             delete config.headers["Content-Type"];
         } else {
-            // Default to 'application/json' if not FormData
             config.headers["Content-Type"] = "application/json";
+        }
+
+        let accessToken = localStorage.getItem("access_token");
+
+        if (accessToken) {
+            try {
+                const decoded = jwtDecode<JwtPayload>(accessToken);
+                if (decoded.exp && Date.now() > decoded.exp * 1000) {
+                    if (!refreshPromise) {
+                        refreshPromise = refreshAccessToken().finally(() => { refreshPromise = null; });
+                    }
+                    accessToken = await refreshPromise;
+                }
+            } catch {
+                accessToken = null;
+            }
         }
 
         if (accessToken) {

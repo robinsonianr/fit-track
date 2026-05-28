@@ -75,7 +75,7 @@ public class JWTAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
         } catch (JwtException ex) {
             LOGGER.warn("Invalid or expired token", ex);
-            handlerExceptionResolver.resolveException(request, response, null, new BadCredentialsException("Invalid or expired token", ex));
+            filterChain.doFilter(request, response);
         }
     }
 }

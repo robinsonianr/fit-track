@@ -4,16 +4,18 @@ import {useAuth} from "../context/AuthContext";
 
 const ProtectedRoute = ({children}: { children: any }) => {
 
-    const {isMemberAuthenticated} = useAuth();
+    const {member, loading} = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!isMemberAuthenticated()) {
+        if (!loading && !member) {
             navigate("/login");
         }
-    }, []);
+    }, [loading, member]);
 
-    return isMemberAuthenticated() ? children : "";
+    if (loading) return null;
+
+    return member ? children : null;
 };
 
 export default ProtectedRoute;
