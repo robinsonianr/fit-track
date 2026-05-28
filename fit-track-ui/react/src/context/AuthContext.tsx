@@ -51,7 +51,7 @@ const AuthProvider = ({children}: { children: any }) => {
             const refreshToken = response.refreshToken;
             if (accessToken !== undefined && refreshToken !== undefined) {
                 localStorage.setItem("access_token", accessToken);
-                localStorage.setItem("refresh_token", refreshToken)
+                localStorage.setItem("refresh_token", refreshToken);
             }
 
             setMember(response.member);
@@ -67,7 +67,7 @@ const AuthProvider = ({children}: { children: any }) => {
             const refreshToken = response.refreshToken;
             if (accessToken !== undefined && refreshToken !== undefined) {
                 localStorage.setItem("access_token", accessToken);
-                localStorage.setItem("refresh_token", refreshToken)
+                localStorage.setItem("refresh_token", refreshToken);
             }
             setMember(response.member);
         } catch (error) {
