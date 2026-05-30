@@ -14,7 +14,11 @@ export const refreshAccessToken = async (): Promise<string | null> => {
 
     try {
         const decoded = jwtDecode<JwtPayload>(refreshToken);
-        if (!decoded.exp || Date.now() > decoded.exp * 1000) return null;
+        if (!decoded.exp || Date.now() > decoded.exp * 1000) {
+            localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
+            return null;
+        }
 
         const {data} = await axios.post(
             `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/refresh`,
@@ -26,7 +30,8 @@ export const refreshAccessToken = async (): Promise<string | null> => {
             localStorage.setItem("access_token", data.accessToken);
             return data.accessToken;
         }
-    } catch {
+    } catch (error) {
+        console.error("Failed to refresh access token:", error);
         return null;
     }
     return null;
@@ -50,6 +55,13 @@ axiosInstance.interceptors.request.use(
                         refreshPromise = refreshAccessToken().finally(() => { refreshPromise = null; });
                     }
                     accessToken = await refreshPromise;
+
+                    if (!accessToken) {
+                        localStorage.removeItem("access_token");
+                        localStorage.removeItem("refresh_token");
+                        window.location.href = "/login";
+                        return Promise.reject(new Error("Token refresh failed"));
+                    }
                 }
             } catch {
                 accessToken = null;

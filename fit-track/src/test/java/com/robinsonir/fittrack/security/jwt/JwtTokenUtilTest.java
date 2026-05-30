@@ -6,8 +6,9 @@ import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import org.springframework.test.util.ReflectionTestUtils;
+
 import javax.crypto.SecretKey;
-import java.lang.reflect.Field;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
@@ -23,11 +24,9 @@ class JwtTokenUtilTest {
     private static final String SECRET_KEY = "this-is-a-test-secret-key-that-is-long-enough-for-hmac-sha256";
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         jwtTokenUtil = new JwtTokenUtil();
-        Field secretKeyField = JwtTokenUtil.class.getDeclaredField("secretKey");
-        secretKeyField.setAccessible(true);
-        secretKeyField.set(jwtTokenUtil, SECRET_KEY);
+        ReflectionTestUtils.setField(jwtTokenUtil, "secretKey", SECRET_KEY);
     }
 
     @Test

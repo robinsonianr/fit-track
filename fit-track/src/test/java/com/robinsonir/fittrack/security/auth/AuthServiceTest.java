@@ -140,8 +140,8 @@ public class AuthServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> authService.refreshToken(refreshToken))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("User not found");
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessage("Invalid refresh token");
 
         verify(jwtUtil, never()).generateToken(anyString(), anyList());
     }
@@ -158,8 +158,39 @@ public class AuthServiceTest {
 
         // Act & Assert
         assertThatThrownBy(() -> authService.refreshToken(refreshToken))
-                .isInstanceOf(RuntimeException.class)
-                .hasMessage("Invalid token");
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessage("Invalid refresh token");
+
+        verify(jwtUtil, never()).generateToken(anyString(), anyList());
+    }
+
+    @Test
+    void refreshTokenThrowsWhenTokenIsNull() {
+        assertThatThrownBy(() -> authService.refreshToken(null))
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessage("Refresh token is required");
+
+        verify(jwtUtil, never()).getSubject(any());
+    }
+
+    @Test
+    void refreshTokenThrowsWhenTokenIsEmpty() {
+        assertThatThrownBy(() -> authService.refreshToken("  "))
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessage("Refresh token is required");
+
+        verify(jwtUtil, never()).getSubject(any());
+    }
+
+    @Test
+    void refreshTokenThrowsWhenTokenIsInvalid() {
+        // Arrange
+        when(jwtUtil.getSubject("malformed-token")).thenThrow(new io.jsonwebtoken.MalformedJwtException("Invalid JWT"));
+
+        // Act & Assert
+        assertThatThrownBy(() -> authService.refreshToken("malformed-token"))
+                .isInstanceOf(BadCredentialsException.class)
+                .hasMessage("Invalid refresh token");
 
         verify(jwtUtil, never()).generateToken(anyString(), anyList());
     }
