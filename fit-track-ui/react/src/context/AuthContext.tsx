@@ -1,5 +1,4 @@
 import {createContext, useContext, useEffect, useMemo, useState} from "react";
-import jwtDecode, {JwtPayload} from "jwt-decode";
 import {AuthRequest, MemberDTO, MemberRegistrationRequest} from "../api/generated/models";
 import {getMemberApi} from "../api/generated/endpoints/member-api/member-api.ts";
 import {getAuthApi} from "../api/generated/endpoints/auth-api/auth-api.ts";
@@ -7,10 +6,10 @@ import {getAuthApi} from "../api/generated/endpoints/auth-api/auth-api.ts";
 
 type AuthContextType = {
     member: MemberDTO | undefined;
+    loading: boolean;
     login: (authRequest: AuthRequest) => Promise<void>;
     register: (req: MemberRegistrationRequest) => Promise<void>;
     logOut: () => void;
-    isMemberAuthenticated: () => boolean;
     refreshMember: () => Promise<void>;
 };
 
@@ -21,6 +20,7 @@ const AuthProvider = ({children}: { children: any }) => {
     const {me: fetchMe, registerMember} = useMemo(() => getMemberApi(), []);
     const {login: performLogin} = getAuthApi();
     const [member, setMember] = useState<MemberDTO | undefined>();
+    const [loading, setLoading] = useState(true);
 
     const refreshMember = async (): Promise<void> => {
         const freshMember = await fetchMe();
@@ -28,33 +28,30 @@ const AuthProvider = ({children}: { children: any }) => {
     };
 
     useEffect(() => {
-        const token = localStorage.getItem("access_token");
-        if (!token) return;
-
-        try {
-            const decoded = jwtDecode<JwtPayload>(token);
-            if (!decoded.exp || Date.now() > decoded.exp * 1000) return;
-
-            fetchMe()
-                .then(setMember)
-                .catch(() => {
-                    localStorage.removeItem("access_token");
-                    setMember(undefined);
-                    window.location.href = "/login";
-                });
-        } catch {
-            localStorage.removeItem("access_token");
-            window.location.href = "/login";
+        if (!localStorage.getItem("access_token") && !localStorage.getItem("refresh_token")) {
+            setLoading(false);
+            return;
         }
+
+        fetchMe()
+            .then(setMember)
+            .catch(() => {
+                localStorage.removeItem("access_token");
+                localStorage.removeItem("refresh_token");
+                setMember(undefined);
+            })
+            .finally(() => setLoading(false));
     }, [fetchMe]);
 
 
     const login = async (authRequest: AuthRequest): Promise<void> => {
         try {
             const response = await performLogin(authRequest);
-            const jwtToken = response.jwtToken;
-            if (jwtToken !== undefined) {
-                localStorage.setItem("access_token", jwtToken);
+            const accessToken = response.accessToken;
+            const refreshToken = response.refreshToken;
+            if (accessToken !== undefined && refreshToken !== undefined) {
+                localStorage.setItem("access_token", accessToken);
+                localStorage.setItem("refresh_token", refreshToken);
             }
 
             setMember(response.member);
@@ -66,9 +63,11 @@ const AuthProvider = ({children}: { children: any }) => {
     const register = async (req: MemberRegistrationRequest): Promise<void> => {
         try {
             const response = await registerMember(req);
-            const jwtToken = response.jwtToken;
-            if (jwtToken !== undefined) {
-                localStorage.setItem("access_token", jwtToken);
+            const accessToken = response.accessToken;
+            const refreshToken = response.refreshToken;
+            if (accessToken !== undefined && refreshToken !== undefined) {
+                localStorage.setItem("access_token", accessToken);
+                localStorage.setItem("refresh_token", refreshToken);
             }
             setMember(response.member);
         } catch (error) {
@@ -78,30 +77,18 @@ const AuthProvider = ({children}: { children: any }) => {
 
     const logOut = () => {
         localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
         setMember(undefined);
         window.location.href = "/login";
-    };
-
-    const isMemberAuthenticated = () => {
-        const token = localStorage.getItem("access_token");
-        if (!token) {
-            return false;
-        }
-        const decodeToken = jwtDecode<JwtPayload>(token);
-        if (!decodeToken.exp) {
-            return false;
-        }
-        const expiration = decodeToken.exp;
-        return Date.now() <= expiration * 1000;
     };
 
     return (
         <AuthContext.Provider value={{
             member: member,
+            loading,
             login: login,
             register: register,
             logOut,
-            isMemberAuthenticated,
             refreshMember,
         }}>
             {children}

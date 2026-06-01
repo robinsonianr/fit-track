@@ -63,8 +63,9 @@ public class MemberController {
     public AuthResponse registerMember(
             @Parameter(description = "request") @Valid @RequestBody MemberRegistrationRequest request) {
         MemberDTO created = memberService.addMember(request);
-        String jwtToken = jwtUtil.generateToken(request.email(), created.roles());
-        return new AuthResponse(jwtToken, created);
+        String accessToken = jwtUtil.generateToken(request.email(), created.roles());
+        String refreshToken = jwtUtil.generateRefreshToken(request.email());
+        return new AuthResponse(accessToken, refreshToken, created);
     }
 
 

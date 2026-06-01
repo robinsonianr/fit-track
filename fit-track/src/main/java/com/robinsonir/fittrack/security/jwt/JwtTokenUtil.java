@@ -16,11 +16,19 @@ import java.util.Map;
 @Service
 public class JwtTokenUtil {
 
-    @Value( "${jwt.secret-key}")
+    @Value("${jwt.secret-key}")
     private String secretKey;
 
-    public String generateToken(String subject, String... roles) {
-        return generateToken(subject, Map.of("scopes", roles));
+    public String generateRefreshToken(String subject) {
+
+        return Jwts
+                .builder()
+                .subject(subject)
+                .issuer("fittrack")
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(Date.from(Instant.now().plus(30, ChronoUnit.DAYS)))
+                .signWith(getSigningKey())
+                .compact();
     }
 
     public String generateToken(String subject, List<String> roles) {
@@ -38,7 +46,7 @@ public class JwtTokenUtil {
                 .subject(subject)
                 .issuer("fittrack")
                 .issuedAt(Date.from(Instant.now()))
-                .expiration(Date.from(Instant.now().plus(1, ChronoUnit.DAYS)))
+                .expiration(Date.from(Instant.now().plus(15, ChronoUnit.MINUTES)))
                 .signWith(getSigningKey())
                 .compact();
     }

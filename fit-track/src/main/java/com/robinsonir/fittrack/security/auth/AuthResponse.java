@@ -5,7 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(name = "AuthResponse")
 public record AuthResponse(
-        String jwtToken,
+        String accessToken,
+        String refreshToken,
         MemberDTO member
 ) {
 }
