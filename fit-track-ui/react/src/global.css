@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./design-system/tokens.css";
 
 @layer base {
   body {
