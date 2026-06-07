@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import React from "react";
 
 /* ============================================================================
@@ -509,7 +509,7 @@ export const ElevationRefusal: Story = {
                                 color: "var(--color-smoke-ink)",
                             }}
                         >
-                            Pure white card with drop shadow against page. Conventional "material" elevation.
+                            Pure white card with drop shadow against page. Conventional &quot;material&quot; elevation.
                         </div>
                     </div>
                     <p
@@ -521,7 +521,7 @@ export const ElevationRefusal: Story = {
                             marginTop: "var(--spacing-16)",
                         }}
                     >
-                        The pure-white-and-shadow approach signals "tech product material design." It works but it's the *wrong* aesthetic for FitTrack's warm-paper identity. The system explicitly refuses this.
+                        The pure-white-and-shadow approach signals &quot;tech product material design.&quot; It works but it&apos;s the *wrong* aesthetic for FitTrack&apos;s warm-paper identity. The system explicitly refuses this.
                     </p>
                 </div>
             </div>

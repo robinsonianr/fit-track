@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react-vite";
 import React from "react";
 
 /* ============================================================================
@@ -707,9 +707,9 @@ export const TwoVoices: Story = {
                         color: "var(--color-smoke-ink)",
                     }}
                 >
-                    The label ("This week"), the secondary line ("Tuesday is usually
-                    Pull Day 2"), and any prose render in AeonikPro. The measurement
-                    ("3 of 4") renders in JetBrains Mono. The user reads the words; the
+                    The label (&quot;This week&quot;), the secondary line (&quot;Tuesday is usually
+                    Pull Day 2&quot;), and any prose render in AeonikPro. The measurement
+                    (&quot;3 of 4&quot;) renders in JetBrains Mono. The user reads the words; the
                     data reads as data. The split is non-negotiable.
                 </p>
             </div>
@@ -837,7 +837,7 @@ export const OpenTypeFeatures: Story = {
                 label: "Default vs ss02 + ss08 + dlig",
                 sample: "Going to the gym again",
                 offFeatures: "normal",
-                onFeatures: '"ss02" on, "ss08" on, "dlig" on',
+                onFeatures: "\"ss02\" on, \"ss08\" on, \"dlig\" on",
             },
         ];
 
@@ -846,7 +846,7 @@ export const OpenTypeFeatures: Story = {
                 label: "Default vs tabular-nums + slashed-zero",
                 sample: "0123456789",
                 offFeatures: "normal",
-                onFeatures: '"tnum" on, "zero" on',
+                onFeatures: "\"tnum\" on, \"zero\" on",
             },
         ];
 
@@ -941,9 +941,9 @@ export const OpenTypeFeatures: Story = {
                             maxWidth: "60ch",
                         }}
                     >
-                        ss08 opens the 'a' and 'e'; ss02 alters the 'g'; dlig enables
+                        ss08 opens the &apos;a&apos; and &apos;e&apos;; ss02 alters the &apos;g&apos;; dlig enables
                         discretionary ligatures. The differences are subtle but cumulative
-                        — they're what give AeonikPro its engineering-precise voice in
+                        — they&apos;re what give AeonikPro its engineering-precise voice in
                         FitTrack rather than reading as generic geometric sans.
                     </p>
                 </div>
@@ -1033,7 +1033,7 @@ export const OpenTypeFeatures: Story = {
                         }}
                     >
                         tnum enforces tabular figures — every digit is the same width, so
-                        numbers don't jitter when they animate or update. zero adds a slash
+                        numbers don&apos;t jitter when they animate or update. zero adds a slash
                         through the zero to distinguish it from capital O. Both features
                         are non-negotiable for a data-display typeface in a tracking app.
                     </p>

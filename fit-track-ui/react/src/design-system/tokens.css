@@ -11,7 +11,7 @@
  * ============================================================================ */
 
 @font-face {
-    font-family: "AeonikPro";
+    font-family: AeonikPro;
     src: url("/fonts/AeonikPro-Regular.woff2") format("woff2");
     font-weight: 400;
     font-style: normal;
@@ -19,7 +19,7 @@
 }
 
 @font-face {
-    font-family: "AeonikPro";
+    font-family: AeonikPro;
     src: url("/fonts/AeonikPro-Medium.woff2") format("woff2");
     font-weight: 500;
     font-style: normal;
@@ -55,6 +55,7 @@
  * ============================================================================ */
 
 @theme {
+
     /* COLORS — Warm Neutrals */
     --color-paper-canvas: #FAFAF8;
     --color-vellum-surface: #F2F1ED;
@@ -187,7 +188,7 @@
         font-feature-settings: var(--font-features-aeonikpro);
         -webkit-font-smoothing: antialiased;
         -moz-osx-font-smoothing: grayscale;
-        text-rendering: optimizeLegibility;
+        text-rendering: optimizelegibility;
     }
 
     .font-mono,

@@ -31,7 +31,7 @@ When finishing:
 
 > One or two sentences on the active goal. What are we building right now and why?
 
-*(no active focus yet)*
+> No active focus yet
 
 ---
 
