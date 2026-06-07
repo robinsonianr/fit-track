@@ -1,320 +1,153 @@
-# CLAUDE.md
+# Hard rules — non-negotiable, no exceptions
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Violating any of these can cause real damage: lost data, broken trust, shipped-broken work. Always follow.
 
-## Project Overview
+## 1. Ask Before Destructive Commands
 
-Fit Track is a full-stack fitness tracking application with a Spring Boot backend and React frontend. The project uses a monorepo structure with separate build configurations for each component.
+Never run irreversible or shared-state-changing commands without explicit permission. State the exact command, why you want to run it, and wait for an OK.
 
-## Repository Structure
+Always require confirmation:
 
-- `/fit-track` - Spring Boot 3.0.4 backend (Kotlin/Java)
-- `/fit-track-ui/react` - React 18.2.0 frontend with TypeScript
-- Root contains Gradle build configuration coordinating the monorepo
+- `git push --force` / `--force-with-lease`
+- `git reset --hard`, `git clean -fd`, `git checkout -- .`
+- `git merge`, `git rebase`, `git cherry-pick` onto shared branches
+- `git branch -D`, deleting remote branches (`git push origin :branch`)
+- `git commit --amend` on already-pushed commits
+- `git tag -d` / force-pushing tags
+- `rm -rf`, dropping DB tables, truncating data, running destructive migrations
+- Anything touching production: deploys, infra apply, secrets, DNS
+- Publishing packages, posting to GitHub/Slack/email, or anything visible to others
 
-## Common Commands
+Safe by default: read-only commands (`status`, `diff`, `log`), local builds, tests, lint, typecheck, and edits inside the working tree.
 
-### Backend (Spring Boot)
+If unsure whether a command is destructive — ask.
 
-From project root:
+## 2. Verify Before Reporting Complete
 
-```bash
-# Build the backend
-./gradlew build
+Before reporting any task as complete, verify it actually works:
 
-# Run the backend application
-./gradlew run
+- Run the tests, execute the script, check the output yourself.
+- For TypeScript: run `tsc --noEmit` and fix every type error.
+- For builds: run the build command and confirm it succeeds.
+- If you cannot verify (no test exists, can't run the code), say so explicitly. Don't imply success.
 
-# Run tests
-./gradlew test
+Report outcomes faithfully:
 
-# Clean build artifacts
-./gradlew clean
-```
+- If tests fail, say so with the relevant output. Never claim "all tests pass" when output shows failures.
+- Never suppress, simplify, or skip a failing check (test, lint, type error) to manufacture a green result.
+- Never characterize incomplete or broken work as done.
+- When something did pass or work, state it plainly. Don't hedge confirmed results with disclaimers, and don't re-verify things you already checked.
 
-### Frontend (React + Vite)
+The goal is an accurate report, not a defensive one.
 
-From `fit-track-ui/react` directory:
+## 3. Think Before Coding
 
-```bash
-# Install dependencies
-npm install
+Don't assume. Don't hide confusion. Surface tradeoffs.
 
-# Start development server (runs on http://localhost:5173)
-npm start
+Before implementing:
 
-# Build for production
-npm run build
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them — don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
 
-# Lint JavaScript/TypeScript
-npm run lint
+---
 
-# Fix linting issues automatically
-npm run lint:fix
+# Medium rules — engineering quality
 
-# Lint CSS
-npm run lint:css
+Apply these by default. Push back if the user asks for something that violates one — but they can override with reason.
 
-# Lint Markdown files
-npm run lint:md
-```
+## 4. Simplicity First
 
-### Database Setup
+Minimum code that solves the problem. Nothing speculative.
 
-The application requires PostgreSQL running in Docker:
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
 
-```bash
-# Create Docker network
-docker network create db
+Ask yourself: *"Would a senior engineer say this is overcomplicated?"* If yes, simplify.
 
-# Run PostgreSQL container
-docker run --name my-postgres-container -p 5432:5432 --network=db \
-  -v dbdata:/var/lib/postgres/data \
-  -e POSTGRES_PASSWORD=root1234 \
-  -e POSTGRES_DB=fit-tracker \
-  -d postgres
+## 5. Surgical Changes
 
-# Check if container is running
-docker ps
+Touch only what you must. Clean up only your own mess.
 
-# Start container if not running
-docker start my-postgres-container
-```
+When editing existing code:
 
-Database connection: `jdbc:postgresql://localhost:5432/fit-tracker`
-Schema name: `fit_tracker` (must be created manually in the database)
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it — don't delete it.
 
-## Architecture
+Decision rule: for every change you're about to make, check whether it traces back to what the user actually asked for. If it does, make it. If it doesn't, leave the file alone and surface the observation instead.
 
-### Backend Architecture
+## 6. Goal-Driven Execution
 
-**Technology Stack:**
-- Spring Boot 3.0.4 with Java 17
-- Kotlin 1.8.10 for build configuration
-- PostgreSQL with Flyway migrations
-- JPA/Hibernate with Envers for audit trails
-- Spring Security + JWT (JJWT 0.11.5)
-- MapStruct 1.6.3 for DTO mapping
-- AWS S3 SDK 2.20.56 for file storage
-- Gradle 7.6.1
+Define success criteria. Loop until verified.
 
-**Layered Architecture:**
-- `api/` - REST Controllers exposing endpoints
-- `security/` - Authentication, JWT handling, filters, and security configuration
-- `data/entity/` - JPA entities (Customer, Workout, Exercise)
-- `data/repository/` - Data access layer using JpaRepository
-- `data/service/` - Business logic services
-- `mappers/` - MapStruct mappers for Entity ↔ DTO conversion
-- `audit/` - Hibernate Envers audit tracking
-- `s3/` - AWS S3 integration for profile image storage
-- `exception/` - Custom exception classes
+Transform tasks into verifiable goals:
 
-**Database Schema:**
-- `customer` - User accounts with profile data and S3 image references
-- `workout` - Workout entries linked to customers
-- `exercises` - Exercise details linked to workouts (One-to-Many)
-- `revinfo` + `customer_aud` - Audit tables for tracking changes
+- `"Add validation"` → *"Write tests for invalid inputs, then make them pass"*
+- `"Fix the bug"` → *"Write a test that reproduces it, then make it pass"*
+- `"Refactor X"` → *"Ensure tests pass before and after"*
+- For UI testing, use the Puppeteer MCP or the Claude Chrome extension to verify how the UI actually renders — code review alone can't judge visuals.
 
-**Relationships:**
-- Customer 1:N Workout
-- Workout 1:N Exercise
-
-**Database Migrations:**
-Located in `fit-track/src/main/resources/db/migration/`. Flyway manages versioned migrations (V202403041200 through V202511161625).
-
-### Frontend Architecture
-
-**Technology Stack:**
-- React 18.2.0 with TypeScript 5.7.3
-- Vite 6.3.4 for build tooling
-- Tailwind CSS with PostCSS
-- Axios 1.8.2 for HTTP requests
-- React Router DOM 6.8.0
-- ECharts 5.5.1 for visualizations
-- Radix UI components
-- next-themes for theme management
-
-**Component Organization:**
-- `src/components/ui/` - Reusable UI components
-- `src/components/features/` - Feature-specific components (login, signup, logs)
-- `src/components/common/` - Shared components (modals, widgets)
-- `src/components/layout/` - Layout structure (navbar, sidebar, header)
-- `src/context/` - React Context providers (AuthContext, ThemeContext)
-- `src/services/` - API client layer with Axios
-- `src/types/` - TypeScript interfaces and types
-- `src/hooks/` - Custom React hooks
-- `src/pages/` - Page-level components
-- `src/styles/` - CSS/Tailwind styling
-
-**State Management:**
-Uses React Context API (no Redux/Zustand):
-
-- **AuthContext**: Manages authentication state, JWT token, and customer data
-- **ThemeContext**: Manages light/dark/system theme preferences
-
-**Data Persistence:**
-- `localStorage.access_token` - JWT authentication token
-- `localStorage.customerId` - Current user ID
-- `localStorage.theme` - Theme preference
-
-### Authentication Flow
-
-**Backend:**
-1. `/api/v1/auth/login` endpoint accepts email/password
-2. Spring Security's AuthenticationManager validates credentials
-3. JWT token generated with 24-hour expiration (HS256 signature)
-4. Token includes user email as subject and roles in claims
-5. JWTAuthenticationFilter validates tokens on all protected endpoints
-
-**Frontend:**
-1. Login form sends credentials to backend
-2. JWT token stored in localStorage
-3. Axios interceptor adds `Authorization: Bearer {token}` header to all requests
-4. ProtectedRoute wrapper prevents unauthenticated access to routes
-5. Token decoded on app mount to restore session
-
-**Protected Endpoints:**
-All endpoints require authentication except:
-- `/api/v1/auth/login`
-- `/api/v1/customers` (POST/GET)
-- `/ping`
-- Profile images
-- `/actuator/**`
-
-### Key API Endpoints
+For multi-step tasks, state a brief plan:
 
 ```
-POST   /api/v1/auth/login                      # Authenticate user
-POST   /api/v1/customers                       # Register new customer
-GET    /api/v1/customers/{id}                  # Get customer details
-GET    /api/v1/customers/{id}/profile-image    # Get profile image
-PUT    /api/v1/customers/{id}/profile-image    # Upload profile image (10MB max)
-PUT    /api/v1/customers/update/{id}           # Update customer
-GET    /api/v1/workouts/log/{customerId}       # Get customer workouts
-POST   /api/v1/workouts                        # Create workout
-GET    /api/v1/workouts/{id}                   # Get workout details
-GET    /api/v1/audit/{entityId}                # Get weight audit history
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
 ```
 
-### File Upload Strategy
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
 
-- Profile images stored in AWS S3: `profile-images/{customerId}/{uuid}`
-- Image reference (UUID) stored in database as `profileImageId`
-- Maximum file size: 10MB
-- FormData used for file uploads from frontend
-- Transactional consistency via `@Transactional` annotation
+## 7. Track Features as a Visible Task List
 
-### Audit Trail System
+§6 is about *defining* what done looks like. §2 is about *verifying* it. This section is about *making progress legible to the user*.
 
-- Hibernate Envers tracks all CustomerEntity changes automatically
-- AuditHistoryService queries revision history
-- Weight change history exposed via `/api/v1/audit/{entityId}`
-- Revisions stored in `revinfo` and `customer_aud` tables
+For any multi-file feature, externalize the task list — use the task tool, not your head. The user should be able to glance at the list and know exactly where you are.
 
-## Subagent Orchestration
+- Create one task per file or concrete unit of work, not one per phase.
+- Status changes are how you communicate position: `in_progress` when you start the file, `completed` when you leave it. Update them as you work, not in a batch at the end.
+- Only one task should be `in_progress` at a time. If you genuinely paused one to start another, say so.
+- Discovered work → a new task in the list, not silent scope creep on the current one.
+- Blocked → keep the task `in_progress` and post the blocker. Don't reassign yourself elsewhere without telling the user.
+- Stale list = lying. If a task no longer applies, delete it with a reason. No abandoned `pending` items at the end.
 
-When a task requires deep domain expertise or multi-step execution, delegate to the specialized agents located in `.claude/agents/lst97/`.
+If the user can't tell from the list what you've finished and what's left, the list is broken — fix it before continuing.
 
-### Dispatch Protocol
+## 8. Learn From Corrections
 
-1. **Identify**: Determine the best specialist for the task (e.g., use `java-architect` for Gradle issues).
-2. **Context**: Provide the subagent with relevant file paths and the specific goal.
-3. **Execute**: Call the agent using the `/agents` command or by referencing their role.
-4. **Rules**: All subagents must follow the core coordination rules defined in `@.claude/agents/lst97/CLAUDE.md`.
+Persistent lessons live in [`learnings.md`](./docs/learnings.md)  — read it at the start of every task and follow every rule there.
 
-## Environment Configuration
+When the user corrects a mistake you made:
 
-**Backend Environment Variables:**
-Configuration via `application.yml` and optional `.env` file:
-- Database: `jdbc:postgresql://localhost:5432/fit-tracker`
-- Database credentials: username `postgres`, password `root1234`
-- Server port: 8080
-- S3 bucket: `fitness-tracker-customers` (region: us-east-1)
-- Max file upload: 10MB
+1. Apply the correction.
+2. Append a rule to `learnings.md` so the same mistake doesn't recur.
+3. Show the user the new rule before continuing.
 
-**Frontend Environment Variables:**
-Located in `fit-track-ui/react/.env`:
-- `VITE_API_BASE_URL` - Backend API base URL (default: http://localhost:8080)
+## 9. Keep `progress.md` Current
 
-## Development Workflow
+[`progress.md`](./docs/progress.md) is the long-lived map of the project — what's built, in flight, blocked, and planned. The visible task list (§7) is your *short-lived* working memory; `progress.md` is the *durable* one.
 
-1. **Start Database**: Ensure PostgreSQL container is running
-2. **Start Backend**: Run `./gradlew run` from project root (runs on port 8080)
-3. **Start Frontend**: Run `npm start` from `fit-track-ui/react` (runs on port 5173)
-4. **Access Application**: Navigate to http://localhost:5173
+At the start of every task:
 
-Test account available:
-- Email: test123@gmail.com
-- Password: Test123
+1. Read **Current Focus**, **In Progress**, and **Blocked / Open Questions**.
+2. Verify the most recent **Completed** entries still match reality. If they don't, fix the file first.
 
-## Important Patterns and Conventions
+While working:
 
-### Backend Patterns
+- Move items between sections as their status changes — don't batch updates at the end.
+- New work discovered mid-task → add to **Backlog** or **In Progress**, don't silently grow the current item (mirrors §7).
+- Significant technical choices → append to **Decisions Log** with context, alternatives, and consequences.
 
-**Entity Design:**
+When finishing:
 
-- `AbstractEntity`: Base class with `id` and `version`
-- `AbstractModifiedDateEntity`: Adds `createdDate` and `lastModifiedDate` timestamps
-- `AbstractAuditEntity`: Extends modified date entity with Hibernate Envers auditing
-- Use `@OneToMany` with `FetchType.LAZY` and `CascadeType.ALL` for relationships
-- Use `@ManyToOne` with `FetchType.LAZY` for reverse relationships
+- Move the item to **Completed** with the date and what you verified (tests, build, deploy). This pairs with §2 — only mark complete what you actually checked.
+- If the task produced a persistent lesson, add the rule to `learnings.md` (§8) and reference it from the completed entry.
 
-**Service Layer:**
-- Services contain business logic and orchestrate repository calls
-- Use `@Transactional` for operations requiring consistency
-- Inject repositories and other services via constructor injection
+A stale `progress.md` is the same failure as a stale task list: it lies to the next person who reads it. Fix it before continuing.
 
-**Repository Pattern:**
-- Extend `JpaRepository<Entity, ID>` for standard CRUD
-- Use `@Query` annotations for custom queries
-- Separate interfaces for complex update operations (e.g., `CustomerUpdateRepository`)
-
-**DTO Mapping:**
-- MapStruct handles Entity ↔ DTO conversions
-- Mappers configured in `FitTrackMapperConfig` with Spring injection
-- Use `@Mapping` annotations for non-standard field mappings
-
-**Error Handling:**
-- Custom exceptions: `ResourceNotFoundException`, `DuplicateResourceException`
-- Global exception handlers process and format error responses
-
-### Frontend Patterns
-
-**Component Structure:**
-- Use functional components with hooks
-- Separate UI components from feature components
-- Keep business logic in services, not components
-- Use TypeScript interfaces for all props and data structures
-
-**API Calls:**
-- All API calls go through `services/client.ts`
-- Axios instance automatically adds auth headers
-- Handle loading and error states in components
-
-**Routing:**
-- Use `ProtectedRoute` wrapper for authenticated routes
-- Page components in `src/pages/`
-- Route definitions centralized in main routing configuration
-
-**Type Safety:**
-- Define interfaces for all data models in `src/types/`
-- Avoid `any` types in public APIs
-- Use strong typing for API responses
-
-## Known Considerations
-
-- JWT secret key is currently hardcoded (should use environment variable)
-- CORS allows all origins (`*`) in development
-- Database credentials are in `application.yml` (should use `.env` for local dev)
-- Backend runs on port 8080, frontend on port 5173 during development
-
-## Testing
-
-**Backend:**
-- JUnit and Mockito for unit tests
-- H2 in-memory database for tests
-- Run tests with `./gradlew test`
-
-**Frontend:**
-- Testing setup available but specific test commands not configured in package.json
-- Uses `@testing-library/react` and `@testing-library/jest-dom`
+---

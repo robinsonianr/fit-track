@@ -1,0 +1,203 @@
+/* ============================================================================
+ * FitTrack Design Tokens
+ * ----------------------------------------------------------------------------
+ * Single source of truth for design tokens. Imported by global.css (which
+ * already imports tailwindcss) — do NOT add @import "tailwindcss" here.
+ * The canonical human-readable reference lives in DESIGN.md at the repo root.
+ * ============================================================================ */
+
+/* ============================================================================
+ * 1. FONT FACE DECLARATIONS
+ * ============================================================================ */
+
+@font-face {
+    font-family: AeonikPro;
+    src: url("/fonts/AeonikPro-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: AeonikPro;
+    src: url("/fonts/AeonikPro-Medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url("/fonts/JetBrainsMono-Regular.woff2") format("woff2");
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url("/fonts/JetBrainsMono-Medium.woff2") format("woff2");
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "JetBrains Mono";
+    src: url("/fonts/JetBrainsMono-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ============================================================================
+ * 2. THEME TOKENS — Tailwind v4 @theme block
+ * ============================================================================ */
+
+@theme {
+
+    /* COLORS — Warm Neutrals */
+    --color-paper-canvas: #FAFAF8;
+    --color-vellum-surface: #F2F1ED;
+    --color-ash-inset: #E8E7E2;
+
+    /* COLORS — Ink Hierarchy */
+    --color-charcoal-ink: #0F1411;
+    --color-smoke-ink: #3F4441;
+    --color-pewter-mute: #6B6F6A;
+
+    /* COLORS — Borders */
+    --color-linen-border: #D4D6D2;
+    --color-pewter-border: #B4B6B2;
+
+    /* COLORS — Indigo Signal (Primary Accent) */
+    --color-indigo-signal: #5B5BD6;
+    --color-indigo-press: #4747C2;
+    --color-indigo-wash: #EEEEFB;
+    --color-indigo-veil: #C7C7F2;
+
+    /* COLORS — Saffron Mark (Celebration Accent) */
+    --color-saffron-mark: #EAB308;
+    --color-saffron-press: #CA8A04;
+    --color-saffron-wash: #FEF9C3;
+
+    /* COLORS — Semantic */
+    --color-moss-success: #4F7A3E;
+    --color-rust-warning: #C2410C;
+    --color-brick-danger: #991B1B;
+
+    /* FONT FAMILIES */
+    --font-aeonikpro: "AeonikPro", "Inter", "Satoshi", "General Sans",
+    system-ui, -apple-system, sans-serif;
+    --font-mono: "JetBrains Mono", "SF Mono", "Cascadia Mono", "Roboto Mono",
+    "Menlo", "Consolas", monospace;
+    --font-sans: var(--font-aeonikpro);
+
+    /* TYPE SCALE — AeonikPro */
+    --text-label: 12px;
+    --text-small: 14px;
+    --text-body: 16px;
+    --text-body-lg: 18px;
+    --text-card-title: 24px;
+    --text-subheading: 32px;
+    --text-heading: 36px;
+    --text-hero: 72px;
+    --text-display: 101px;
+
+    /* TYPE SCALE — JetBrains Mono */
+    --text-mono-label: 12px;
+    --text-mono-table: 14px;
+    --text-mono-body: 16px;
+    --text-mono-medium: 24px;
+    --text-mono-large: 32px;
+    --text-mono-xl: 48px;
+    --text-mono-readout: 56px;
+    --text-mono-readout-lg: 72px;
+    --text-mono-readout-xl: 101px;
+
+    /* LINE HEIGHTS */
+    --leading-hero: 1.0;
+    --leading-tight: 1.1;
+    --leading-snug: 1.2;
+    --leading-card: 1.25;
+    --leading-table: 1.4;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.6;
+
+    /* LETTER SPACING — AeonikPro */
+    --tracking-hero: -0.025em;
+    --tracking-heading: -0.012em;
+    --tracking-card: -0.006em;
+    --tracking-normal: 0em;
+    --tracking-body: 0.010em;
+    --tracking-small: 0.020em;
+
+    /* LETTER SPACING — JetBrains Mono */
+    --tracking-mono-hero: -0.015em;
+    --tracking-mono-large: -0.008em;
+    --tracking-mono-normal: 0em;
+    --tracking-mono-small: 0.005em;
+
+    /* SPACING SCALE */
+    --spacing-4: 4px;
+    --spacing-8: 8px;
+    --spacing-12: 12px;
+    --spacing-16: 16px;
+    --spacing-24: 24px;
+    --spacing-32: 32px;
+    --spacing-48: 48px;
+    --spacing-64: 64px;
+    --spacing-96: 96px;
+
+    /* BORDER RADIUS */
+    --radius-badges: 4px;
+    --radius-inputs: 8px;
+    --radius-buttons: 8px;
+    --radius-cards: 12px;
+    --radius-modals: 16px;
+    --radius-hero-cards: 20px;
+    --radius-pills: 9999px;
+    --radius-avatar: 9999px;
+
+    /* LAYOUT */
+    --layout-page-max-width: 1360px;
+    --layout-section-gap: 48px;
+    --layout-card-padding: 24px;
+    --layout-element-gap: 16px;
+    --layout-page-padding-x: 40px;
+    --layout-topbar-height: 72px;
+}
+
+/* ============================================================================
+ * 3. OPENTYPE FEATURE UTILITIES
+ * ============================================================================ */
+
+:root {
+    --font-features-aeonikpro: "dlig" on, "ss02" on, "ss08" on;
+    --font-features-mono: "calt" off, "liga" off, "tnum" on, "zero" on,
+    "ss01" on, "ss02" on, "ss19" on, "ss20" on;
+}
+
+/* ============================================================================
+ * 4. BASE LAYER
+ * ============================================================================ */
+
+@layer base {
+    html {
+        font-family: var(--font-aeonikpro);
+        font-feature-settings: var(--font-features-aeonikpro);
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizelegibility;
+    }
+
+    .font-mono,
+    [class*="font-mono"],
+    code,
+    pre,
+    kbd,
+    samp {
+        font-feature-settings: var(--font-features-mono);
+        font-variant-numeric: tabular-nums slashed-zero;
+    }
+}
