@@ -6,8 +6,8 @@
     @apply bg-white text-black;
   }
 
-  .dark body {
-    @apply  dark:bg-[#444] dark:text-white;
+  [data-theme="dark"] body {
+    @apply bg-[#444] text-white;
   }
 
   /* Number input styling */
@@ -25,7 +25,7 @@
     @apply bg-white border border-gray-300 text-[#222] text-xl my-3 outline-none py-1;
   }
 
-  .dark select {
+  [data-theme="dark"] select {
     @apply bg-[#222] border-gray-600 text-gray-100;
   }
 
@@ -35,8 +35,8 @@
     @apply bg-white border border-gray-300 text-gray-900 outline-none py-1 w-full;
   }
 
-  .dark input,
-  .dark select {
+  [data-theme="dark"] input,
+  [data-theme="dark"] select {
     @apply bg-[#222] border-gray-600 text-gray-100;
   }
 
@@ -51,7 +51,7 @@
     @apply bg-white rounded-lg shadow-md mt-4 p-4 w-full flex items-center justify-center text-gray-900;
   }
 
-  .dark .visual-widget {
+  [data-theme="dark"] .visual-widget {
     @apply bg-gray-800 text-gray-100;
   }
 }

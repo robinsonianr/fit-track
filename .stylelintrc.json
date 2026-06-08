@@ -18,7 +18,8 @@
           "variants",
           "responsive",
           "screen",
-          "import"
+          "import",
+          "custom-variant"
         ]
       }
     ],
