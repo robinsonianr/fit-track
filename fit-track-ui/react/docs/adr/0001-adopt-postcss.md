@@ -8,7 +8,7 @@
 ## Decision
 
 - It's highly modular, allowing us to use the only features we need
-- Excellent Typescript Support 
+- Excellent Typescript Support
 - Integrates well with Vite
 - Rich ecosystem of plugins
 
