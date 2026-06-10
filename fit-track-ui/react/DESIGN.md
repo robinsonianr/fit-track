@@ -125,46 +125,55 @@ FitTrack reads like a quiet check-in that reveals a precision instrument underne
 ## Components
 
 ### TopBar
+
 **Role:** Primary application chrome
 
 Fixed top bar on Paper Canvas. Height 72px. Horizontal padding 40px. Three regions: left holds the wordmark (AeonikPro 18px weight 500 Charcoal Ink, optional icon mark); center holds the pill navigation (Dashboard / Workouts / History / Profile in AeonikPro 16px weight 500, active state with Indigo Wash background and Indigo Signal text, 9999px pills); right holds search input, primary "Start workout" button, and avatar with dropdown. Hairline Linen Border below the bar separates it from the page content. No background fill — sits directly on the Paper Canvas.
 
 ### Pill Navigation Item
+
 **Role:** Top-level navigation — inactive state
 
 AeonikPro 16px weight 500 Smoke Ink on transparent background. 9999px border-radius (full pill). Padding 8px horizontal, 6px vertical. Active state: Indigo Wash (#EEEEFB) background fill, Indigo Signal text. Hover state: Vellum Surface background. The nav items collectively read as a single rounded capsule cluster, not a row of independent buttons.
 
 ### Primary Action Button
+
 **Role:** Primary CTA — "Start workout," "Save," "Log a set"
 
 AeonikPro weight 500 at 16px with letter-spacing +0.010em. Paper Canvas (#FAFAF8) text on Indigo Signal (#5B5BD6) background. 8px border-radius. Horizontal padding 20px, vertical padding 10px. Hover state: Indigo Press (#4747C2) background. No border, no shadow — the indigo carries the visual weight against the warm canvas.
 
 ### Secondary Action Button
+
 **Role:** Secondary CTA — "Cancel," "View all," "See more"
 
 AeonikPro weight 500 at 16px with letter-spacing +0.010em. Charcoal Ink text on transparent background with 1px Linen Border (#D4D6D2) border. 8px border-radius. Same padding rhythm as primary. Hover state: Vellum Surface (#F2F1ED) background fill. Used alongside the primary button when an action has a secondary path.
 
 ### Ghost Button
+
 **Role:** Tertiary action — inline links, dismissive controls, low-priority actions
 
 AeonikPro weight 500 at 16px. Indigo Signal text on transparent background. No border, no fill. Hover state: Indigo Wash (#EEEEFB) background. Used when an action exists but is subordinate to both primary and secondary CTAs.
 
 ### Badge
+
 **Role:** Inline metadata — muscle groups, workout type, exercise category
 
 Small pill with 4px border-radius (badges radius). Paper Canvas or Vellum Surface background. 1px Linen Border. Padding 6px horizontal, 2px vertical. Text in AeonikPro 12px weight 500, Smoke Ink, with letter-spacing +0.020em. Variants: "muscle" badges have transparent fill; "type" badges (Strength, Cardio, Recovery) have soft-tone fills using Indigo Wash or Saffron Wash for category distinction. Maximum two badges per content row to preserve calm.
 
 ### MetricCard
+
 **Role:** Dashboard stat tile — workouts this week, calories burned, active minutes, supporting metrics
 
 Vellum Surface (#F2F1ED) background with 12px border-radius. Padding 24px. Eyebrow label in AeonikPro 12px weight 500 Pewter Mute, uppercase tracking +0.020em. Primary value in JetBrains Mono 32-48px weight 500 Charcoal Ink, tabular figures, slashed zero. Trend delta (e.g. "+8%") in AeonikPro 14px weight 500, Moss Success for positive, Pewter Mute for neutral, Rust Warning for declining. Optional sparkline below value in Charcoal Ink at 1.5px stroke weight. No border — the Vellum Surface tonal shift carries the elevation.
 
 ### DuotoneCard (Hero Surface)
+
 **Role:** The signature hero component — weekly adherence
 
 Vellum Surface (#F2F1ED) background with 20px border-radius (hero-cards radius). Padding 32px. Contains: eyebrow label ("THIS WEEK") in AeonikPro 12px weight 500 Pewter Mute; the Adherence Hero Number (JetBrains Mono 56px weight 500, tabular figures, slashed zero, Indigo Signal in progress / Saffron Mark when complete); a horizontal progress fill bar below the number in Indigo Signal or Saffron Mark depending on completion state; a 7-day calendar grid (completed days filled with Indigo or Saffron, today outlined in Charcoal Ink, future days at Ash Inset); a quiet secondary line ("Tuesday is usually Pull Day 2") in AeonikPro 14px Smoke Ink at the bottom. Hairline Linen Border at 1px optional — used only when the card sits within a denser layout that needs the structural definition.
 
 ### Chart (Line / Area)
+
 **Role:** Longitudinal data visualization — volume over time, weight per exercise, weekly trends
 
 Paper Canvas or Vellum Surface card background, 12px border-radius. Line strokes in Charcoal Ink at 1.5px weight. Area fills (when used) in Indigo Wash at 60-80% opacity for primary series; Pewter Border at 40% opacity for secondary. Axis labels in JetBrains Mono 12px weight 400 Pewter Mute, tabular figures. Gridlines in Linen Border at 1px, sparse — every 4th tick at most. PR annotations as small Saffron Mark dots (4px diameter) at the relevant data point. No animations on initial load; chart renders in final state.
