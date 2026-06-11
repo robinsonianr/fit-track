@@ -367,13 +367,13 @@ export const AllColors: Story = {
                     <Swatch
                         name="Moss Success"
                         value="#4F7A3E"
-                        token="--color-moss-success"
+                        token="--color-moss-positive"
                         role="Semantic success — routine completion (workout saved, sync done)"
                     />
                     <Swatch
                         name="Rust Warning"
                         value="#C2410C"
-                        token="--color-rust-warning"
+                        token="--color-rust-negative"
                         role="Semantic warning — overload signals, deload prompts, recovery alerts"
                     />
                     <Swatch
@@ -548,13 +548,13 @@ export const Semantic: Story = {
                 <Swatch
                     name="Moss Success"
                     value="#4F7A3E"
-                    token="--color-moss-success"
+                    token="--color-moss-positive"
                     role="Workout saved, sync complete, routine confirmation"
                 />
                 <Swatch
                     name="Rust Warning"
                     value="#C2410C"
-                    token="--color-rust-warning"
+                    token="--color-rust-negative"
                     role="Overload signals, deload prompts, recovery alerts"
                 />
                 <Swatch

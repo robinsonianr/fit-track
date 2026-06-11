@@ -419,7 +419,7 @@ export const ElevationRefusal: Story = {
                         style={{
                             fontFamily: "var(--font-mono)",
                             fontSize: "var(--text-mono-label)",
-                            color: "var(--color-moss-success)",
+                            color: "var(--color-moss-positive)",
                             fontVariantNumeric: "tabular-nums",
                             marginBottom: "var(--spacing-12)",
                             letterSpacing: "var(--tracking-small)",
@@ -475,7 +475,7 @@ export const ElevationRefusal: Story = {
                         style={{
                             fontFamily: "var(--font-mono)",
                             fontSize: "var(--text-mono-label)",
-                            color: "var(--color-rust-warning)",
+                            color: "var(--color-rust-negative)",
                             fontVariantNumeric: "tabular-nums",
                             marginBottom: "var(--spacing-12)",
                             letterSpacing: "var(--tracking-small)",
