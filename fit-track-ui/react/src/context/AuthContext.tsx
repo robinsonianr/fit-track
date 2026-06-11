@@ -14,7 +14,7 @@ type AuthContextType = {
 };
 
 
-const AuthContext = createContext<AuthContextType | null>(null);
+export const AuthContext = createContext<AuthContextType | null>(null);
 
 const AuthProvider = ({children}: { children: any }) => {
     const {me: fetchMe, registerMember} = useMemo(() => getMemberApi(), []);

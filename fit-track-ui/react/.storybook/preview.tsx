@@ -1,6 +1,7 @@
 import type { Preview, Decorator } from "@storybook/react";
 import { withThemeByDataAttribute } from "@storybook/addon-themes";
 import React from "react";
+import { ThemeProvider } from "../src/context/theme-context";
 
 // IMPORTANT: This loads your design tokens, Tailwind utilities, and @font-face
 // declarations into every story. Without this import, your tokens won't apply
@@ -77,6 +78,16 @@ const preview: Preview = {
       defaultTheme: "light",
       attributeName: "data-theme",
     }),
+
+    // ThemeProvider — makes useTheme() available in every story.
+    // withThemeByDataAttribute (above) sets [data-theme] on the DOM, but
+    // it does not provide ThemeContext. Components that call useTheme()
+    // would throw without this wrapper.
+    (Story) => (
+        <ThemeProvider>
+          <Story />
+        </ThemeProvider>
+    ),
 
     // Wrap every story in a container that applies your design system's
     // baseline typography and spacing. This ensures stories render in the

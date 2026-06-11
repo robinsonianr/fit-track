@@ -1,4 +1,4 @@
-import { forwardRef } from "react";
+import { forwardRef, type ButtonHTMLAttributes } from "react";
 import * as Avatar from "@radix-ui/react-avatar";
 
 /* ============================================================================
@@ -28,12 +28,9 @@ import * as Avatar from "@radix-ui/react-avatar";
  *     mouse click)
  * ============================================================================ */
 
-interface AvatarButtonProps {
+interface AvatarButtonProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children"> {
     name: string;
     imageUrl?: string;
-    onClick?: () => void;
-    /** Optional className for layout positioning. */
-    className?: string;
 }
 
 /* Helper: convert "Long Tang" → "LT". Falls back gracefully for single-word
@@ -65,16 +62,16 @@ function getInitials(name: string): string {
 }
 
 export const AvatarButton = forwardRef<HTMLButtonElement, AvatarButtonProps>(
-    function AvatarButton({ name, imageUrl, onClick, className }, ref) {
+    function AvatarButton({ name, imageUrl, className, ...rest }, ref) {
         const initials = getInitials(name);
 
         return (
             <button
                 ref={ref}
                 type="button"
-                onClick={onClick}
                 aria-label={`${name} menu`}
                 className={className}
+                {...rest}
                 style={{
                 // Reset default button chrome
                     border: "none",
