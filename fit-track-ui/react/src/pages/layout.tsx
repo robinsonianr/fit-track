@@ -1,87 +1,53 @@
-import {Outlet, useLocation, useOutletContext} from "react-router-dom";
-import {useMediaQuery} from "@uidotdev/usehooks";
-import {useRef, useState} from "react";
+import { useState } from "react";
+import { Outlet, useOutletContext } from "react-router-dom";
+import { useAuth } from "../context/AuthContext.tsx";
+import { MemberDTO } from "../api/generated/models";
+import { TopBar } from "../components/layout/TopBar/TopBar";
+import WorkoutModal from "../components/common/modal/workout-modal/WorkoutModal.tsx";
 
-import Sidebar from "../components/layout/sidebar/Sidebar";
-import Header from "../components/layout/header/Header";
+export type LayoutContext = {
+    member: MemberDTO;
+    openWorkoutModal: () => void;
+};
 
-import {cn} from "../utils/cn";
-import "./layout.css";
-import {useAuth} from "../context/AuthContext.tsx";
-import {MemberDTO} from "../api/generated/models";
-
-
-export type LayoutContext = { member: MemberDTO }
 export const authenticatedMember = () => useOutletContext<LayoutContext>().member;
+export const useOpenWorkoutModal = () => useOutletContext<LayoutContext>().openWorkoutModal;
 
 const Layout = () => {
-    const {member} = useAuth();
-    const isLargeScreen = useMediaQuery("(min-width: 1024px)");
-    const [sidebarOpen, setSidebarOpen] = useState(false);
-    const location = useLocation();
-    const sidebarRef = useRef(null);
+    const { member } = useAuth();
+    const [isWorkoutModalOpen, setIsWorkoutModalOpen] = useState(false);
 
     if (!member) {
         return <div>Loading...</div>;
     }
 
-    const getHeaderTitle = (): string => {
-        const currentPage = location.pathname.split("/")[1];
-
-        switch (currentPage) {
-        case "dashboard":
-            return "Dashboard";
-        case "profile":
-            return "Profile";
-        case "logs":
-            return "Logs";
-        default:
-            return "Dashboard";
-        }
-    };
-
-    // Auto-close sidebar on mobile when clicking outside
-    const handleOverlayClick = () => {
-        if (!isLargeScreen) {
-            setSidebarOpen(false);
-        }
-    };
+    const openWorkoutModal = () => setIsWorkoutModalOpen(true);
+    const closeWorkoutModal = () => setIsWorkoutModalOpen(false);
 
     return (
-        <div className="layout-container">
-            {/* Mobile overlay */}
-            {sidebarOpen && !isLargeScreen && (
-                <div className="mobile-overlay" onClick={handleOverlayClick}/>
-            )}
+        <div
+            style={{
+                minHeight: "100vh",
+                backgroundColor: "var(--color-paper-canvas)",
+            }}
+        >
+            <TopBar onAddWorkout={openWorkoutModal} />
 
-            {/* Sidebar - hidden on mobile, visible on large screens */}
-            <div className={cn(
-                "sidebar-container",
-                isLargeScreen ? "sidebar-visible" : sidebarOpen ? "sidebar-visible" : "sidebar-hidden"
-            )}>
-                <Sidebar
-                    ref={sidebarRef}
-                    collapsed={false}
-                    member={member}
-                    onClose={() => setSidebarOpen(false)}
-                />
-            </div>
+            <main
+                style={{
+                    maxWidth: "var(--layout-max-width)",
+                    margin: "0 auto",
+                    padding: "var(--spacing-48) var(--layout-page-padding-x)",
+                }}
+            >
+                <Outlet context={{ member, openWorkoutModal } satisfies LayoutContext} />
+            </main>
 
-            {/* Main content area */}
-            <div className={cn(
-                "main-content",
-                isLargeScreen ? "main-content-desktop" : "main-content-mobile"
-            )}>
-                <Header
-                    collapsed={false}
-                    setCollapsed={() => setSidebarOpen(!sidebarOpen)}
-                    member={member}
-                    title={getHeaderTitle()}
-                />
-                <div className="content-area">
-                    <Outlet context={{member} satisfies LayoutContext}/>
-                </div>
-            </div>
+            <WorkoutModal
+                isOpen={isWorkoutModalOpen}
+                onClose={closeWorkoutModal}
+                member={member}
+            />
         </div>
     );
 };
