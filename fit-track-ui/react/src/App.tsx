@@ -36,7 +36,7 @@ export const router = createBrowserRouter([
                 element: <Profile />
             },
             {
-                path: "logs",
+                path: "activities",
                 element: <Logs />
             }
         ]

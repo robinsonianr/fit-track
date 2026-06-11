@@ -166,6 +166,7 @@
     --layout-section-gap: 48px;
     --layout-card-padding: 24px;
     --layout-element-gap: 16px;
+    --layout-max-width: 1360px;
     --layout-page-padding-x: 40px;
     --layout-topbar-height: 72px;
 }
