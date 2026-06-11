@@ -84,8 +84,8 @@
     --color-saffron-wash: #FEF9C3;
 
     /* COLORS — Semantic */
-    --color-moss-success: #4F7A3E;
-    --color-rust-warning: #C2410C;
+    --color-moss-positive: #4F7A3E;
+    --color-rust-negative: #C2410C;
     --color-brick-danger: #991B1B;
 
     /* FONT FAMILIES */
@@ -155,6 +155,7 @@
     --radius-badges: 4px;
     --radius-inputs: 8px;
     --radius-buttons: 8px;
+    --radius-rows: 8px;
     --radius-cards: 12px;
     --radius-modals: 16px;
     --radius-hero-cards: 20px;
