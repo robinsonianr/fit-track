@@ -10,33 +10,19 @@ const meta: Meta<typeof ActivityRow> = {
         docs: {
             description: {
                 component:
-                    "Full-row-clickable activity entry. Two variants: `compact` for the Dashboard's Recent Activity list (single line, no highlight); `full` for the Activities page (two lines, highlight shown). The type dot color is derived from the workout type name — strength types glow saffron, cardio types go moss-positive.",
+                    "Full-row-clickable activity entry. Two variants: `compact` for the Dashboard's Recent Activity list (single inline row: type · highlight (routineContext) PR · duration · timestamp); `full` for the Activities page (two lines). Type dot color is driven by a TYPE_COLOR_MAP — Strength → saffron, Run → moss-positive, others → pewter.",
             },
         },
     },
     tags: ["autodocs"],
     argTypes: {
-        type: {
-            control: "text",
-            description: "Workout type label (e.g. \"Push\", \"Cardio\")",
-        },
-        timestamp: {
-            control: "text",
-            description: "Pre-formatted date/time string",
-        },
-        duration: {
-            control: "text",
-            description: "Pre-formatted duration string",
-        },
-        highlight: {
-            control: "text",
-            description: "Optional highlight text (PR, notable event)",
-        },
-        variant: {
-            control: "radio",
-            options: ["compact", "full"],
-            description: "compact = Dashboard single-line · full = Activities two-line",
-        },
+        type: { control: "text", description: "Workout type label" },
+        timestamp: { control: "text", description: "Pre-formatted date/time string" },
+        duration: { control: "text", description: "Pre-formatted duration string" },
+        highlight: { control: "text", description: "Exercise or event highlight" },
+        routineContext: { control: "text", description: "Routine day context — shown in parens after highlight" },
+        highlightIsPR: { control: "boolean", description: "True renders saffron PR badge" },
+        variant: { control: "radio", options: ["compact", "full"] },
     },
 };
 
@@ -45,196 +31,181 @@ export default meta;
 type Story = StoryObj<typeof ActivityRow>;
 
 /* ----------------------------------------------------------------------------
- * CompactDefault — typical Dashboard row
+ * CompactDefault — Strength row, no PR, no routineContext
  * ---------------------------------------------------------------------------- */
 
 export const CompactDefault: Story = {
     args: {
-        type: "Push",
+        type: "Strength",
         timestamp: "Mon, Jun 9",
-        duration: "48 min",
+        duration: "48m",
+        highlight: "Squat 225×5",
         variant: "compact",
     },
 };
 
 /* ----------------------------------------------------------------------------
- * CompactNoHighlight — no highlight prop in compact (not rendered anyway)
- * Shows that compact gracefully ignores the highlight prop.
+ * CompactWithContext — Strength row with routineContext
  * ---------------------------------------------------------------------------- */
 
-export const CompactNoHighlight: Story = {
+export const CompactWithContext: Story = {
     args: {
-        type: "Cardio",
-        timestamp: "Sat, Jun 7",
-        duration: "32 min",
-        highlight: "7.2 km", // ignored in compact
+        type: "Strength",
+        timestamp: "Mon, Jun 9",
+        duration: "52m",
+        highlight: "Bench 185×5",
+        routineContext: "Push Day 1",
         variant: "compact",
     },
 };
 
 /* ----------------------------------------------------------------------------
- * FullDefault — Activities page row, no highlight
+ * CompactWithPR — highlight + routineContext + PR badge
+ * ---------------------------------------------------------------------------- */
+
+export const CompactWithPR: Story = {
+    args: {
+        type: "Strength",
+        timestamp: "2h ago",
+        duration: "52m",
+        highlight: "Bench 185×5",
+        routineContext: "Push Day 1",
+        highlightIsPR: true,
+        variant: "compact",
+    },
+};
+
+/* ----------------------------------------------------------------------------
+ * CompactRun — no routineContext (Run type), moss-positive dot
+ * ---------------------------------------------------------------------------- */
+
+export const CompactRun: Story = {
+    args: {
+        type: "Run",
+        timestamp: "Sun",
+        duration: "32m",
+        highlight: "3.1 mi",
+        variant: "compact",
+    },
+};
+
+/* ----------------------------------------------------------------------------
+ * FullDefault — two-line layout, no highlight
  * ---------------------------------------------------------------------------- */
 
 export const FullDefault: Story = {
     args: {
         type: "Pull",
         timestamp: "Tue, Jun 10",
-        duration: "55 min",
+        duration: "55m",
         variant: "full",
     },
 };
 
 /* ----------------------------------------------------------------------------
- * FullWithHighlight — Activities page row with PR notation
+ * FullWithPR — full variant with PR badge prefix
  * ---------------------------------------------------------------------------- */
 
-export const FullWithHighlight: Story = {
+export const FullWithPR: Story = {
     args: {
-        type: "Legs",
+        type: "Strength",
         timestamp: "Mon, Jun 9",
-        duration: "1h 12min",
-        highlight: "PR: 225 lbs squat",
+        duration: "1h 12m",
+        highlight: "225 lbs squat",
+        highlightIsPR: true,
         variant: "full",
     },
 };
 
 /* ----------------------------------------------------------------------------
- * DotColors — all three dot color categories side by side (compact)
+ * DotColors — saffron / moss-positive / pewter-mute side by side
  * ---------------------------------------------------------------------------- */
 
 export const DotColors: Story = {
     render: () => (
-        <div style={{ display: "flex", flexDirection: "column", maxWidth: "400px" }}>
-            <ActivityRow type="Push" timestamp="Mon, Jun 9" duration="48 min" variant="compact" />
-            <ActivityRow type="Run" timestamp="Sun, Jun 8" duration="32 min" variant="compact" />
-            <ActivityRow type="Mobility" timestamp="Sat, Jun 7" duration="20 min" variant="compact" />
+        <div style={{ display: "flex", flexDirection: "column", maxWidth: "480px" }}>
+            <ActivityRow type="Strength" timestamp="Mon, Jun 9" duration="48m" highlight="Bench 185×5" routineContext="Push Day 1" variant="compact" />
+            <ActivityRow type="Run"      timestamp="Sun, Jun 8" duration="32m" highlight="3.1 mi"      variant="compact" />
+            <ActivityRow type="Mobility" timestamp="Sat, Jun 7" duration="20m" highlight="Hip mobility" variant="compact" />
         </div>
     ),
 };
 
 /* ----------------------------------------------------------------------------
- * HoverState — wrapped in a list to make hover easy to test
+ * HoverState — hover any row to see pill background
  * ---------------------------------------------------------------------------- */
 
 export const HoverState: Story = {
     render: () => (
-        <div style={{ display: "flex", flexDirection: "column", maxWidth: "400px" }}>
-            <ActivityRow
-                type="Push"
-                timestamp="Mon, Jun 9"
-                duration="48 min"
-                variant="compact"
-                onClick={() => console.log("Push clicked")}
-            />
-            <ActivityRow
-                type="Pull"
-                timestamp="Sun, Jun 8"
-                duration="52 min"
-                variant="compact"
-                onClick={() => console.log("Pull clicked")}
-            />
-            <ActivityRow
-                type="Legs"
-                timestamp="Fri, Jun 6"
-                duration="1h 12min"
-                variant="compact"
-                onClick={() => console.log("Legs clicked")}
-            />
+        <div style={{ display: "flex", flexDirection: "column", maxWidth: "540px" }}>
+            <ActivityRow type="Strength" timestamp="2h ago"     duration="52m" highlight="Bench 185×5"    routineContext="Push Day 1" highlightIsPR={true}  variant="compact" onClick={() => {}} />
+            <ActivityRow type="Strength" timestamp="Yesterday"  duration="48m" highlight="Squat 225×5"    routineContext="Legs Day 1"                        variant="compact" onClick={() => {}} />
+            <ActivityRow type="Run"      timestamp="Sun"        duration="32m" highlight="3.1 mi"                                                             variant="compact" onClick={() => {}} />
         </div>
     ),
 };
 
 /* ----------------------------------------------------------------------------
- * ListOfRows — compact list as it appears on Dashboard
+ * ListOfRows — compact list as on Dashboard (activeUserData equivalent)
  * ---------------------------------------------------------------------------- */
 
 export const ListOfRows: Story = {
     render: () => (
-        <div style={{ display: "flex", flexDirection: "column", maxWidth: "480px" }}>
-            <ActivityRow type="Push" timestamp="Mon, Jun 9" duration="48 min" variant="compact" />
-            <ActivityRow type="Cardio" timestamp="Sun, Jun 8" duration="32 min" variant="compact" />
-            <ActivityRow type="Pull" timestamp="Fri, Jun 6" duration="52 min" variant="compact" />
-            <ActivityRow type="Legs" timestamp="Wed, Jun 4" duration="1h 12min" variant="compact" />
-            <ActivityRow type="Upper Body" timestamp="Mon, Jun 2" duration="44 min" variant="compact" />
+        <div
+            style={{
+                display: "flex",
+                flexDirection: "column",
+                maxWidth: "540px",
+                border: "1px solid var(--color-linen-border)",
+                borderRadius: "var(--radius-cards)",
+                overflow: "hidden",
+            }}
+        >
+            <ActivityRow type="Strength" timestamp="2h ago"    duration="52m" highlight="Bench 185×5"    routineContext="Push Day 1" highlightIsPR={true}  variant="compact" />
+            <ActivityRow type="Strength" timestamp="Yesterday" duration="48m" highlight="Squat 225×5"    routineContext="Legs Day 1"                        variant="compact" />
+            <ActivityRow type="Strength" timestamp="Mon"       duration="1h 5m" highlight="Deadlift 315×3" routineContext="Pull Day 1" highlightIsPR={true} variant="compact" />
+            <ActivityRow type="Run"      timestamp="Sun"       duration="32m" highlight="3.1 mi"                                                            variant="compact" />
+            <ActivityRow type="Strength" timestamp="Sat"       duration="55m" highlight="Pull 12 sets"   routineContext="Pull Day 2"                        variant="compact" />
         </div>
     ),
 };
 
 /* ----------------------------------------------------------------------------
- * FullList — full variant as it appears on Activities page
+ * FullList — full variant with mixed highlight/PR/no-highlight
  * ---------------------------------------------------------------------------- */
 
 export const FullList: Story = {
     render: () => (
         <div style={{ display: "flex", flexDirection: "column", maxWidth: "600px" }}>
-            <ActivityRow
-                type="Push"
-                timestamp="Mon, Jun 9"
-                duration="48 min"
-                highlight="PR: 225 lbs bench"
-                variant="full"
-            />
-            <ActivityRow
-                type="Cardio"
-                timestamp="Sun, Jun 8"
-                duration="32 min"
-                highlight="7.2 km"
-                variant="full"
-            />
-            <ActivityRow
-                type="Pull"
-                timestamp="Fri, Jun 6"
-                duration="52 min"
-                variant="full"
-            />
-            <ActivityRow
-                type="Legs"
-                timestamp="Wed, Jun 4"
-                duration="1h 12min"
-                highlight="PR: 315 lbs deadlift"
-                variant="full"
-            />
-            <ActivityRow
-                type="Mobility"
-                timestamp="Mon, Jun 2"
-                duration="20 min"
-                variant="full"
-            />
+            <ActivityRow type="Strength" timestamp="Mon, Jun 9" duration="52m"   highlight="Bench 185×5"    highlightIsPR={true}  variant="full" />
+            <ActivityRow type="Run"      timestamp="Sun, Jun 8" duration="32m"   highlight="3.1 mi"                               variant="full" />
+            <ActivityRow type="Strength" timestamp="Fri, Jun 6" duration="55m"                                                    variant="full" />
+            <ActivityRow type="Strength" timestamp="Wed, Jun 4" duration="1h 12m" highlight="Deadlift 315×3" highlightIsPR={true} variant="full" />
+            <ActivityRow type="Mobility" timestamp="Mon, Jun 2" duration="20m"                                                    variant="full" />
         </div>
     ),
 };
 
 /* ----------------------------------------------------------------------------
- * InContext — SectionTitle + compact list (Dashboard-style)
+ * InContext — SectionTitle("Recent activity") + compact list
  * ---------------------------------------------------------------------------- */
 
 export const InContext: Story = {
     render: () => (
-        <div style={{ maxWidth: "480px" }}>
+        <div style={{ maxWidth: "540px" }}>
             <SectionTitle>Recent activity</SectionTitle>
-            <div style={{ display: "flex", flexDirection: "column" }}>
-                <ActivityRow
-                    type="Push"
-                    timestamp="Mon, Jun 9"
-                    duration="48 min"
-                    variant="compact"
-                    onClick={() => console.log("Navigate to Push detail")}
-                />
-                <ActivityRow
-                    type="Cardio"
-                    timestamp="Sun, Jun 8"
-                    duration="32 min"
-                    variant="compact"
-                    onClick={() => console.log("Navigate to Cardio detail")}
-                />
-                <ActivityRow
-                    type="Pull"
-                    timestamp="Fri, Jun 6"
-                    duration="52 min"
-                    variant="compact"
-                    onClick={() => console.log("Navigate to Pull detail")}
-                />
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    border: "1px solid var(--color-linen-border)",
+                    borderRadius: "var(--radius-cards)",
+                    overflow: "hidden",
+                }}
+            >
+                <ActivityRow type="Strength" timestamp="2h ago"    duration="52m"   highlight="Bench 185×5" routineContext="Push Day 1" highlightIsPR={true} variant="compact" onClick={() => {}} />
+                <ActivityRow type="Strength" timestamp="Yesterday" duration="48m"   highlight="Squat 225×5" routineContext="Legs Day 1"                      variant="compact" onClick={() => {}} />
+                <ActivityRow type="Run"      timestamp="Sun"       duration="32m"   highlight="3.1 mi"                                                       variant="compact" onClick={() => {}} />
             </div>
         </div>
     ),

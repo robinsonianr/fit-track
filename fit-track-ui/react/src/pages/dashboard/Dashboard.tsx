@@ -1,320 +1,176 @@
-import {useEffect, useState} from "react";
-
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { PageHeader } from "../../components/ui/PageHeader/PageHeader";
+import { SectionTitle } from "../../components/ui/SectionTitle/SectionTitle";
+import { MetricCard } from "../../components/ui/MetricCard/MetricCard";
+import { ActivityRow } from "../../components/ui/ActivityRow/ActivityRow";
+import { InsightCard } from "../../components/ui/InsightCard/InsightCard";
 import {
-    calculateTotalCalories,
-    calculateTotalMinutes,
-    calculateTotalVolume,
-    calculateVolumeChange,
-    filterWorkoutsThisWeek,
-    formatNumber,
-} from "../../utils/dashboardCalculations.ts";
+    type Activity,
+    type DashboardData,
+    type Insight,
+    activeUserData,
+    formatDate,
+    formatDuration,
+    formatVolume,
+    getFirstName,
+    getGreeting,
+} from "./mock-data";
 
-import {isDateInThisWeek, sortWorkoutsAsc} from "../../utils/utilities.ts";
+/* ============================================================================
+ * Secondary text builders — MetricCard companion voice rules:
+ *   - Sessions: always show "/ N target" (the target is what it is, no shame)
+ *   - Volume: delta text when non-zero; "lbs" otherwise (zero value or zero delta)
+ *   - Time: "no time logged yet" on zero value; delta text when non-zero; omit on equal weeks
+ * ============================================================================ */
 
-import "./dashboard.css";
-import {WorkoutDTO} from "../../api/generated/models";
-import {getWorkoutsApi} from "../../api/generated/endpoints/workouts-api/workouts-api.ts";
-import {authenticatedMember} from "../layout.tsx";
+function sessionsSecondary(target: number): string {
+    return `/ ${target} target`;
+}
 
-export const Dashboard = () => {
-    const member = authenticatedMember();
-    const {getAllWorkoutsByMemberId} = getWorkoutsApi();
-    const [workouts, setWorkouts] = useState<WorkoutDTO[]>([]);
+function volumeSecondary(volume: number, delta: number): string {
+    if (volume === 0) return "lbs";
+    if (delta > 0) return `+${formatVolume(delta)} lbs from last week`;
+    if (delta < 0) return `-${formatVolume(Math.abs(delta))} lbs from last week`;
+    return "lbs";
+}
 
+function timeSecondary(minutes: number, delta: number): string | undefined {
+    if (minutes === 0) return "no time logged yet";
+    if (delta > 0) return `+${formatDuration(delta)} from last week`;
+    if (delta < 0) return `-${formatDuration(Math.abs(delta))} from last week`;
+    return undefined;
+}
 
-    // Dashboard metrics state
-    const [workoutsThisWeek, setWorkoutsThisWeek] = useState<number>(0);
-    const [caloriesBurned, setCaloriesBurned] = useState<number>(0);
-    const [activeMinutes, setActiveMinutes] = useState<number>(0);
-    const [volumeLifted, setVolumeLifted] = useState<number>(0);
-    const [volumeChange, setVolumeChange] = useState<string>("0%");
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+/* ============================================================================
+ * Section components — local to Dashboard, not reused elsewhere
+ * ============================================================================ */
 
-    const today = new Date();
-    const thisWeek = new Date(today);
-    thisWeek.setDate(today.getDate() - today.getDay());
-    const [weeks, setWeeks] = useState<Date[]>([]);
+function QuickStatsSection({ weekStats }: { weekStats: DashboardData["weekStats"] }) {
+    return (
+        <section>
+            <SectionTitle>This week</SectionTitle>
+            <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: "repeat(3, 1fr)",
+                    gap: "var(--spacing-12)",
+                }}
+            >
+                <MetricCard
+                    label="Sessions"
+                    value={weekStats.sessions}
+                    secondary={sessionsSecondary(weekStats.sessionsTarget)}
+                />
+                <MetricCard
+                    label="Volume"
+                    value={`${formatVolume(weekStats.volume)} lbs`}
+                    secondary={volumeSecondary(weekStats.volume, weekStats.volumeDelta)}
+                />
+                <MetricCard
+                    label="Time trained"
+                    value={formatDuration(weekStats.timeTrainedMinutes)}
+                    secondary={timeSecondary(weekStats.timeTrainedMinutes, weekStats.timeDelta)}
+                />
+            </div>
+        </section>
+    );
+}
 
-    // Fetch workouts separately to avoid unnecessary re-renders
-    useEffect(() => {
-        const fetchWorkouts = async () => {
-            if (!member?.id) {
-                setIsLoading(false);
-                return;
-            }
+function RecentActivitySection({ activities }: { activities: Activity[] }) {
+    const navigate = useNavigate();
+    const hasActivities = activities.length > 0;
 
-            try {
-                await getAllWorkoutsByMemberId(member.id).then(setWorkouts);
-            } catch (error) {
-                console.error("Error fetching workouts:", error);
-                setWorkouts([]);
-            }
-        };
-
-        fetchWorkouts();
-    }, [member?.id]);
-
-    // Calculate dashboard metrics (Monday-Sunday week)
-    useEffect(() => {
-        if (!member || workouts.length === 0) {
-            setIsLoading(false);
-            return;
-        }
-
-        try {
-            const weekWorkouts = filterWorkoutsThisWeek(workouts);
-
-            const workoutCount = weekWorkouts.length;
-            const calories = calculateTotalCalories(weekWorkouts);
-            const minutes = calculateTotalMinutes(weekWorkouts);
-            const volume = calculateTotalVolume(weekWorkouts);
-            const change = calculateVolumeChange(weekWorkouts, workouts);
-
-            // Update state
-            setWorkoutsThisWeek(workoutCount);
-            setCaloriesBurned(calories);
-            setActiveMinutes(minutes);
-            setVolumeLifted(volume);
-            setVolumeChange(change);
-            setIsLoading(false);
-
-        } catch (error) {
-            console.error("Error calculating dashboard metrics:", error);
-            setIsLoading(false);
-        }
-    }, [member, workouts]);
-
-    useEffect(() => {
-        if (workouts.length > 0) {
-            const sortedWorkouts = sortWorkoutsAsc(workouts);
-            let date: Date;
-            const newWeeks: Date[] = [...weeks];
-
-            sortedWorkouts.forEach((workout) => {
-                date = new Date(workout.workoutDate.toString());
-
-                if (!isDateInThisWeek(date)) {
-                    if (newWeeks.length > 0) {
-                        const prevDate = newWeeks[newWeeks.length - 1];
-                        const dayOfWeek = date.getDay();
-
-                        const firstDayOfWeek = new Date(date);
-                        firstDayOfWeek.setDate(date.getDate() - (dayOfWeek === 0 ? 6 : dayOfWeek));
-                        firstDayOfWeek.setHours(0, 0, 0, 0);
-
-                        const lastDayOfWeek = new Date(prevDate);
-                        lastDayOfWeek.setDate(prevDate.getDate() + 6);
-
-                        if (date > lastDayOfWeek) {
-                            if (!newWeeks.some(week => week.getTime() === firstDayOfWeek.getTime())) {
-                                newWeeks.unshift(firstDayOfWeek);
-                            }
-                        }
-                    } else {
-                        const dayOfWeek = date.getDay();
-                        const firstDayOfWeek = new Date(date);
-                        firstDayOfWeek.setDate(date.getDate() - dayOfWeek);
-                        firstDayOfWeek.setHours(0, 0, 0, 0);
-
-                        newWeeks.push(firstDayOfWeek);
-                    }
-                } else {
-                    // setSelectedWeek(thisWeek);
-                }
-            });
-
-            setWeeks(newWeeks);
-        }
-    }, [member]);
+    const viewAllAction = hasActivities ? (
+        <Link
+            to="/activities?sort=recent"
+            style={{ color: "inherit", textDecoration: "none" }}
+        >
+            View all →
+        </Link>
+    ) : undefined;
 
     return (
-        <div className="dashboard-container">
-            {/* Tabs */}
-            <div className="tabs-container">
-                <div className="tabs-wrapper">
-                    <button className="tab-button-active">
-                        Overview
-                    </button>
-                    <button className="tab-button-inactive">
-                        Workouts
-                    </button>
-                    <button className="tab-button-inactive">
-                        Nutrition
-                    </button>
-                    <button className="tab-button-inactive">
-                        Body
-                    </button>
-                </div>
-            </div>
+        <section>
+            <SectionTitle action={viewAllAction}>Recent activity</SectionTitle>
 
-            {/* Summary Widgets */}
-            <div className="summary-widgets">
-                <div className="widget-card">
-                    <div className="widget-content">
-                        <div>
-                            <p className="widget-info">Workouts This Week</p>
-                            <p className="widget-value">
-                                {isLoading ? "..." : workoutsThisWeek}
-                            </p>
-                            <p className="widget-target">Target: 4 workouts</p>
-                        </div>
-                        <div className="widget-icon-container widget-icon-purple">
-                            <svg className="widget-icon icon-purple" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                    d="M9 6v6m0 0v6m0-6h6m-6 0H9"/>
-                            </svg>
-                        </div>
-                    </div>
+            {hasActivities ? (
+                <div
+                    style={{
+                        border: "1px solid var(--color-ash-inset)",
+                        borderRadius: "var(--radius-cards)",
+                        overflow: "hidden",
+                    }}
+                >
+                    {activities.slice(0, 5).map((activity) => (
+                        <ActivityRow
+                            key={activity.id}
+                            type={activity.type}
+                            timestamp={activity.timestamp}
+                            duration={formatDuration(activity.durationMinutes)}
+                            highlight={activity.highlight}
+                            routineContext={activity.routineContext}
+                            highlightIsPR={activity.highlightIsPR}
+                            variant="compact"
+                            onClick={() => navigate(`/activities/${activity.id}`)}
+                        />
+                    ))}
                 </div>
+            ) : (
+                <div
+                    style={{
+                        border: "1px dashed var(--color-linen-border)",
+                        borderRadius: "var(--radius-cards)",
+                        padding: "var(--spacing-32) var(--spacing-24)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontFamily: "var(--font-aeonikpro)",
+                        fontSize: "14px",
+                        fontWeight: 400,
+                        color: "var(--color-smoke-ink)",
+                    }}
+                >
+                    Activities you log will appear here.
+                </div>
+            )}
+        </section>
+    );
+}
 
-                <div className="widget-card">
-                    <div className="widget-content">
-                        <div>
-                            <p className="widget-info">Calories Burned</p>
-                            <p className="widget-value">
-                                {isLoading ? "..." : formatNumber(caloriesBurned)}
-                            </p>
-                            <p className="widget-target">Target: 2,500 kcal</p>
-                        </div>
-                        <div className="widget-icon-container widget-icon-orange">
-                            <svg className="widget-icon icon-orange" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                    d="M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+function NoticedSection({ insight }: { insight: Insight }) {
+    return (
+        <section>
+            <InsightCard eyebrow={insight.eyebrow} body={insight.body} />
+        </section>
+    );
+}
 
-                <div className="widget-card">
-                    <div className="widget-content">
-                        <div>
-                            <p className="widget-info">Active Minutes</p>
-                            <p className="widget-value">
-                                {isLoading ? "..." : formatNumber(activeMinutes)}
-                            </p>
-                            <p className="widget-target">Target: 150 minutes</p>
-                        </div>
-                        <div className="widget-icon-container widget-icon-blue">
-                            <svg className="widget-icon icon-blue" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
+/* ============================================================================
+ * Dashboard
+ * ============================================================================ */
 
-                <div className="widget-card">
-                    <div className="widget-content">
-                        <div>
-                            <p className="widget-info">Volume Lifted</p>
-                            <p className="widget-value">
-                                {isLoading ? "..." : formatNumber(volumeLifted)}
-                            </p>
-                            <p className={`text-sm ${volumeChange.startsWith("+") ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
-                                {volumeChange} from last week
-                            </p>
-                        </div>
-                        <div className="widget-icon-container widget-icon-green">
-                            <svg className="widget-icon icon-green" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                    d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
-                            </svg>
-                        </div>
-                    </div>
-                </div>
-            </div>
+interface DashboardProps {
+    /** Mock data fixture. Defaults to activeUserData so the live route renders
+     *  something meaningful before real API wiring lands in a future sprint. */
+    data?: DashboardData;
+}
 
-            {/* Activity Sections */}
-            <div className="activity-sections">
-                <div className="activity-card">
-                    <h3 className="activity-title">Workout Activity</h3>
-                    <p className="activity-description">Your workout frequency and duration over time</p>
-                    <div className="empty-state-container">
-                        <div className="empty-state-icon">
-                            <svg className="empty-state-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
-                            </svg>
-                        </div>
-                        <p className="empty-state-text">No workout data yet</p>
-                        <p className="empty-state-subtext">Add your first workout to see your activity chart</p>
-                        <button className="primary-button">
-                            + Add Workout
-                        </button>
-                    </div>
-                </div>
+export function Dashboard({ data = activeUserData }: DashboardProps) {
+    const { member } = useAuth();
+    const now = new Date();
+    const greeting = getGreeting(now);
+    const firstName = member ? getFirstName(member.name ?? "there") : "there";
+    const date = formatDate(now);
 
-                <div className="activity-card">
-                    <h3 className="activity-title">Weight Trend</h3>
-                    <p className="activity-description">Track your weight progress over time</p>
-                    <div className="empty-state-container">
-                        <div className="empty-state-icon">
-                            <svg className="empty-state-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                    d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/>
-                            </svg>
-                        </div>
-                        <p className="empty-state-text">No weight data yet</p>
-                        <p className="empty-state-subtext">Log your weight to track your progress</p>
-                        <button className="secondary-button">
-                            + Log Weight
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            {/* Goals and Recent Activity */}
-            <div className="goals-section">
-                <div className="goals-card">
-                    <h3 className="activity-title">Weekly Goals</h3>
-                    <p className="activity-description">Your progress toward weekly fitness goals</p>
-                    <div className="goals-grid">
-                        <div className="goal-item">
-                            <div className="goal-circle goal-circle-pink">
-                                <span className="goal-percentage goal-percentage-pink">25%</span>
-                            </div>
-                            <span className="goal-label">Cardio</span>
-                        </div>
-                        <div className="goal-item">
-                            <div className="goal-circle goal-circle-purple">
-                                <span className="goal-percentage goal-percentage-purple">50%</span>
-                            </div>
-                            <span className="goal-label">Strength</span>
-                        </div>
-                        <div className="goal-item">
-                            <div className="goal-circle goal-circle-green">
-                                <span className="goal-percentage goal-percentage-green">80%</span>
-                            </div>
-                            <span className="goal-label">Flexibility</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div className="recent-workouts-card">
-                    <div className="recent-workouts-header">
-                        <h3 className="recent-workouts-title">Recent Workouts</h3>
-                        <button className="view-all-button">
-                            View All
-                        </button>
-                    </div>
-                    <p className="recent-workouts-description">Your latest training sessions</p>
-                    <div className="recent-workouts-empty">
-                        <div className="recent-workouts-empty-icon">
-                            <svg className="empty-state-icon-svg" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                                    d="M9 6v6m0 0v6m0-6h6m-6 0H9"/>
-                            </svg>
-                        </div>
-                        <p className="recent-workouts-empty-text">No recent workouts</p>
-                    </div>
-                </div>
-            </div>
+    return (
+        <div style={{ display: "flex", flexDirection: "column", gap: "var(--spacing-48)" }}>
+            <PageHeader greeting={greeting} name={firstName} date={date} />
+            <QuickStatsSection weekStats={data.weekStats} />
+            <RecentActivitySection activities={data.recentActivities} />
+            {data.insight && <NoticedSection insight={data.insight} />}
         </div>
     );
-};
+}
 
 export default Dashboard;

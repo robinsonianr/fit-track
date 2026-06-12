@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { ReactNode } from "react";
 
 /* ============================================================================
@@ -41,6 +42,8 @@ interface SectionTitleProps {
 }
 
 export function SectionTitle({ children, action, eyebrow, className }: SectionTitleProps) {
+    const [actionHovered, setActionHovered] = useState(false);
+
     return (
         <div
             className={className}
@@ -90,9 +93,21 @@ export function SectionTitle({ children, action, eyebrow, className }: SectionTi
                 </span>
             </div>
 
-            {/* Right: optional action (pushed to far edge via space-between) */}
+            {/* Right: optional action — indigo-signal, 500 weight, hover shifts to indigo-press */}
             {action && (
-                <div style={{ flexShrink: 0 }}>
+                <div
+                    style={{
+                        flexShrink: 0,
+                        fontFamily: "var(--font-aeonikpro)",
+                        fontSize: "13px",
+                        fontWeight: 500,
+                        color: actionHovered ? "var(--color-indigo-press)" : "var(--color-indigo-signal)",
+                        cursor: "pointer",
+                        transition: "color 120ms ease",
+                    }}
+                    onMouseEnter={() => setActionHovered(true)}
+                    onMouseLeave={() => setActionHovered(false)}
+                >
                     {action}
                 </div>
             )}
