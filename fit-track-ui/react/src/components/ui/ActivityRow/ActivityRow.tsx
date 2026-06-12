@@ -3,25 +3,26 @@
  * ----------------------------------------------------------------------------
  * A full-row-clickable activity entry used in two contexts:
  *
- *   compact  — Dashboard "Recent Activity" list. Single line: type on left,
- *              duration + timestamp on right. No highlight.
+ *   compact  — Dashboard "Recent Activity" list. Single inline row:
+ *              [dot] [type] · [highlight] [(routineContext)] [PR] · [duration] · [timestamp]
+ *              Type and highlight anchor left; duration+timestamp anchor right.
+ *              routineContext is the most truncatable element; highlight and
+ *              type never truncate.
  *
- *   full     — Activities page. Two lines: type + optional highlight on the
- *              left column; timestamp + duration on the right column.
+ *   full     — Activities page. Two lines: type + highlight on the left
+ *              column; timestamp + duration on the right column.
  *
  * Rendered as a <button> so the entire row is keyboard-accessible. The caller
  * is responsible for navigation (push to workout detail, etc.).
  *
- * Type dot color is derived from the workout type name:
- *   strength keywords (Push/Pull/Legs/Upper/Lower/Full/Strength) → saffron
- *   cardio keywords (Run/Cardio/Bike/Swim/Walk/HIIT)             → moss-positive
- *   everything else                                              → pewter-mute
+ * Type dot color is driven by a TYPE_COLOR_MAP (exact match, then pewter-mute
+ * fallback). This is a placeholder pending the broader chart/type color system.
+ *   Strength → saffron-mark
+ *   Run      → moss-positive
+ *   others   → pewter-mute
  *
- * Highlight parsing: if highlight starts with "PR:" the prefix renders in
- * --color-saffron-mark (500 weight); the rest renders in --color-charcoal-ink.
- * All other highlights render in --color-charcoal-ink at 400 weight.
- * A hidden placeholder line is always reserved in full variant so row heights
- * are consistent whether or not a highlight is present.
+ * PR badge: `highlightIsPR` renders an inline "PR" label in saffron-mark (10px
+ * 500, 0.05em tracking) in compact, and a "PR:" prefix in saffron in full.
  *
  * Used by:
  *   - Dashboard ("Recent Activity" section, compact variant)
@@ -33,9 +34,9 @@
  *   - --color-linen-border      (row bottom separator)
  *   - --color-charcoal-ink      (type + highlight text)
  *   - --color-smoke-ink         (duration text)
- *   - --color-pewter-mute       (timestamp, separator dot, default dot)
- *   - --color-saffron-mark      (strength-type dot + "PR:" prefix)
- *   - --color-moss-positive     (cardio-type dot)
+ *   - --color-pewter-mute       (timestamp, separator dot, routineContext, default dot)
+ *   - --color-saffron-mark      (Strength dot + PR badge)
+ *   - --color-moss-positive     (Run dot)
  *   - --color-indigo-press      (focus ring)
  *   - --font-aeonikpro          (all text)
  *   - --radius-rows             (hover background radius)
@@ -45,7 +46,7 @@
  *
  * Accessibility:
  *   - Full row is a <button> — keyboard activation via Enter/Space.
- *   - aria-label: "{type} · {duration}{highlight ? ' · ' + highlight : ''}"
+ *   - aria-label built from type · duration · highlight · routineContext
  *   - Visible focus ring on keyboard focus only (mirrors PillNavigationItem).
  * ============================================================================ */
 
@@ -55,51 +56,64 @@ import type { ButtonHTMLAttributes } from "react";
 type ActivityVariant = "compact" | "full";
 
 interface ActivityRowProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "type"> {
-    /** Workout type label (e.g., "Push", "Pull", "Legs", "Cardio"). */
+    /** Workout type label (e.g., "Strength", "Run"). Drives dot color. */
     type: string;
-    /** Pre-formatted timestamp string (e.g., "Mon, Jun 9" or "Today, 9:41 AM"). */
+    /** Pre-formatted timestamp string (e.g., "Mon, Jun 9" or "2h ago"). */
     timestamp: string;
-    /** Pre-formatted duration string (e.g., "48 min", "1h 12min"). */
+    /** Pre-formatted duration string (e.g., "48m", "1h 12m"). */
     duration: string;
-    /** Optional highlight — personal record or notable event.
-     *  If it starts with "PR:" the prefix renders in saffron-mark. */
+    /** Exercise or event highlight (e.g., "Bench 185×5", "3.1 mi"). */
     highlight?: string;
+    /** Routine day context (e.g., "Push Day 1"). Shown in parens after highlight.
+     *  Omit for non-routine activity types (Run, Yoga). */
+    routineContext?: string;
+    /** True renders a saffron "PR" badge after the routineContext in compact,
+     *  or a "PR:" prefix in full. */
+    highlightIsPR?: boolean;
     /** "compact" → single-line Dashboard row. "full" → two-line Activities row.
      *  Defaults to "compact". */
     variant?: ActivityVariant;
 }
 
-const STRENGTH_KEYWORDS = /push|pull|legs|upper|lower|full|strength|lift|squat|deadlift/i;
-const CARDIO_KEYWORDS = /run|cardio|bike|swim|walk|hike|hiit|row|cycle|elliptical/i;
+/* Placeholder type→color map. Expand as the type system grows.
+ * Exact string match only — no substring matching. */
+const TYPE_COLOR_MAP: Record<string, string> = {
+    Strength: "var(--color-saffron-mark)",
+    Run:      "var(--color-moss-positive)",
+};
 
-function dotColor(type: string): string {
-    if (STRENGTH_KEYWORDS.test(type)) return "var(--color-saffron-mark)";
-    if (CARDIO_KEYWORDS.test(type)) return "var(--color-moss-positive)";
-    return "var(--color-pewter-mute)";
+function getDotColor(type: string): string {
+    return TYPE_COLOR_MAP[type] ?? "var(--color-pewter-mute)";
 }
 
-function buildAriaLabel(type: string, duration: string, highlight?: string): string {
+function buildAriaLabel(
+    type: string,
+    duration: string,
+    highlight?: string,
+    routineContext?: string,
+    highlightIsPR?: boolean,
+): string {
     let label = `${type} · ${duration}`;
-    if (highlight) label += ` · ${highlight}`;
-    return label;
-}
-
-/* Render highlight text. "PR:" prefix gets saffron treatment; rest is charcoal. */
-function HighlightText({ text }: { text: string }) {
-    if (text.startsWith("PR:")) {
-        return (
-            <>
-                <span style={{ color: "var(--color-saffron-mark)", fontWeight: 500 }}>PR:</span>
-                <span style={{ color: "var(--color-charcoal-ink)" }}>{text.slice(3)}</span>
-            </>
-        );
+    if (highlight) {
+        label += ` · ${highlightIsPR ? "PR: " : ""}${highlight}`;
+        if (routineContext) label += ` (${routineContext})`;
     }
-    return <span style={{ color: "var(--color-charcoal-ink)" }}>{text}</span>;
+    return label;
 }
 
 export const ActivityRow = forwardRef<HTMLButtonElement, ActivityRowProps>(
     function ActivityRow(
-        { type, timestamp, duration, highlight, variant = "compact", className, ...rest },
+        {
+            type,
+            timestamp,
+            duration,
+            highlight,
+            routineContext,
+            highlightIsPR = false,
+            variant = "compact",
+            className,
+            ...rest
+        },
         ref,
     ) {
         const [hovered, setHovered] = useState(false);
@@ -116,7 +130,7 @@ export const ActivityRow = forwardRef<HTMLButtonElement, ActivityRowProps>(
                 <button
                     ref={ref}
                     type="button"
-                    aria-label={buildAriaLabel(type, duration, highlight)}
+                    aria-label={buildAriaLabel(type, duration, highlight, routineContext, highlightIsPR)}
                     onMouseEnter={() => setHovered(true)}
                     onMouseLeave={() => setHovered(false)}
                     onFocus={(e) => {
@@ -124,25 +138,21 @@ export const ActivityRow = forwardRef<HTMLButtonElement, ActivityRowProps>(
                     }}
                     onBlur={() => setFocusVisible(false)}
                     style={{
-                    // Reset button chrome
                         border: "none",
                         cursor: "pointer",
                         textAlign: "left",
                         width: "100%",
 
-                        // Layout
                         display: "flex",
                         flexDirection: "row",
-                        alignItems: variant === "full" ? "flex-start" : "center",
+                        alignItems: variant === "compact" ? "baseline" : "flex-start",
                         justifyContent: "space-between",
                         padding: `${paddingY} var(--spacing-8)`,
                         gap: "var(--spacing-16)",
 
-                        // Pill hover — borderRadius free because separator lives on wrapper
                         backgroundColor: hovered ? "var(--color-vellum-surface)" : "transparent",
                         borderRadius: "var(--radius-rows)",
 
-                        // Focus ring (keyboard only)
                         outline: "none",
                         boxShadow: focusVisible
                             ? "0 0 0 2px var(--color-paper-canvas), 0 0 0 4px var(--color-indigo-press)"
@@ -152,129 +162,276 @@ export const ActivityRow = forwardRef<HTMLButtonElement, ActivityRowProps>(
                     }}
                     {...rest}
                 >
-                    {/* Left column */}
-                    <div
-                        style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "var(--spacing-4)",
-                            minWidth: 0,
-                        }}
-                    >
-                        {/* Type row: dot + label */}
-                        <div
-                            style={{
-                                display: "flex",
-                                alignItems: "center",
-                                gap: "var(--spacing-8)",
-                            }}
-                        >
+                    {variant === "compact" ? (
+                        // ── Compact ───────────────────────────────────────────
+                        // Single inline flex row. Left side (flex:1) holds the training
+                        // narrative; right side (flexShrink:0) anchors duration+timestamp.
+                        <>
+                            {/* Left: dot · type · highlight · routineContext · PR */}
                             <span
-                                aria-hidden="true"
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    flex: 1,
+                                    minWidth: 0,
+                                }}
+                            >
+                                {/* Type dot */}
+                                <span
+                                    aria-hidden="true"
+                                    style={{
+                                        flexShrink: 0,
+                                        display: "inline-block",
+                                        width: "8px",
+                                        height: "8px",
+                                        borderRadius: "9999px",
+                                        backgroundColor: getDotColor(type),
+                                        marginRight: "8px",
+                                    }}
+                                />
+                                {/* Type */}
+                                <span
+                                    style={{
+                                        flexShrink: 0,
+                                        fontFamily: "var(--font-aeonikpro)",
+                                        fontSize: "14px",
+                                        fontWeight: 500,
+                                        color: "var(--color-charcoal-ink)",
+                                        lineHeight: 1.3,
+                                    }}
+                                >
+                                    {type}
+                                </span>
+
+                                {/* Highlight + routineContext + PR badge */}
+                                {highlight && (
+                                    <span
+                                        style={{
+                                            display: "flex",
+                                            alignItems: "center",
+                                            minWidth: 0,
+                                            flex: 1,
+                                        }}
+                                    >
+                                        {/* Separator */}
+                                        <span
+                                            aria-hidden="true"
+                                            style={{
+                                                flexShrink: 0,
+                                                margin: "0 8px",
+                                                color: "var(--color-pewter-mute)",
+                                                fontSize: "15px",
+                                                fontWeight: 400,
+                                            }}
+                                        >
+                                            ·
+                                        </span>
+                                        {/* Highlight */}
+                                        <span
+                                            style={{
+                                                flexShrink: 0,
+                                                fontFamily: "var(--font-aeonikpro)",
+                                                fontSize: "14px",
+                                                fontWeight: 500,
+                                                color: "var(--color-charcoal-ink)",
+                                                lineHeight: 1.3,
+                                            }}
+                                        >
+                                            {highlight}
+                                        </span>
+                                        {/* routineContext — truncates first under pressure */}
+                                        {routineContext && (
+                                            <span
+                                                style={{
+                                                    flexShrink: 1,
+                                                    minWidth: 0,
+                                                    overflow: "hidden",
+                                                    textOverflow: "ellipsis",
+                                                    whiteSpace: "nowrap",
+                                                    fontFamily: "var(--font-aeonikpro)",
+                                                    fontSize: "13px",
+                                                    fontWeight: 400,
+                                                    color: "var(--color-pewter-mute)",
+                                                    marginLeft: "4px",
+                                                    lineHeight: 1.3,
+                                                }}
+                                            >
+                                                ({routineContext})
+                                            </span>
+                                        )}
+                                        {/* PR badge */}
+                                        {highlightIsPR && (
+                                            <span
+                                                style={{
+                                                    flexShrink: 0,
+                                                    marginLeft: "6px",
+                                                    fontFamily: "var(--font-aeonikpro)",
+                                                    fontSize: "11px",
+                                                    fontWeight: 500,
+                                                    color: "var(--color-saffron-mark)",
+                                                    letterSpacing: "0.05em",
+                                                    lineHeight: 1.3,
+                                                }}
+                                            >
+                                                PR
+                                            </span>
+                                        )}
+                                    </span>
+                                )}
+                            </span>
+
+                            {/* Right: duration · timestamp */}
+                            <span
                                 style={{
                                     flexShrink: 0,
-                                    width: "7px",
-                                    height: "7px",
-                                    borderRadius: "9999px",
-                                    backgroundColor: dotColor(type),
-                                }}
-                            />
-                            <span
-                                style={{
                                     fontFamily: "var(--font-aeonikpro)",
-                                    fontSize: "15px",
-                                    fontWeight: 500,
-                                    color: "var(--color-charcoal-ink)",
                                     lineHeight: 1.3,
                                     whiteSpace: "nowrap",
-                                    overflow: "hidden",
-                                    textOverflow: "ellipsis",
                                 }}
                             >
-                                {type}
+                                <span
+                                    style={{
+                                        fontSize: "14px",
+                                        fontWeight: 500,
+                                        color: "var(--color-smoke-ink)",
+                                    }}
+                                >
+                                    {duration}
+                                </span>
+                                <span
+                                    aria-hidden="true"
+                                    style={{ margin: "0 7px", fontSize: "14px", color: "var(--color-pewter-mute)" }}
+                                >
+                                    ·
+                                </span>
+                                <span
+                                    style={{
+                                        fontSize: "12px",
+                                        fontWeight: 400,
+                                        color: "var(--color-pewter-mute)",
+                                    }}
+                                >
+                                    {timestamp}
+                                </span>
                             </span>
-                        </div>
-
-                        {/* Highlight line — full variant only.
-                        Always rendered (visible or hidden) to lock row height. */}
-                        {variant === "full" && (
-                            <span
-                                aria-hidden={!highlight || undefined}
-                                style={{
-                                    fontFamily: "var(--font-aeonikpro)",
-                                    fontSize: "13px",
-                                    fontWeight: 400,
-                                    lineHeight: 1.4,
-                                    paddingLeft: "15px", // aligns with type text (7px dot + 8px gap)
-                                    visibility: highlight ? "visible" : "hidden",
-                                }}
-                            >
-                                {highlight ? <HighlightText text={highlight} /> : "​"}
-                            </span>
-                        )}
-                    </div>
-
-                    {/* Right column */}
-                    {variant === "compact" ? (
-                    // Compact: duration (smoke-ink, 500) · timestamp (pewter-mute, 400)
-                        <span
-                            style={{
-                                flexShrink: 0,
-                                fontFamily: "var(--font-aeonikpro)",
-                                fontSize: "13px",
-                                lineHeight: 1.3,
-                                whiteSpace: "nowrap",
-                            }}
-                        >
-                            <span style={{ fontWeight: 500, color: "var(--color-smoke-ink)" }}>
-                                {duration}
-                            </span>
-                            <span
-                                aria-hidden="true"
-                                style={{ margin: "0 5px", color: "var(--color-pewter-mute)" }}
-                            >
-                            ·
-                            </span>
-                            <span style={{ fontWeight: 400, color: "var(--color-pewter-mute)" }}>
-                                {timestamp}
-                            </span>
-                        </span>
+                        </>
                     ) : (
-                    // Full: timestamp (pewter-mute, 400) on top; duration (smoke-ink, 500) below
-                        <div
-                            style={{
-                                flexShrink: 0,
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "flex-end",
-                                gap: "var(--spacing-4)",
-                            }}
-                        >
-                            <span
+                        // ── Full ──────────────────────────────────────────────
+                        // Two-line layout. Left: type header + highlight line.
+                        // Right: timestamp on top, duration below.
+                        <>
+                            {/* Left column */}
+                            <div
                                 style={{
-                                    fontFamily: "var(--font-aeonikpro)",
-                                    fontSize: "13px",
-                                    fontWeight: 400,
-                                    color: "var(--color-pewter-mute)",
-                                    lineHeight: 1.3,
-                                    whiteSpace: "nowrap",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    gap: "var(--spacing-4)",
+                                    minWidth: 0,
                                 }}
                             >
-                                {timestamp}
-                            </span>
-                            <span
+                                {/* Type row: dot + label */}
+                                <div
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: "var(--spacing-8)",
+                                    }}
+                                >
+                                    <span
+                                        aria-hidden="true"
+                                        style={{
+                                            flexShrink: 0,
+                                            width: "8px",
+                                            height: "8px",
+                                            borderRadius: "9999px",
+                                            backgroundColor: getDotColor(type),
+                                        }}
+                                    />
+                                    <span
+                                        style={{
+                                            fontFamily: "var(--font-aeonikpro)",
+                                            fontSize: "15px",
+                                            fontWeight: 500,
+                                            color: "var(--color-charcoal-ink)",
+                                            lineHeight: 1.3,
+                                            whiteSpace: "nowrap",
+                                            overflow: "hidden",
+                                            textOverflow: "ellipsis",
+                                        }}
+                                    >
+                                        {type}
+                                    </span>
+                                </div>
+
+                                {/* Highlight line — always rendered to lock row height */}
+                                <span
+                                    aria-hidden={!highlight || undefined}
+                                    style={{
+                                        fontFamily: "var(--font-aeonikpro)",
+                                        fontSize: "13px",
+                                        fontWeight: 400,
+                                        lineHeight: 1.4,
+                                        paddingLeft: "15px",
+                                        visibility: highlight ? "visible" : "hidden",
+                                    }}
+                                >
+                                    {highlight ? (
+                                        <>
+                                            {highlightIsPR && (
+                                                <span
+                                                    style={{
+                                                        color: "var(--color-saffron-mark)",
+                                                        fontWeight: 500,
+                                                        marginRight: "4px",
+                                                    }}
+                                                >
+                                                    PR:
+                                                </span>
+                                            )}
+                                            <span style={{ color: "var(--color-charcoal-ink)" }}>
+                                                {highlight}
+                                            </span>
+                                        </>
+                                    ) : "​"}
+                                </span>
+                            </div>
+
+                            {/* Right column: timestamp + duration */}
+                            <div
                                 style={{
-                                    fontFamily: "var(--font-aeonikpro)",
-                                    fontSize: "13px",
-                                    fontWeight: 500,
-                                    color: "var(--color-smoke-ink)",
-                                    lineHeight: 1.3,
-                                    whiteSpace: "nowrap",
+                                    flexShrink: 0,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "flex-end",
+                                    gap: "var(--spacing-4)",
                                 }}
                             >
-                                {duration}
-                            </span>
-                        </div>
+                                <span
+                                    style={{
+                                        fontFamily: "var(--font-aeonikpro)",
+                                        fontSize: "13px",
+                                        fontWeight: 400,
+                                        color: "var(--color-pewter-mute)",
+                                        lineHeight: 1.3,
+                                        whiteSpace: "nowrap",
+                                    }}
+                                >
+                                    {timestamp}
+                                </span>
+                                <span
+                                    style={{
+                                        fontFamily: "var(--font-aeonikpro)",
+                                        fontSize: "13px",
+                                        fontWeight: 500,
+                                        color: "var(--color-smoke-ink)",
+                                        lineHeight: 1.3,
+                                        whiteSpace: "nowrap",
+                                    }}
+                                >
+                                    {duration}
+                                </span>
+                            </div>
+                        </>
                     )}
                 </button>
             </div>
