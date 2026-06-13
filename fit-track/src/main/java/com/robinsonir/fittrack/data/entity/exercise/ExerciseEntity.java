@@ -1,9 +1,12 @@
 package com.robinsonir.fittrack.data.entity.exercise;
 
 import com.robinsonir.fittrack.data.entity.AbstractEntity;
+import com.robinsonir.fittrack.data.entity.set.SetEntity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.List;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -22,15 +25,13 @@ public class ExerciseEntity extends AbstractEntity {
     @Column(name = "muscle_group", nullable = false)
     private String muscleGroup;
 
-    @Column(name = "sets", nullable = false)
-    private Integer sets;
-
-    @Column(name = "reps", nullable = false)
-    private Integer reps;
-
-    @Column(name = "weight_per_rep", nullable = false)
-    private Integer weightPerRep;
-
     @Column(name = "concentration", nullable = false)
     private String concentration;
+
+    @Column(name = "is_bilateral", nullable = false)
+    private Boolean isBilateral;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "exercise_id")
+    private List<SetEntity> sets;
 }
