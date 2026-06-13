@@ -19,8 +19,6 @@ public record WorkoutCreationRequest(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         Integer durationMinutes,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-        Boolean isBilateral,
-        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         Set<ExerciseDTO> exercises
 ) {
 }
