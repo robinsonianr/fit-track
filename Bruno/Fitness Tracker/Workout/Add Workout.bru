@@ -16,32 +16,54 @@ auth:bearer {
 
 body:json {
   {
-      "customer": {"id":1},
+      "memberId": 1,
       "title": "Upper Body",
       "workoutType": "Strength Training",
+     "volume": 5800,
+      "calories": 122,
+      "durationMinutes": 12,
+      "workoutDate": "2026-06-10T21:45:13.018-05:00",
       "exercises": [
         {
           "title": "Incline Dumbbell Press",
           "equipment": "Dumbbell",
           "description": "Incline dumbbell press targeting upper chest",
           "muscleGroup": "Chest",
-          "reps": 10,
-          "sets": 2,
-          "weightPerRep": 70
+          "concentration": "Chest",
+          "isBilateral": true,
+          "sets": [
+            {
+              "setNumber": 1,
+              "reps": 10,
+              "weight": 70
+            },
+             {
+              "setNumber": 2,
+              "reps": 10,
+              "weight": 70
+            }
+          ]
         },
         {
           "title": "Push-ups",
           "equipment": "Bodyweight",
           "description": "Bodyweight exercise for chest, shoulders, and triceps",
           "muscleGroup": "Chest",
-          "reps": 15,
-          "sets": 2,
-          "weightPerRep": 70
+          "concentration": "Chest",
+          "isBilateral": false,
+          "sets": [
+              {
+                "setNumber": 1,
+                "reps": 15,
+                "weight": 175
+              },
+               {
+                "setNumber": 2,
+                "reps": 15,
+                "weight": 175
+              }
+          ]
         }
-      ],
-      "volume": 2800,
-      "calories": 44,
-      "durationMinutes": 8,
-      "workoutDate": "2026-02-03T21:45:13.018-05:00"
+      ]
     }
 }

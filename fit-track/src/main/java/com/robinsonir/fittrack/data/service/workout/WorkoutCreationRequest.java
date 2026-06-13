@@ -11,14 +11,16 @@ public record WorkoutCreationRequest(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         String title,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-        Set<ExerciseDTO> exercises,
-        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         String workoutType,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         Integer volume,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         Integer calories,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-        Integer durationMinutes
+        Integer durationMinutes,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+        Boolean isBilateral,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+        Set<ExerciseDTO> exercises
 ) {
 }

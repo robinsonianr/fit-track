@@ -1,8 +1,11 @@
 package com.robinsonir.fittrack.data.repository.exercise;
 
+import com.robinsonir.fittrack.data.repository.set.SetDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema
+import java.util.List;
+
+@Schema(name = "ExerciseDTO")
 public record ExerciseDTO(
         Long id,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
@@ -16,10 +19,7 @@ public record ExerciseDTO(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         String concentration,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-        Integer reps,
-        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-        Integer sets,
-        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-        Integer weightPerRep
+        Boolean isBilateral,
+        List<SetDTO> sets
 ){
 }
