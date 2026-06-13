@@ -126,7 +126,7 @@ public class WorkoutServiceTest {
     void addWorkout() {
         // Arrange
         WorkoutCreationRequest workoutCreationRequest = new WorkoutCreationRequest(
-                member.getId(), "Swimming", "Cardio", 12000, 400, 60, false, new HashSet<>()
+                member.getId(), "Swimming", "Cardio", 12000, 400, 60, new HashSet<>()
         );
 
         when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
