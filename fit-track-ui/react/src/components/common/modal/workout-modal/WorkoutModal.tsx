@@ -1,7 +1,7 @@
 import React, {useEffect, useMemo, useState} from "react";
 import ReactDOM from "react-dom";
 import {PREDEFINED_EXERCISES} from "../../../../constants/exercises.ts";
-import {ExerciseDTO, MemberDTO} from "../../../../api/generated/models";
+import {ExerciseDTO, MemberDTO, SetDTO} from "../../../../api/generated/models";
 import {getWorkoutsApi} from "../../../../api/generated/endpoints/workouts-api/workouts-api.ts";
 
 
@@ -12,10 +12,8 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
 }) => {
     const [selectedExercises, setSelectedExercises] = useState<ExerciseDTO[]>([]);
     const [exerciseTitle, setExerciseTitle] = useState("");
-    const [sets, setSets] = useState(0);
-    const [reps, setReps] = useState(0);
-    const [weight, setWeight] = useState(0);
     const [volume, setVolume] = useState(0);
+    const [calories, setCalories] = useState(0);
     const [selectedMuscleGroup, setSelectedMuscleGroup] = useState("");
     const [selectedConcentration, setSelectedConcentration] = useState("");
     const {createWorkout} = getWorkoutsApi();
@@ -23,6 +21,11 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
     const muscleGroups = useMemo(() => {
         return [...new Set(PREDEFINED_EXERCISES.map(ex => ex.muscleGroup))];
     }, []);
+
+    const calculateCalories = (duration: number) => {
+        if (!member?.weight) return;
+        setCalories(Math.floor(3.5 * 0.00795 * member?.weight * duration));
+    }
 
     const concentrations = useMemo(() => {
         if (!selectedMuscleGroup) return [];
@@ -39,22 +42,20 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
 
     useEffect(() => {
         let weight = 0;
-        selectedExercises.forEach(ex => {
-            if (ex.equipment === "Bodyweight") {
-                if (member?.weight) {
-                    weight += ex.sets * ex.reps * (ex.weightPerRep + member?.weight);
-                } else {
-                    weight += ex.sets * ex.reps * (ex.weightPerRep + 100);
-                }
-            } else {
-                const multiplier = ex.equipment === "Dumbbell" ? 2 : 1;
-                weight += ex.sets * ex.reps * ex.weightPerRep * multiplier;
-            }
+        selectedExercises.forEach(exercise => {
+            const sets = exercise.sets;
+               sets?.forEach(set => {
+                   if (exercise.isBilateral) {
+                       weight += (set.weight * set.reps * 2);
+                   } else {
+                       weight += (set.weight * set.reps);
+                   }
+               });
         });
         setVolume(weight);
     }, [selectedExercises]);
 
-    const addExercise = (selectedTitle: string, sets: number, reps: number, weight: number) => {
+    const addExercise = (selectedTitle: string, sets: SetDTO[]) => {
         const predefined = PREDEFINED_EXERCISES.find(ex => ex.title === selectedTitle);
         if (!predefined) return;
         const newExercise: ExerciseDTO = {
@@ -63,9 +64,8 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
             muscleGroup: predefined.muscleGroup,
             concentration: predefined.concentration,
             sets: sets,
-            reps: reps,
-            weightPerRep: weight,
-            equipment: predefined.equipment
+            equipment: predefined.equipment,
+            isBilateral: predefined.isBilateral
         };
         setSelectedExercises([...selectedExercises, newExercise]);
         setExerciseTitle("");
@@ -102,11 +102,9 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
                 const workoutCreationRequest = {
                     memberId: member.id,
                     title: deriveTitle(selectedExercises),
-                    exercises: selectedExercises,
                     workoutType: inputs.get("workoutType") as string,
-                    volume: Number(inputs.get("volume")),
-                    calories: Number(inputs.get("calories")),
-                    durationMinutes: Number(inputs.get("durationMinutes"))
+                    durationMinutes: Number(inputs.get("durationMinutes")),
+                    exercises: selectedExercises,
                 };
                 await createWorkout(workoutCreationRequest);
                 onClose();
@@ -155,7 +153,7 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
                                 onChange={(e) => {
                                     setSelectedMuscleGroup(e.target.value);
                                     setSelectedConcentration("");
-                                    setExerciseTitle("");
+                                    // setExerciseTitle("");
                                 }}
                             >
                                 <option value="">All Muscle Groups</option>
@@ -171,7 +169,7 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
                                 value={selectedConcentration}
                                 onChange={(e) => {
                                     setSelectedConcentration(e.target.value);
-                                    setExerciseTitle("");
+                                    // setExerciseTitle("");
                                 }}
                                 disabled={!selectedMuscleGroup}
                             >
@@ -186,7 +184,7 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
                             <select
                                 className="bg-[#222] text-white rounded-md p-2 text-sm w-full border border-gray-600"
                                 name="exerciseTitle"
-                                onChange={(e) => setExerciseTitle(e.target.value)}
+                                // onChange={(e) => setExerciseTitle(e.target.value)}
                             >
                                 <option value="">Select Exercise</option>
                                 {filteredExercises.map(ex => <option key={ex.title}
@@ -194,35 +192,36 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
                             </select>
                         </div>
                     </div>
-                    {exerciseTitle !== "" && (
-                        <>
-                            <div className="flex flex-row gap-4 mt-2">
-                                <div>
-                                    <label className="font-bold">Sets</label>
-                                    <input placeholder="Sets" type="number"
-                                        onChange={(e) => setSets(parseInt(e.target.value))}
-                                        className="text-sm rounded-md w-full p-2"/>
-                                </div>
-                                <div>
-                                    <label className="font-bold">Reps</label>
-                                    <input placeholder="Reps" type="number"
-                                        onChange={(e) => setReps(parseInt(e.target.value))}
-                                        className="text-sm rounded-md w-full p-2"/>
-                                </div>
-                                <div>
-                                    <label className="font-bold">Weight Per Rep (lbs)</label>
-                                    <input placeholder="Weight" type="number"
-                                        onChange={(e) => setWeight(parseFloat(e.target.value))}
-                                        className="text-sm rounded-md w-full p-2"/>
-                                </div>
-                            </div>
-                            <button
-                                className="bg-[#3f76c0] mt-4 rounded-md text-white cursor-pointer hover:bg-[#355a8f] duration-300 h-10 w-30"
-                                onClick={() => addExercise(exerciseTitle, sets, reps, weight)} type="button">Add
-                                Exercise
-                            </button>
-                        </>
-                    )}
+                    // Need to add functionality to add exercises with customizable sets and reps to workout
+                    {/*{exerciseTitle !== "" && (*/}
+                    {/*    <>*/}
+                    {/*        <div className="flex flex-row gap-4 mt-2">*/}
+                    {/*            <div>*/}
+                    {/*                <label className="font-bold">Sets</label>*/}
+                    {/*                <input placeholder="Sets" type="number"*/}
+                    {/*                    onChange={(e) => setSets(parseInt(e.target.value))}*/}
+                    {/*                    className="text-sm rounded-md w-full p-2"/>*/}
+                    {/*            </div>*/}
+                    {/*            <div>*/}
+                    {/*                <label className="font-bold">Reps</label>*/}
+                    {/*                <input placeholder="Reps" type="number"*/}
+                    {/*                    onChange={(e) => setReps(parseInt(e.target.value))}*/}
+                    {/*                    className="text-sm rounded-md w-full p-2"/>*/}
+                    {/*            </div>*/}
+                    {/*            <div>*/}
+                    {/*                <label className="font-bold">Weight Per Rep (lbs)</label>*/}
+                    {/*                <input placeholder="Weight" type="number"*/}
+                    {/*                    onChange={(e) => setWeight(parseFloat(e.target.value))}*/}
+                    {/*                    className="text-sm rounded-md w-full p-2"/>*/}
+                    {/*            </div>*/}
+                    {/*        </div>*/}
+                    {/*        <button*/}
+                    {/*            className="bg-[#3f76c0] mt-4 rounded-md text-white cursor-pointer hover:bg-[#355a8f] duration-300 h-10 w-30"*/}
+                    {/*            onClick={() => addExercise(exerciseTitle, sets, reps, weight)} type="button">Add*/}
+                    {/*            Exercise*/}
+                    {/*        </button>*/}
+                    {/*    </>*/}
+                    {/*)}*/}
                     <div
                         className="h-28 overflow-y-auto grid grid-cols-3 gap-4 border-gray-600 border-2 rounded-md p-2">
                         {selectedExercises.map((exercise, index) => (
@@ -230,7 +229,7 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
                                 className="group overflow-hidden h-10 w-full text-white bg-[#222] p-2 border-3 border-white rounded-md flex text-center items-center"
                                 key={index}>
                                 <span
-                                    className="text-xs whitespace-nowrap group-hover:animate-marquee">{exercise.title} - {exercise.sets}x{exercise.reps} @ {exercise.weightPerRep} lbs</span>
+                                    className="text-xs whitespace-nowrap group-hover:animate-marquee">{exercise.title}</span>
                             </div>
                         ))}
                     </div>
@@ -242,12 +241,12 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
                     </div>
                     <div>
                         <label className="font-bold">Calories (kcal)</label>
-                        <input className="rounded-md p-2" placeholder="Calories" type="number" name="calories"
-                            required/>
+                        <input className="rounded-md p-2" placeholder="Calories" type="number" name="calories" value={calories}
+                            readOnly/>
                     </div>
                     <div>
                         <label className="font-bold">Workout Duration (min)</label>
-                        <input className="rounded-md p-2" placeholder="Duration" type="number" name="durationMinutes"
+                        <input className="rounded-md p-2" placeholder="Duration" type="number" name="durationMinutes" onChange={(e) => calculateCalories(Number(e.target.value))}
                             required/>
                     </div>
                     <button

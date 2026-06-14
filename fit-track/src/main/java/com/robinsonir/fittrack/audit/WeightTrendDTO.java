@@ -7,7 +7,7 @@ import java.time.OffsetDateTime;
 @Schema(name = "WeightTrendDTO")
 public record WeightTrendDTO(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-        Integer weight,
+        Double weight,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         OffsetDateTime date
 ) {

@@ -20,11 +20,11 @@ public record MemberDTO(
         Gender gender,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         LocalDate dateOfBirth,
-        Integer weight,
+        Double weight,
         Integer height,
-        Integer weightGoal,
+        Double weightGoal,
         Fitness fitness,
-        Integer bodyFat,
+        Double bodyFat,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         OffsetDateTime memberSince,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)

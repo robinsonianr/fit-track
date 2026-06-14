@@ -60,9 +60,9 @@ public class WorkoutServiceTest {
     @Test
     void getAllWorkouts() {
         // Arrange
-        WorkoutEntity workoutEntity1 = new WorkoutEntity("Cardio", "Running", 500, 12000, 60, OffsetDateTime.now(), new HashSet<>(), member);
+        WorkoutEntity workoutEntity1 = new WorkoutEntity("Cardio", "Running", 500, 500, 60, OffsetDateTime.now(), new HashSet<>(), member);
         workoutEntity1.setId(1L);
-        WorkoutEntity workoutEntity2 = new WorkoutEntity("Cardio", "Cycling", 300, 12000, 45, OffsetDateTime.now(), new HashSet<>(), member);
+        WorkoutEntity workoutEntity2 = new WorkoutEntity("Cardio", "Cycling", 300, 500, 45, OffsetDateTime.now(), new HashSet<>(), member);
         workoutEntity2.setId(2L);
 
         List<WorkoutEntity> workoutList = new ArrayList<>();
@@ -92,7 +92,7 @@ public class WorkoutServiceTest {
     void getWorkoutSuccess() {
         // Arrange
         Long workoutId = 1L;
-        WorkoutEntity workoutEntity = new WorkoutEntity("Cardio", "Running", 500, 12000, 60, OffsetDateTime.now(), null, member);
+        WorkoutEntity workoutEntity = new WorkoutEntity("Cardio", "Running", 500, 500, 60, OffsetDateTime.now(), null, member);
         WorkoutDTO expectedWorkout = new WorkoutDTO(workoutId, member.getId(), "Cardio", "Running", new HashSet<>(), 12000, 60, null, OffsetDateTime.now());
 
         when(workoutRepository.findById(workoutId)).thenReturn(Optional.of(workoutEntity));
@@ -126,7 +126,7 @@ public class WorkoutServiceTest {
     void addWorkout() {
         // Arrange
         WorkoutCreationRequest workoutCreationRequest = new WorkoutCreationRequest(
-                member.getId(), "Swimming", "Cardio", 12000, 400, 60, new HashSet<>()
+                member.getId(), "Swimming", "Cardio",60, new HashSet<>()
         );
 
         when(memberRepository.findById(member.getId())).thenReturn(Optional.of(member));
