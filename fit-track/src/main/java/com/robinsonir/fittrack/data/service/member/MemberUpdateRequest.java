@@ -14,10 +14,10 @@ public record MemberUpdateRequest(
         @Past(message = "Date of birth must be in the past")
         LocalDate dateOfBirth,
         Gender gender,
-        Integer weight,
+        Double weight,
         Integer height,
-        Integer weightGoal,
+        Double weightGoal,
         Fitness fitness,
-        Integer bodyFat
+        Double bodyFat
 ) {
 }

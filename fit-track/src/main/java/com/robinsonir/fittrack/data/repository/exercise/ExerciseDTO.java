@@ -20,6 +20,7 @@ public record ExerciseDTO(
         String concentration,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         Boolean isBilateral,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         List<SetDTO> sets
 ){
 }

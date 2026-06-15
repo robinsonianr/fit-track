@@ -38,11 +38,11 @@ class AuditHistoryServiceTest {
     void testGetMemberWeightTrend() {
         Long entityId = 1L;
         MemberEntity member1 = new MemberEntity();
-        member1.setWeight(70);
+        member1.setWeight(70.0);
         member1.setLastModifiedDate(OffsetDateTime.parse("2024-01-01T10:00:00Z"));
 
         MemberEntity member2 = new MemberEntity();
-        member2.setWeight(75);
+        member2.setWeight(75.0);
         member2.setLastModifiedDate(OffsetDateTime.parse("2024-02-01T10:00:00Z"));
 
         List<MemberEntity> mockResults = Arrays.asList(member1, member2);
@@ -58,8 +58,8 @@ class AuditHistoryServiceTest {
         List<WeightTrendDTO> result = auditHistoryService.getMemberWeightTrend(entityId);
 
         List<WeightTrendDTO> expected = new ArrayList<>();
-        expected.add(new WeightTrendDTO(70, OffsetDateTime.parse("2024-01-01T10:00:00Z")));
-        expected.add(new WeightTrendDTO(75, OffsetDateTime.parse("2024-02-01T10:00:00Z")));
+        expected.add(new WeightTrendDTO(70.0, OffsetDateTime.parse("2024-01-01T10:00:00Z")));
+        expected.add(new WeightTrendDTO(75.0, OffsetDateTime.parse("2024-02-01T10:00:00Z")));
 
         assertEquals(expected, result);
     }

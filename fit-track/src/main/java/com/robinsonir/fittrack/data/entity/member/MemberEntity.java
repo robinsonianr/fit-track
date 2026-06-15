@@ -51,20 +51,20 @@ public class MemberEntity extends AbstractModifiedDateEntity implements UserDeta
     private String profileImageId;
 
     @Column(name = "weight")
-    private Integer weight;
+    private Double weight;
 
     @Column(name = "height")
     private Integer height;
 
     @Column(name = "weight_goal")
-    private Integer weightGoal;
+    private Double weightGoal;
 
     @Column(name = "fitness")
     @Enumerated(EnumType.STRING)
     private Fitness fitness;
 
     @Column(name = "body_fat")
-    private Integer bodyFat;
+    private Double bodyFat;
 
     @NotAudited
     @Column(name = "member_since")

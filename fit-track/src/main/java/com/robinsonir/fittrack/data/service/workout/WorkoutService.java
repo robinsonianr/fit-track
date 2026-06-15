@@ -1,6 +1,8 @@
 package com.robinsonir.fittrack.data.service.workout;
 
+import com.robinsonir.fittrack.data.entity.exercise.ExerciseEntity;
 import com.robinsonir.fittrack.data.entity.member.MemberEntity;
+import com.robinsonir.fittrack.data.entity.set.SetEntity;
 import com.robinsonir.fittrack.data.entity.workout.WorkoutEntity;
 import com.robinsonir.fittrack.data.repository.member.MemberRepository;
 import com.robinsonir.fittrack.data.repository.workout.WorkoutDTO;
@@ -14,22 +16,24 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class WorkoutService {
 
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(WorkoutService.class);
     private final WorkoutMapper workoutMapper;
     private final ExerciseMapper exerciseMapper;
     private final WorkoutRepository workoutRepository;
     private final MemberRepository memberRepository;
-    
-    private static final Logger LOGGER = LoggerFactory.getLogger(WorkoutService.class);
 
     @Autowired
     public WorkoutService(final WorkoutMapper workoutMapper,
-                          final WorkoutRepository workoutRepository, 
+                          final WorkoutRepository workoutRepository,
                           final ExerciseMapper exerciseMapper,
                           final MemberRepository memberRepository) {
         this.workoutMapper = workoutMapper;
@@ -58,18 +62,19 @@ public class WorkoutService {
     }
 
     public WorkoutDTO addWorkout(WorkoutCreationRequest workoutCreationRequest) {
+        Optional<MemberEntity> memberEntity = memberRepository.findById(workoutCreationRequest.memberId());
 
         WorkoutEntity newWorkout = new WorkoutEntity();
-        newWorkout.setWorkoutType(workoutCreationRequest.workoutType());
-        newWorkout.setTitle(workoutCreationRequest.title());
-        newWorkout.setExercises(exerciseMapper.mapToExerciseEntities(workoutCreationRequest.exercises()));
-        newWorkout.setCalories(workoutCreationRequest.calories());
-        newWorkout.setVolume(workoutCreationRequest.volume());
-        newWorkout.setDurationMinutes(workoutCreationRequest.durationMinutes());
-        newWorkout.setWorkoutDate(OffsetDateTime.now());
+        if (memberEntity.isPresent()) {
+            newWorkout.setWorkoutType(workoutCreationRequest.workoutType());
+            newWorkout.setTitle(workoutCreationRequest.title());
+            newWorkout.setExercises(exerciseMapper.mapToExerciseEntities(workoutCreationRequest.exercises()));
+            newWorkout.setDurationMinutes(workoutCreationRequest.durationMinutes());
+            newWorkout.setWorkoutDate(OffsetDateTime.now());
+            newWorkout.setVolume(calculateVolume(newWorkout.getExercises()));
+            newWorkout.setCalories(calculateCalories(memberEntity.get().getWeight(), newWorkout.getDurationMinutes()));
+        }
 
-
-        Optional<MemberEntity> memberEntity = memberRepository.findById(workoutCreationRequest.memberId());
         memberEntity.ifPresent(newWorkout::setMember);
         workoutRepository.save(newWorkout);
         LOGGER.info("Workout created successfully");
@@ -89,5 +94,25 @@ public class WorkoutService {
         checkIfWorkoutExistsOrThrow(id);
         workoutRepository.deleteById(id);
         LOGGER.info("Workout deleted successfully");
+    }
+
+
+    private Integer calculateVolume(Set<ExerciseEntity> exercises) {
+        int volume = 0;
+        for (ExerciseEntity exercise : exercises) {
+            boolean isBilateral = exercise.getIsBilateral();
+            for (SetEntity set : exercise.getSets()) {
+                if (isBilateral) {
+                    volume += set.getReps() * set.getWeight() * 2;
+                } else {
+                    volume += set.getReps() * set.getWeight();
+                }
+            }
+        }
+        return volume;
+    }
+
+    private Integer calculateCalories(Double weight, Integer durationMinutes) {
+        return (int) Math.floor(3.5 * 0.00795 * weight * durationMinutes);
     }
 }
