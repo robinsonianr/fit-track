@@ -179,11 +179,11 @@ public class MemberServiceTest {
                 "jane@example.com",
                 updatedDob,
                 Gender.FEMALE,
-                65,
+                65.0,
                 170,
-                60,
+                60.0,
                 Fitness.BEGINNER,
-                18
+                18.0
         );
 
         when(memberRepository.findById(memberId)).thenReturn(Optional.of(existingMember));
@@ -221,7 +221,7 @@ public class MemberServiceTest {
         existingMember.setEmail("john.doe@example.com");
         existingMember.setDateOfBirth(originalDob);
         existingMember.setGender(Gender.MALE);
-        existingMember.setWeight(80);
+        existingMember.setWeight(80.0);
         existingMember.setFitness(Fitness.BEGINNER);
 
         MemberUpdateRequest partialRequest = new MemberUpdateRequest(
@@ -229,9 +229,9 @@ public class MemberServiceTest {
                 null,      // email — unchanged
                 null,      // dateOfBirth — unchanged
                 null,      // gender — unchanged
-                75,        // weight — updated
+                75.0,        // weight — updated
                 null,      // height — unchanged
-                70,        // weightGoal — updated
+                70.0,        // weightGoal — updated
                 null,      // fitness — unchanged
                 null       // bodyFat — unchanged
         );

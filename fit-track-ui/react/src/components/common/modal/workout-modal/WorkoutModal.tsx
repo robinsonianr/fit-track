@@ -11,6 +11,7 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
     member: MemberDTO | undefined
 }) => {
     const [selectedExercises, setSelectedExercises] = useState<ExerciseDTO[]>([]);
+    const [sets, setSets] = useState<SetDTO[]>([]);
     const [exerciseTitle, setExerciseTitle] = useState("");
     const [volume, setVolume] = useState(0);
     const [calories, setCalories] = useState(0);
@@ -25,7 +26,7 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
     const calculateCalories = (duration: number) => {
         if (!member?.weight) return;
         setCalories(Math.floor(3.5 * 0.00795 * member?.weight * duration));
-    }
+    };
 
     const concentrations = useMemo(() => {
         if (!selectedMuscleGroup) return [];
@@ -44,13 +45,13 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
         let weight = 0;
         selectedExercises.forEach(exercise => {
             const sets = exercise.sets;
-               sets?.forEach(set => {
-                   if (exercise.isBilateral) {
-                       weight += (set.weight * set.reps * 2);
-                   } else {
-                       weight += (set.weight * set.reps);
-                   }
-               });
+            sets?.forEach(set => {
+                if (exercise.isBilateral) {
+                    weight += (set.weight * set.reps * 2);
+                } else {
+                    weight += (set.weight * set.reps);
+                }
+            });
         });
         setVolume(weight);
     }, [selectedExercises]);
@@ -192,36 +193,36 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
                             </select>
                         </div>
                     </div>
-                    // Need to add functionality to add exercises with customizable sets and reps to workout
-                    {/*{exerciseTitle !== "" && (*/}
-                    {/*    <>*/}
-                    {/*        <div className="flex flex-row gap-4 mt-2">*/}
-                    {/*            <div>*/}
-                    {/*                <label className="font-bold">Sets</label>*/}
-                    {/*                <input placeholder="Sets" type="number"*/}
-                    {/*                    onChange={(e) => setSets(parseInt(e.target.value))}*/}
-                    {/*                    className="text-sm rounded-md w-full p-2"/>*/}
-                    {/*            </div>*/}
-                    {/*            <div>*/}
-                    {/*                <label className="font-bold">Reps</label>*/}
-                    {/*                <input placeholder="Reps" type="number"*/}
-                    {/*                    onChange={(e) => setReps(parseInt(e.target.value))}*/}
-                    {/*                    className="text-sm rounded-md w-full p-2"/>*/}
-                    {/*            </div>*/}
-                    {/*            <div>*/}
-                    {/*                <label className="font-bold">Weight Per Rep (lbs)</label>*/}
-                    {/*                <input placeholder="Weight" type="number"*/}
-                    {/*                    onChange={(e) => setWeight(parseFloat(e.target.value))}*/}
-                    {/*                    className="text-sm rounded-md w-full p-2"/>*/}
-                    {/*            </div>*/}
-                    {/*        </div>*/}
-                    {/*        <button*/}
-                    {/*            className="bg-[#3f76c0] mt-4 rounded-md text-white cursor-pointer hover:bg-[#355a8f] duration-300 h-10 w-30"*/}
-                    {/*            onClick={() => addExercise(exerciseTitle, sets, reps, weight)} type="button">Add*/}
-                    {/*            Exercise*/}
-                    {/*        </button>*/}
-                    {/*    </>*/}
-                    {/*)}*/}
+                    {/* Need to add functionality to add exercises with customizable sets and reps to workout*/}
+                    {exerciseTitle !== "" && (
+                        <>
+                            <div className="flex flex-row gap-4 mt-2">
+                                <div>
+                                    <label className="font-bold">Sets</label>
+                                    <input placeholder="Sets" type="number"
+                                        onChange={() => setSets([])}
+                                        className="text-sm rounded-md w-full p-2"/>
+                                </div>
+                                {/*<div>*/}
+                                {/*    <label className="font-bold">Reps</label>*/}
+                                {/*    <input placeholder="Reps" type="number"*/}
+                                {/*        onChange={(e) => setReps((e.target.value))}*/}
+                                {/*        className="text-sm rounded-md w-full p-2"/>*/}
+                                {/*</div>*/}
+                                {/*<div>*/}
+                                {/*    <label className="font-bold">Weight Per Rep (lbs)</label>*/}
+                                {/*    <input placeholder="Weight" type="number"*/}
+                                {/*        onChange={(e) => setWeight(parseFloat(e.target.value))}*/}
+                                {/*        className="text-sm rounded-md w-full p-2"/>*/}
+                                {/*</div>*/}
+                            </div>
+                            <button
+                                className="bg-[#3f76c0] mt-4 rounded-md text-white cursor-pointer hover:bg-[#355a8f] duration-300 h-10 w-30"
+                                onClick={() => addExercise(exerciseTitle, sets)} type="button">Add
+                                Exercise
+                            </button>
+                        </>
+                    )}
                     <div
                         className="h-28 overflow-y-auto grid grid-cols-3 gap-4 border-gray-600 border-2 rounded-md p-2">
                         {selectedExercises.map((exercise, index) => (

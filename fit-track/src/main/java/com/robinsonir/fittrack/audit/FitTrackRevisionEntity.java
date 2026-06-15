@@ -17,7 +17,7 @@ import java.util.Objects;
 public class FitTrackRevisionEntity {
 
     @Id
-    @SequenceGenerator(name = "sequence_gen", sequenceName = "fit_tracker.hibernate_seq", allocationSize = 1)
+    @SequenceGenerator(name = "sequence_gen", schema = "fit_tracker", sequenceName = "hibernate_seq", allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_gen")
     @RevisionNumber
     @Column(name = "rev")
