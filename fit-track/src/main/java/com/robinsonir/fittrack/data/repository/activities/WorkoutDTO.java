@@ -26,19 +26,18 @@ public record WorkoutDTO(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         OffsetDateTime workoutDate
 ) implements ActivityDetailDTO {
-        @Override
-        public String activityType() {
-                return "Workout";
-        }
+    @Override
+    public String activityType() {
+        return "Workout";
+    }
 
-        @Override
-        public OffsetDateTime activityTimestamp()
-        {
-                return workoutDate;
-        }
+    @Override
+    public OffsetDateTime activityTimestamp() {
+        return workoutDate;
+    }
 
-        @Override
-        public String routineContext() {
-                return title;
-        }
+    @Override
+    public String routineContext() {
+        return title;
+    }
 }

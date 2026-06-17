@@ -1,0 +1,24 @@
+meta {
+  name: Get Activity Detail
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}:8080/api/v1/activities/:activityId
+  body: none
+  auth: bearer
+}
+
+params:path {
+  activityId: 1
+}
+
+auth:bearer {
+  token: {{bearerToken}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

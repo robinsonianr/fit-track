@@ -10,6 +10,7 @@ import com.robinsonir.fittrack.data.repository.member.MemberRepository;
 import com.robinsonir.fittrack.data.repository.set.SetDTO;
 import com.robinsonir.fittrack.data.repository.activities.WorkoutDTO;
 import com.robinsonir.fittrack.data.repository.workout.WorkoutRepository;
+import com.robinsonir.fittrack.data.service.activities.ActivitiesService;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
 import com.robinsonir.fittrack.mappers.ExerciseMapper;
 import com.robinsonir.fittrack.mappers.WorkoutMapper;
@@ -45,6 +46,9 @@ public class WorkoutServiceTest {
 
     @Mock
     private ExerciseMapper exerciseMapper;
+
+    @Mock
+    private ActivitiesService activitiesService;
 
     @InjectMocks
     private WorkoutService workoutService;

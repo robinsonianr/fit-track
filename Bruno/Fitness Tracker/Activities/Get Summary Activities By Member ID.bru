@@ -1,0 +1,28 @@
+meta {
+  name: Get Summary Activities By Member ID
+  type: http
+  seq: 6
+}
+
+get {
+  url: {{baseUrl}}:8080/api/v1/activities/member/:memberId
+  body: none
+  auth: bearer
+}
+
+params:query {
+  ~activityType: 
+}
+
+params:path {
+  memberId: 1
+}
+
+auth:bearer {
+  token: {{bearerToken}}
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
