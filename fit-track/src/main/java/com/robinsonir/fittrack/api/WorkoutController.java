@@ -1,6 +1,6 @@
 package com.robinsonir.fittrack.api;
 
-import com.robinsonir.fittrack.data.repository.workout.WorkoutDTO;
+import com.robinsonir.fittrack.data.repository.activities.WorkoutDTO;
 import com.robinsonir.fittrack.data.service.workout.WorkoutCreationRequest;
 import com.robinsonir.fittrack.data.service.workout.WorkoutService;
 import io.swagger.v3.oas.annotations.Operation;
