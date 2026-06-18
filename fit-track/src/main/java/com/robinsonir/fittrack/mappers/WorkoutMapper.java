@@ -1,7 +1,7 @@
 package com.robinsonir.fittrack.mappers;
 
 import com.robinsonir.fittrack.data.entity.workout.WorkoutEntity;
-import com.robinsonir.fittrack.data.repository.workout.WorkoutDTO;
+import com.robinsonir.fittrack.data.repository.activities.WorkoutDTO;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

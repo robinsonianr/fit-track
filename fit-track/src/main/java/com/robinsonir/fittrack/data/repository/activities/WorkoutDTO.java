@@ -1,4 +1,4 @@
-package com.robinsonir.fittrack.data.repository.workout;
+package com.robinsonir.fittrack.data.repository.activities;
 
 import com.robinsonir.fittrack.data.repository.exercise.ExerciseDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,5 +25,19 @@ public record WorkoutDTO(
         Integer durationMinutes,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         OffsetDateTime workoutDate
-) {
+) implements ActivityDetailDTO {
+    @Override
+    public String activityType() {
+        return "Workout";
+    }
+
+    @Override
+    public OffsetDateTime activityTimestamp() {
+        return workoutDate;
+    }
+
+    @Override
+    public String routineContext() {
+        return title;
+    }
 }

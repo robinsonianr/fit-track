@@ -1,18 +1,21 @@
 package com.robinsonir.fittrack.data.service.workout;
 
+import com.robinsonir.fittrack.data.entity.activities.ActivityEntity;
 import com.robinsonir.fittrack.data.entity.exercise.ExerciseEntity;
 import com.robinsonir.fittrack.data.entity.member.MemberEntity;
 import com.robinsonir.fittrack.data.entity.set.SetEntity;
 import com.robinsonir.fittrack.data.entity.workout.WorkoutEntity;
 import com.robinsonir.fittrack.data.repository.member.MemberRepository;
-import com.robinsonir.fittrack.data.repository.workout.WorkoutDTO;
+import com.robinsonir.fittrack.data.repository.activities.WorkoutDTO;
 import com.robinsonir.fittrack.data.repository.workout.WorkoutRepository;
+import com.robinsonir.fittrack.data.service.activities.ActivitiesService;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
 import com.robinsonir.fittrack.mappers.ExerciseMapper;
 import com.robinsonir.fittrack.mappers.WorkoutMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -30,16 +33,19 @@ public class WorkoutService {
     private final ExerciseMapper exerciseMapper;
     private final WorkoutRepository workoutRepository;
     private final MemberRepository memberRepository;
+    private final ActivitiesService activitiesService;
 
     @Autowired
     public WorkoutService(final WorkoutMapper workoutMapper,
                           final WorkoutRepository workoutRepository,
                           final ExerciseMapper exerciseMapper,
-                          final MemberRepository memberRepository) {
+                          final MemberRepository memberRepository,
+                          @Lazy final ActivitiesService activitiesService) {
         this.workoutMapper = workoutMapper;
         this.workoutRepository = workoutRepository;
         this.memberRepository = memberRepository;
         this.exerciseMapper = exerciseMapper;
+        this.activitiesService = activitiesService;
     }
 
 
@@ -65,6 +71,7 @@ public class WorkoutService {
         Optional<MemberEntity> memberEntity = memberRepository.findById(workoutCreationRequest.memberId());
 
         WorkoutEntity newWorkout = new WorkoutEntity();
+        ActivityEntity activity = new ActivityEntity();
         if (memberEntity.isPresent()) {
             newWorkout.setWorkoutType(workoutCreationRequest.workoutType());
             newWorkout.setTitle(workoutCreationRequest.title());
@@ -73,12 +80,24 @@ public class WorkoutService {
             newWorkout.setWorkoutDate(OffsetDateTime.now());
             newWorkout.setVolume(calculateVolume(newWorkout.getExercises()));
             newWorkout.setCalories(calculateCalories(memberEntity.get().getWeight(), newWorkout.getDurationMinutes()));
-        }
 
-        memberEntity.ifPresent(newWorkout::setMember);
-        workoutRepository.save(newWorkout);
-        LOGGER.info("Workout created successfully");
-        return workoutMapper.convertWorkoutEntityToWorkout(newWorkout);
+            activity.setActivityTimestamp(newWorkout.getWorkoutDate());
+            activity.setActivityType("Workout");
+            activity.setMemberId(memberEntity.get().getId());
+            activity.setRoutineContext(newWorkout.getTitle());
+            activity.setDurationMinutes(newWorkout.getDurationMinutes());
+            activity.setHighlight(activitiesService.getHighlight(newWorkout));
+            activity.setHighlightIsPR(false);
+
+            newWorkout.setMember(memberEntity.get());
+
+            workoutRepository.save(newWorkout);
+            activity.setSourceId(newWorkout.getId());
+            activitiesService.addActivity(activity);
+            LOGGER.info("Workout created successfully");
+            return workoutMapper.convertWorkoutEntityToWorkout(newWorkout);
+        }
+        return null;
     }
 
     public void checkIfWorkoutExistsOrThrow(Long id) {
