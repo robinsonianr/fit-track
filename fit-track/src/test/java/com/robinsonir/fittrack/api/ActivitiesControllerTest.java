@@ -84,7 +84,7 @@ public class ActivitiesControllerTest {
     void getActivityDetailReturnsWorkoutDTO() {
         // Arrange
         Long activityId = 1L;
-        WorkoutDTO workoutDTO = new WorkoutDTO(10L, 1L, "Push Day", "Push",
+        WorkoutDTO workoutDTO = new WorkoutDTO(10L, activityId, 1L, "Push Day", "Push",
                 new HashSet<>(), 5000, 300, 60, OffsetDateTime.now());
 
         when(activitiesService.getActivityDetail(activityId)).thenReturn(workoutDTO);
@@ -96,7 +96,7 @@ public class ActivitiesControllerTest {
         assertNotNull(result);
         assertInstanceOf(WorkoutDTO.class, result);
         assertEquals("Workout", result.activityType());
-        assertEquals(10L, result.id());
+        assertEquals(activityId, ((WorkoutDTO) result).activityId());
         verify(activitiesService, times(1)).getActivityDetail(activityId);
     }
 

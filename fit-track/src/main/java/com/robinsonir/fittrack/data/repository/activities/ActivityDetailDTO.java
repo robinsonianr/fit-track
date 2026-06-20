@@ -14,8 +14,6 @@ import java.time.OffsetDateTime;
 })
 @Schema(name = "ActivityDetailDTO")
 public sealed interface ActivityDetailDTO permits WorkoutDTO {
-    Long id();
-
     String activityType();
 
     Long memberId();
