@@ -47,9 +47,6 @@ public class WorkoutServiceTest {
     @Mock
     private ExerciseMapper exerciseMapper;
 
-    @Mock
-    private ActivitiesService activitiesService;
-
     @InjectMocks
     private WorkoutService workoutService;
 
