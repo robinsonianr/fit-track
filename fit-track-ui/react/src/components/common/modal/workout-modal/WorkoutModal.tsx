@@ -2,7 +2,7 @@ import React, {useEffect, useMemo, useState} from "react";
 import ReactDOM from "react-dom";
 import {PREDEFINED_EXERCISES} from "../../../../constants/exercises.ts";
 import {ExerciseDTO, MemberDTO, SetDTO} from "../../../../api/generated/models";
-import {getWorkoutsApi} from "../../../../api/generated/endpoints/workouts-api/workouts-api.ts";
+import {getActivitiesApi} from "../../../../api/generated/endpoints/activities-api/activities-api.ts";
 
 
 export const WorkoutModal = ({isOpen, onClose, member}: {
@@ -17,7 +17,7 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
     const [calories, setCalories] = useState(0);
     const [selectedMuscleGroup, setSelectedMuscleGroup] = useState("");
     const [selectedConcentration, setSelectedConcentration] = useState("");
-    const {createWorkout} = getWorkoutsApi();
+    const {createActivity} = getActivitiesApi();
 
     const muscleGroups = useMemo(() => {
         return [...new Set(PREDEFINED_EXERCISES.map(ex => ex.muscleGroup))];
@@ -100,14 +100,15 @@ export const WorkoutModal = ({isOpen, onClose, member}: {
             try {
                 const inputs = new FormData(e.currentTarget);
 
-                const workoutCreationRequest = {
+                const activityCreationRequest = {
                     memberId: member.id,
                     title: deriveTitle(selectedExercises),
+                    activityType: "Workout",
                     workoutType: inputs.get("workoutType") as string,
                     durationMinutes: Number(inputs.get("durationMinutes")),
                     exercises: selectedExercises,
                 };
-                await createWorkout(workoutCreationRequest);
+                await createActivity(activityCreationRequest);
                 onClose();
 
                 setTimeout(() => {
