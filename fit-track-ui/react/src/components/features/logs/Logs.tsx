@@ -38,7 +38,7 @@ const Logs = () => {
 
     const openWorkout = (activity: ActivitySummaryDTO) => {
         getActivityDetail(activity.id).then((detail) => {
-            setSelectedActivity(detail)
+            setSelectedActivity(detail);
             openModal();
         });
     };
@@ -59,7 +59,7 @@ const Logs = () => {
         const firstDay = startDayOfMonth(currentMonth);
         const daysArray: React.ReactNode[] = [];
         const today = new Date();
-        const activities = []
+        const activities = [];
 
         console.log(activitiesData);
         if (activitiesData.length > 0) {
