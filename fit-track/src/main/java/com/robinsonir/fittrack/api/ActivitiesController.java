@@ -31,10 +31,13 @@ public class ActivitiesController {
 
     @Operation(summary = "Get Summary activities by MemberId and or Activity Type")
     @GetMapping("/member/{memberId}")
-    public List<ActivitySummaryDTO> getMemberActivitiesByActivityType(
-            @PathVariable final Long memberId, @RequestParam(required = false) final String activityType) {
-        return activitiesService.getMemberActivitiesByActivityType(memberId, activityType);
+    public List<ActivitySummaryDTO> getActivitySummariesByMemberId(
+            @PathVariable final Long memberId,
+            @Parameter(description = "Filter by activity type", example = "Workout")
+            @RequestParam(required = false) final String activityType) {
+        return activitiesService.getActivitySummariesByMemberId(memberId, activityType);
     }
+
 
     @Operation(summary = "Get an activity detail by ID")
     @ApiResponse(responseCode = "404", description = "Activity not found")

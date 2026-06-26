@@ -99,6 +99,6 @@ public class WorkoutService {
     }
 
     private Integer calculateCalories(Double weight, Integer durationMinutes) {
-        return (int) Math.floor(3.5 * 0.00795 * weight * durationMinutes);
+        return (int) Math.floor(4.0 * 0.00795 * weight * durationMinutes);
     }
 }

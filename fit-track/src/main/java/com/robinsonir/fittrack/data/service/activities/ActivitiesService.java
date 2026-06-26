@@ -30,7 +30,7 @@ public class ActivitiesService {
         this.activityRepository = activityRepository;
     }
 
-    public List<ActivitySummaryDTO> getMemberActivitiesByActivityType(Long memberId, String activityType) {
+    public List<ActivitySummaryDTO> getActivitySummariesByMemberId(Long memberId, String activityType) {
         LOGGER.info("Getting activities for member {} with activity type {}", memberId, activityType);
         if (activityType != null) {
             return activityMapper.activityEntityListToActivitySummaryDTOList(activityRepository.findByMemberIdAndActivityType(memberId, activityType));

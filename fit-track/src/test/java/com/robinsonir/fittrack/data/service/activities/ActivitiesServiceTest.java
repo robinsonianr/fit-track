@@ -54,7 +54,7 @@ public class ActivitiesServiceTest {
         when(activityMapper.activityEntityListToActivitySummaryDTOList(entities)).thenReturn(List.of(summaryDTO));
 
         // Act
-        List<ActivitySummaryDTO> result = activitiesService.getMemberActivitiesByActivityType(memberId, activityType);
+        List<ActivitySummaryDTO> result = activitiesService.getActivitySummariesByMemberId(memberId, activityType);
 
         // Assert
         assertEquals(1, result.size());
@@ -75,7 +75,7 @@ public class ActivitiesServiceTest {
         when(activityMapper.activityEntityListToActivitySummaryDTOList(entities)).thenReturn(List.of(summaryDTO));
 
         // Act
-        List<ActivitySummaryDTO> result = activitiesService.getMemberActivitiesByActivityType(memberId, null);
+        List<ActivitySummaryDTO> result = activitiesService.getActivitySummariesByMemberId(memberId, null);
 
         // Assert
         assertEquals(1, result.size());

@@ -9,8 +9,7 @@ import java.time.OffsetDateTime;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME,
         property = "activityType")
 @JsonSubTypes({
-        @JsonSubTypes.Type(value =
-                WorkoutDTO.class, name = "Workout")
+        @JsonSubTypes.Type(value = WorkoutDTO.class, name = "Workout")
 })
 @Schema(name = "ActivityDetailDTO")
 public sealed interface ActivityDetailDTO permits WorkoutDTO {

@@ -1,7 +1,7 @@
 import React, {useEffect, useRef, useState} from "react";
 import {getMemberApi} from "../../api/generated/endpoints/member-api/member-api.ts";
-import {Fitness, Gender, MemberUpdateRequest} from "../../api/generated/models";
-// import {getActivitiesApi} from "../../api/generated/endpoints/activities-api/activities-api.ts";
+import {ActivitySummaryDTO, Fitness, Gender, MemberUpdateRequest} from "../../api/generated/models";
+import {getActivitiesApi} from "../../api/generated/endpoints/activities-api/activities-api.ts";
 import {buildProfileImage} from "../../services/client.ts";
 import {toast} from "sonner";
 import {authenticatedMember} from "../layout.tsx";
@@ -12,11 +12,11 @@ import {calculateAge} from "../../utils/utilities.ts";
 export const Profile = () => {
     const member = authenticatedMember();
     const {refreshMember} = useAuth();
-    // const [workoutData, setWorkoutData] = useState<WorkoutDTO[]>([]);
+    const [activitiesData, setActivitiesData] = useState<ActivitySummaryDTO[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const dobInputRef = useRef<HTMLInputElement>(null);
     const {updateMember, uploadMemberProfileImage} = getMemberApi();
-    // const {getMemberActivitiesByActivityType} = getActivitiesApi();
+    const {getActivitySummariesByMemberId} = getActivitiesApi();
     const [isEditable, setIsEditable] = useState(false);
     const [pendingDob, setPendingDob] = useState<string | null>(null);
 
@@ -24,7 +24,7 @@ export const Profile = () => {
         const fetchData = async () => {
             try {
                 if (member) {
-                    // getMemberActivitiesByActivityType(member.id, {"Workout"}).then(setWorkoutData);
+                    getActivitySummariesByMemberId(member.id).then(setActivitiesData);
                 }
             } catch (error) {
                 console.error("Could not retrieve member: ", error);
@@ -172,7 +172,7 @@ export const Profile = () => {
                                 <p className="text-black dark:text-gray-400">{memberDate}</p>
                             </div>
                             <div className="bg-[#222] rounded-md p-3 text-white">
-                                <p className="text-2xl font-bold text-black dark:text-white">{10}</p>
+                                <p className="text-2xl font-bold text-black dark:text-white">{activitiesData.length}</p>
                                 <p className="text-black dark:text-gray-400">Workouts</p>
                             </div>
                         </div>

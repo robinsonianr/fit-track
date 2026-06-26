@@ -34,16 +34,16 @@ public class ActivitiesControllerTest {
         ActivitySummaryDTO summary = new ActivitySummaryDTO(1L, memberId, 10L, "Workout",
                 "Push Day", 60, "Bench Press 225x5", false, OffsetDateTime.now());
 
-        when(activitiesService.getMemberActivitiesByActivityType(memberId, null))
+        when(activitiesService.getActivitySummariesByMemberId(memberId, null))
                 .thenReturn(List.of(summary));
 
         // Act
-        List<ActivitySummaryDTO> result = activitiesController.getMemberActivitiesByActivityType(memberId, null);
+        List<ActivitySummaryDTO> result = activitiesController.getActivitySummariesByMemberId(memberId, null);
 
         // Assert
         assertEquals(1, result.size());
         assertEquals(summary, result.get(0));
-        verify(activitiesService, times(1)).getMemberActivitiesByActivityType(memberId, null);
+        verify(activitiesService, times(1)).getActivitySummariesByMemberId(memberId, null);
     }
 
     @Test
@@ -54,27 +54,27 @@ public class ActivitiesControllerTest {
         ActivitySummaryDTO summary = new ActivitySummaryDTO(1L, memberId, 10L, activityType,
                 "Leg Day", 63, "Squat 275x5", false, OffsetDateTime.now());
 
-        when(activitiesService.getMemberActivitiesByActivityType(memberId, activityType))
+        when(activitiesService.getActivitySummariesByMemberId(memberId, activityType))
                 .thenReturn(List.of(summary));
 
         // Act
-        List<ActivitySummaryDTO> result = activitiesController.getMemberActivitiesByActivityType(memberId, activityType);
+        List<ActivitySummaryDTO> result = activitiesController.getActivitySummariesByMemberId(memberId, activityType);
 
         // Assert
         assertEquals(1, result.size());
         assertEquals("Workout", result.get(0).activityType());
-        verify(activitiesService, times(1)).getMemberActivitiesByActivityType(memberId, activityType);
+        verify(activitiesService, times(1)).getActivitySummariesByMemberId(memberId, activityType);
     }
 
     @Test
     void getMemberActivitiesReturnsEmptyList() {
         // Arrange
         Long memberId = 99L;
-        when(activitiesService.getMemberActivitiesByActivityType(memberId, null))
+        when(activitiesService.getActivitySummariesByMemberId(memberId, null))
                 .thenReturn(List.of());
 
         // Act
-        List<ActivitySummaryDTO> result = activitiesController.getMemberActivitiesByActivityType(memberId, null);
+        List<ActivitySummaryDTO> result = activitiesController.getActivitySummariesByMemberId(memberId, null);
 
         // Assert
         assertTrue(result.isEmpty());
