@@ -8,6 +8,7 @@ COPY fit-track-ui/react/package*.json ./
 RUN npm ci --silent
 
 COPY openapi/api.json /app/openapi/api.json
+COPY scripts/fix-openapi-spec.js /app/scripts/fix-openapi-spec.js
 COPY fit-track-ui/react ./
 
 RUN echo "VITE_API_BASE_URL=${api_base_url}" > .env
