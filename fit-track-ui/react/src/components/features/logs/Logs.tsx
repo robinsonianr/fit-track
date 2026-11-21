@@ -1,29 +1,28 @@
 import React, {useEffect, useState} from "react";
-import {WorkoutDTO} from "../../../api/generated/models";
+import {ActivityDetailDTO, ActivitySummaryDTO} from "../../../api/generated/models";
 import WorkoutLogModal from "../../common/modal/workout-log-modal/WorkoutLogModal.tsx";
 import {authenticatedMember} from "../../../pages/layout.tsx";
-import {getWorkoutsApi} from "../../../api/generated/endpoints/workouts-api/workouts-api.ts";
+import {getActivitiesApi} from "../../../api/generated/endpoints/activities-api/activities-api.ts";
 
 const Logs = () => {
     const member = authenticatedMember();
-    const {getAllWorkoutsByMemberId} = getWorkoutsApi();
-    const [workoutData, setWorkoutData] = useState<WorkoutDTO[]>([]);
+    const {getActivitySummariesByMemberId, getActivityDetail} = getActivitiesApi();
+    const [activitiesData, setActivitiesData] = useState<ActivitySummaryDTO[]>([]);
     const [currentMonth, setCurrentMonth] = useState(new Date());
-    const [selectedWorkout, setSelectedWorkout] = useState<WorkoutDTO>();
+    const [selectedActivity, setSelectedActivity] = useState<ActivityDetailDTO>();
     const [hoverDay, setHoverDay] = useState<number | null>(null);
 
-    // Fetch member data when component mounts
     useEffect(() => {
         const fetchData = async () => {
             try {
-                getAllWorkoutsByMemberId(member.id).then(setWorkoutData);
+                getActivitySummariesByMemberId(member.id).then(setActivitiesData);
             } catch (error) {
                 console.error("Could not retrieve member: ", error);
             }
         };
 
         fetchData();
-    }, []); // Run only once when the component mounts
+    }, []);
 
     const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -37,9 +36,11 @@ const Logs = () => {
         setIsModalOpen(false);
     };
 
-    const openWorkout = (workout: any) => {
-        setSelectedWorkout(workout);
-        openModal();
+    const openWorkout = (activity: ActivitySummaryDTO) => {
+        getActivityDetail(activity.id).then((detail) => {
+            setSelectedActivity(detail);
+            openModal();
+        });
     };
 
     const getDaysInMonth = (date: Date) => {
@@ -53,53 +54,50 @@ const Logs = () => {
         const month = date.getMonth();
         return new Date(year, month, 1).getDay();
     };
-
-    const renderCalendarDays = () => {
+    const buildCalendar = () => {
         const daysInMonth = getDaysInMonth(currentMonth);
         const firstDay = startDayOfMonth(currentMonth);
-        const daysArray: any[] = [];
+        const daysArray: React.ReactNode[] = [];
         const today = new Date();
-        const workouts: any[] = [];
+        const activities = [];
 
-        // Get workouts for the current month
-        if (workoutData.length > 0) {
-            for (let i = 0; i < workoutData.length; i++) {
-                const date = new Date(workoutData[i].workoutDate);
-                if (date.getMonth() === currentMonth.getMonth() && date.getFullYear() == currentMonth.getFullYear()) {
-                    workouts.push(workoutData[i]);
+        console.log(activitiesData);
+        if (activitiesData.length > 0) {
+            for (let i = 0; i < activitiesData.length; i++) {
+                const date = new Date(activitiesData[i].activityTimestamp);
+                if (date.getMonth() === currentMonth.getMonth() && date.getFullYear() === currentMonth.getFullYear()) {
+                    activities.push(activitiesData[i]);
                 }
             }
         }
 
-        // Fill in previous month's blank days
         for (let i = 0; i < firstDay; i++) {
             daysArray.push(<div key={`empty-${i}`} className="flex bg-[#333] min-h-25 p-5 items-center justify-center rounded-md"></div>);
         }
 
-        // Fill in the days of the current month
         for (let day = 1; day <= daysInMonth; day++) {
             const isToday =
                 today.getDate() === day &&
                 today.getMonth() === currentMonth.getMonth() &&
                 today.getFullYear() === currentMonth.getFullYear();
 
-            let minutes: any = null;
+            let minutes: number | null = null;
 
-            const workoutForDay = workouts.find((workout) => {
-                const workoutDate = new Date(workout.workoutDate);
-                if (workoutDate.getDate() === day) {
-                    minutes = workout.durationMinutes;
+            const activityForDay = activities.find((activity: ActivitySummaryDTO) => {
+                const activityDate = new Date(activity.activityTimestamp);
+                if (activityDate.getDate() === day) {
+                    minutes = activity.durationMinutes ?? null;
                 }
-                return workoutDate.getDate() === day;
+                return activityDate.getDate() === day;
             });
 
             const dayStyle: React.CSSProperties = {
                 color: isToday
                     ? "white"
-                    : workoutForDay
+                    : activityForDay
                         ? "lightgreen"
                         : "#888",
-                cursor: workoutForDay ? "pointer" : "default",
+                cursor: activityForDay ? "pointer" : "default",
                 backgroundColor: isToday
                     ? hoverDay === day
                         ? "inherit"
@@ -114,9 +112,9 @@ const Logs = () => {
                 <div
                     key={day}
                     className={"flex border border-[#333] min-h-25 p-5 items-center justify-center rounded-md"}
-                    onClick={() => workoutForDay && openWorkout(workoutForDay)}
-                    onMouseEnter={() => workoutForDay && setHoverDay(day)}
-                    onMouseLeave={() => workoutForDay && setHoverDay(null)}
+                    onClick={() => activityForDay && openWorkout(activityForDay)}
+                    onMouseEnter={() => activityForDay && setHoverDay(day)}
+                    onMouseLeave={() => activityForDay && setHoverDay(null)}
                     style={dayStyle}
                 >
                     {day}
@@ -138,7 +136,7 @@ const Logs = () => {
 
     return (
         <div className="flex p-6">
-            <WorkoutLogModal isOpen={isModalOpen} onClose={closeModal} workout={selectedWorkout!}/>
+            <WorkoutLogModal isOpen={isModalOpen} onClose={closeModal} activity={selectedActivity!}/>
             <div className="flex flex-col items-center justify-center w-full h-full ">
                 <div className="flex items-center justify-between w-full p-2 mb-4">
                     <button className="bg-[#3f76c0] rounded-md cursor-pointer p-1" onClick={handlePreviousMonth}>{"<"}</button>
@@ -160,7 +158,7 @@ const Logs = () => {
                     </div>
 
                     {/* Calendar days */}
-                    <div className="grid grid-cols-7 gap-1 grow-1 text-center text-white w-full h-full">{renderCalendarDays()}</div>
+                    <div className="grid grid-cols-7 gap-1 grow-1 text-center text-white w-full h-full">{buildCalendar()}</div>
                 </div>
             </div>
         </div>

@@ -1,4 +1,4 @@
-package com.robinsonir.fittrack.data.service.workout;
+package com.robinsonir.fittrack.data.service.activities;
 
 import com.robinsonir.fittrack.data.repository.exercise.ExerciseDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,5 +16,9 @@ public record WorkoutCreationRequest(
         Integer durationMinutes,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         Set<ExerciseDTO> exercises
-) {
+) implements ActivityCreationRequest {
+    @Override
+    public String activityType() {
+        return "Workout";
+    }
 }

@@ -9,7 +9,9 @@ import java.util.Set;
 @Schema(name = "WorkoutDTO")
 public record WorkoutDTO(
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
-        Long id,
+        Long workoutId,
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
+        Long activityId,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
         Long memberId,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED)
@@ -40,4 +42,11 @@ public record WorkoutDTO(
     public String routineContext() {
         return title;
     }
+
+    public WorkoutDTO withActivityId(Long activityId) {
+        return new WorkoutDTO(workoutId, activityId, memberId,
+                title, workoutType, exercises, volume, calories,
+                durationMinutes, workoutDate);
+    }
+
 }

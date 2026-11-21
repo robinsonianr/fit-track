@@ -5,9 +5,8 @@ import com.robinsonir.fittrack.data.repository.activities.ActivityDetailDTO;
 import com.robinsonir.fittrack.data.repository.activities.ActivityRepository;
 import com.robinsonir.fittrack.data.repository.activities.ActivitySummaryDTO;
 import com.robinsonir.fittrack.data.repository.activities.WorkoutDTO;
-import com.robinsonir.fittrack.data.entity.exercise.ExerciseEntity;
-import com.robinsonir.fittrack.data.entity.set.SetEntity;
-import com.robinsonir.fittrack.data.entity.workout.WorkoutEntity;
+import com.robinsonir.fittrack.data.repository.exercise.ExerciseDTO;
+import com.robinsonir.fittrack.data.repository.set.SetDTO;
 import com.robinsonir.fittrack.data.service.workout.WorkoutService;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
 import com.robinsonir.fittrack.mappers.ActivityMapper;
@@ -24,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,7 +54,7 @@ public class ActivitiesServiceTest {
         when(activityMapper.activityEntityListToActivitySummaryDTOList(entities)).thenReturn(List.of(summaryDTO));
 
         // Act
-        List<ActivitySummaryDTO> result = activitiesService.getMemberActivitiesByActivityType(memberId, activityType);
+        List<ActivitySummaryDTO> result = activitiesService.getActivitySummariesByMemberId(memberId, activityType);
 
         // Assert
         assertEquals(1, result.size());
@@ -75,7 +75,7 @@ public class ActivitiesServiceTest {
         when(activityMapper.activityEntityListToActivitySummaryDTOList(entities)).thenReturn(List.of(summaryDTO));
 
         // Act
-        List<ActivitySummaryDTO> result = activitiesService.getMemberActivitiesByActivityType(memberId, null);
+        List<ActivitySummaryDTO> result = activitiesService.getActivitySummariesByMemberId(memberId, null);
 
         // Assert
         assertEquals(1, result.size());
@@ -93,7 +93,7 @@ public class ActivitiesServiceTest {
         entity.setId(activityId);
         entity.setSourceId(sourceId);
 
-        WorkoutDTO workoutDTO = new WorkoutDTO(sourceId, 1L, "Push Day", "Push",
+        WorkoutDTO workoutDTO = new WorkoutDTO(sourceId, null, 1L, "Push Day", "Push",
                 new HashSet<>(), 5000, 300, 60, OffsetDateTime.now());
 
         when(activityRepository.findById(activityId)).thenReturn(Optional.of(entity));
@@ -106,6 +106,7 @@ public class ActivitiesServiceTest {
         assertNotNull(result);
         assertInstanceOf(WorkoutDTO.class, result);
         assertEquals("Workout", result.activityType());
+        assertEquals(activityId, ((WorkoutDTO) result).activityId());
         verify(activityRepository, times(1)).findById(activityId);
         verify(workoutService, times(1)).getWorkout(sourceId);
     }
@@ -141,40 +142,78 @@ public class ActivitiesServiceTest {
     @Test
     void addActivity() {
         // Arrange
-        ActivityEntity entity = createActivityEntity(1L, "Workout");
-        when(activityRepository.save(entity)).thenReturn(entity);
+        OffsetDateTime now = OffsetDateTime.now();
+        SetDTO setDTO = new SetDTO(1L, 1, 10, 225);
+        ExerciseDTO exerciseDTO = new ExerciseDTO(1L, "Bench Press", "Barbell",
+                "Flat bench press", "Chest", "Chest", false, List.of(setDTO));
+        WorkoutDTO workoutDTO = new WorkoutDTO(10L, null, 1L, "Push Day", "Push",
+                Set.of(exerciseDTO), 5000, 300, 60, now);
+        WorkoutCreationRequest request = new WorkoutCreationRequest(1L, "Push Day", "Push", 60, Set.of(exerciseDTO));
+        ActivitySummaryDTO expectedSummary = createSummaryDTO(1L, "Workout");
+
+        when(activityRepository.save(any(ActivityEntity.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(activityMapper.activityEntityToActivitySummaryDTO(any(ActivityEntity.class))).thenReturn(expectedSummary);
 
         // Act
-        activitiesService.addActivity(entity);
+        ActivitySummaryDTO result = activitiesService.addActivity(workoutDTO, request);
 
         // Assert
-        verify(activityRepository, times(1)).save(entity);
+        assertNotNull(result);
+        verify(activityRepository, times(1)).save(any(ActivityEntity.class));
+        verify(activityMapper, times(1)).activityEntityToActivitySummaryDTO(any(ActivityEntity.class));
+    }
+
+    @Test
+    void getActivitySummary() {
+        // Arrange
+        Long activityId = 1L;
+        ActivityEntity entity = createActivityEntity(1L, "Workout");
+        entity.setId(activityId);
+        ActivitySummaryDTO expectedSummary = createSummaryDTO(1L, "Workout");
+
+        when(activityRepository.findById(activityId)).thenReturn(Optional.of(entity));
+        when(activityMapper.activityEntityToActivitySummaryDTO(entity)).thenReturn(expectedSummary);
+
+        // Act
+        ActivitySummaryDTO result = activitiesService.getActivitySummary(activityId);
+
+        // Assert
+        assertEquals(expectedSummary, result);
+        verify(activityRepository, times(1)).findById(activityId);
+    }
+
+    @Test
+    void getActivitySummaryThrowsWhenNotFound() {
+        // Arrange
+        Long activityId = 99L;
+        when(activityRepository.findById(activityId)).thenReturn(Optional.empty());
+
+        // Act and Assert
+        assertThrows(ResourceNotFoundException.class,
+                () -> activitiesService.getActivitySummary(activityId));
+    }
+
+    @Test
+    void deleteActivity() {
+        // Arrange
+        Long activityId = 1L;
+
+        // Act
+        activitiesService.deleteActivity(activityId);
+
+        // Assert
+        verify(activityRepository, times(1)).deleteById(activityId);
     }
 
     @Test
     void getHighlightReturnsHeaviestSet() {
         // Arrange
-        SetEntity lightSet = new SetEntity();
-        lightSet.setSetNumber(1);
-        lightSet.setReps(10);
-        lightSet.setWeight(135);
-
-        SetEntity heavySet = new SetEntity();
-        heavySet.setSetNumber(2);
-        heavySet.setReps(5);
-        heavySet.setWeight(225);
-
-        ExerciseEntity exercise = new ExerciseEntity();
-        exercise.setTitle("Bench Press");
-        exercise.setEquipment("Barbell");
-        exercise.setDescription("Flat bench press");
-        exercise.setMuscleGroup("Chest");
-        exercise.setConcentration("Chest");
-        exercise.setIsBilateral(false);
-        exercise.setSets(List.of(lightSet, heavySet));
-
-        WorkoutEntity workout = new WorkoutEntity();
-        workout.setExercises(Set.of(exercise));
+        SetDTO lightSet = new SetDTO(1L, 1, 10, 135);
+        SetDTO heavySet = new SetDTO(2L, 2, 5, 225);
+        ExerciseDTO exercise = new ExerciseDTO(1L, "Bench Press", "Barbell",
+                "Flat bench press", "Chest", "Chest", false, List.of(lightSet, heavySet));
+        WorkoutDTO workout = new WorkoutDTO(1L, null, 1L, "Push Day", "Push",
+                Set.of(exercise), 5000, 300, 60, OffsetDateTime.now());
 
         // Act
         String highlight = activitiesService.getHighlight(workout);
@@ -186,8 +225,8 @@ public class ActivitiesServiceTest {
     @Test
     void getHighlightReturnsEmptyForNoExercises() {
         // Arrange
-        WorkoutEntity workout = new WorkoutEntity();
-        workout.setExercises(new HashSet<>());
+        WorkoutDTO workout = new WorkoutDTO(1L, null, 1L, "Push Day", "Push",
+                new HashSet<>(), 0, 0, 60, OffsetDateTime.now());
 
         // Act
         String highlight = activitiesService.getHighlight(workout);

@@ -115,8 +115,9 @@ describe("isDateInSelectedWeek", () => {
     });
 });
 
-const makeWorkout = (id: number, workoutDate: string): WorkoutDTO => ({
-    id,
+const makeWorkout = (workoutId: number, workoutDate: string): WorkoutDTO => ({
+    workoutId,
+    activityType: "Workout",
     memberId: 1,
     title: "test",
     workoutType: "Cardio",
@@ -137,7 +138,7 @@ describe("sortWorkouts", () => {
 
         const sorted = sortWorkouts(workouts);
 
-        expect(sorted.map(w => w.id)).toEqual([2, 3, 1]);
+        expect(sorted.map(w => w.workoutId)).toEqual([2, 3, 1]);
     });
 });
 
@@ -151,6 +152,6 @@ describe("sortWorkoutsAsc", () => {
 
         const sorted = sortWorkoutsAsc(workouts);
 
-        expect(sorted.map(w => w.id)).toEqual([2, 3, 1]);
+        expect(sorted.map(w => w.workoutId)).toEqual([2, 3, 1]);
     });
 });

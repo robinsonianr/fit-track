@@ -5,12 +5,13 @@ import com.robinsonir.fittrack.data.entity.exercise.ExerciseEntity;
 import com.robinsonir.fittrack.data.entity.member.MemberEntity;
 import com.robinsonir.fittrack.data.entity.set.SetEntity;
 import com.robinsonir.fittrack.data.entity.workout.WorkoutEntity;
+import com.robinsonir.fittrack.data.repository.activities.WorkoutDTO;
 import com.robinsonir.fittrack.data.repository.exercise.ExerciseDTO;
 import com.robinsonir.fittrack.data.repository.member.MemberRepository;
 import com.robinsonir.fittrack.data.repository.set.SetDTO;
-import com.robinsonir.fittrack.data.repository.activities.WorkoutDTO;
 import com.robinsonir.fittrack.data.repository.workout.WorkoutRepository;
 import com.robinsonir.fittrack.data.service.activities.ActivitiesService;
+import com.robinsonir.fittrack.data.service.activities.WorkoutCreationRequest;
 import com.robinsonir.fittrack.exception.ResourceNotFoundException;
 import com.robinsonir.fittrack.mappers.ExerciseMapper;
 import com.robinsonir.fittrack.mappers.WorkoutMapper;
@@ -23,7 +24,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -47,9 +47,6 @@ public class WorkoutServiceTest {
     @Mock
     private ExerciseMapper exerciseMapper;
 
-    @Mock
-    private ActivitiesService activitiesService;
-
     @InjectMocks
     private WorkoutService workoutService;
 
@@ -67,42 +64,11 @@ public class WorkoutServiceTest {
     }
 
     @Test
-    void getAllWorkouts() {
-        // Arrange
-        WorkoutEntity workoutEntity1 = new WorkoutEntity("Cardio", "Running", 500, 500, 60, OffsetDateTime.now(), new HashSet<>(), member);
-        workoutEntity1.setId(1L);
-        WorkoutEntity workoutEntity2 = new WorkoutEntity("Cardio", "Cycling", 300, 500, 45, OffsetDateTime.now(), new HashSet<>(), member);
-        workoutEntity2.setId(2L);
-
-        List<WorkoutEntity> workoutList = new ArrayList<>();
-        workoutList.add(workoutEntity1);
-        workoutList.add(workoutEntity2);
-        when(workoutRepository.findAll()).thenReturn(workoutList);
-
-        WorkoutDTO workoutDTO1 = new WorkoutDTO(1L, member.getId(), "Cardio", "Running", new HashSet<>(), 12000, 500, 50, OffsetDateTime.now());
-        WorkoutDTO workoutDTO2 = new WorkoutDTO(2L, member.getId(), "Cardio", "Cycling", new HashSet<>(), 12000, 600, 60, OffsetDateTime.now());
-        List<WorkoutDTO> workouts = new ArrayList<>();
-        workouts.add(workoutDTO1);
-        workouts.add(workoutDTO2);
-
-        when(workoutMapper.convertWorkoutEntityListToWorkoutList(anyList())).thenReturn(workouts);
-
-        // Act
-        List<WorkoutDTO> result = workoutService.getAllWorkouts();
-
-        // Assert
-        assertEquals(2, result.size());
-        assertEquals(List.of(workoutDTO1, workoutDTO2), result);
-        verify(workoutRepository, times(1)).findAll();
-        verify(workoutMapper, times(1)).convertWorkoutEntityListToWorkoutList(anyList());
-    }
-
-    @Test
     void getWorkoutSuccess() {
         // Arrange
         Long workoutId = 1L;
         WorkoutEntity workoutEntity = new WorkoutEntity("Cardio", "Running", 500, 500, 60, OffsetDateTime.now(), null, member);
-        WorkoutDTO expectedWorkout = new WorkoutDTO(workoutId, member.getId(), "Cardio", "Running", new HashSet<>(), 12000, 60, null, OffsetDateTime.now());
+        WorkoutDTO expectedWorkout = new WorkoutDTO(workoutId, null, member.getId(), "Cardio", "Running", new HashSet<>(), 12000, 60, null, OffsetDateTime.now());
 
         when(workoutRepository.findById(workoutId)).thenReturn(Optional.of(workoutEntity));
         when(workoutMapper.convertWorkoutEntityToWorkout(workoutEntity)).thenReturn(expectedWorkout);
@@ -165,7 +131,7 @@ public class WorkoutServiceTest {
         when(workoutMapper.convertWorkoutEntityToWorkout(any(WorkoutEntity.class)))
                 .thenAnswer(inv -> {
                     WorkoutEntity saved = inv.getArgument(0);
-                    return new WorkoutDTO(null, member.getId(), saved.getTitle(), saved.getWorkoutType(),
+                    return new WorkoutDTO(null, null, member.getId(), saved.getTitle(), saved.getWorkoutType(),
                             new HashSet<>(), saved.getVolume(), saved.getCalories(), saved.getDurationMinutes(),
                             saved.getWorkoutDate());
                 });
